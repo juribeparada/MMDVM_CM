@@ -1,0 +1,12 @@
+[Unit]
+Description=YSF2DMR Service
+After=syslog.target network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/sbin/ysf2dmr.service start
+ExecStop=/usr/local/sbin/ysf2dmr.service stop
+ExecReload=/usr/local/sbin/ysf2dmr.service restart
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,21 @@
+# TGList_P25.txt downloaded from http://www.pistar.uk/downloads/TGList_P25.txt
+# sourced from https://raw.githubusercontent.com/g4klx/P25Clients/master/P25Gateway/P25Hosts.txt
+# Please report issues at https://www.facebook.com/groups/pistar/
+# File created at Wednesday 23rd of May 2018 01:21:05 AM BST
+#
+# Dest ID;Name;Description
+#
+10100;P25 World Wide;P25 World Wide
+10200;P25 North America;P25 North America
+10201;P25 Noth America TAC01;P25 Noth America TAC01
+10300;P25 Europe;P25 Europe
+10301;P25 Europe TAC01;P25 Europe TAC01
+10400;P25 Pacific;P25 Pacific
+10401;P25 Pacific TAC01;P25 Pacific TAC01
+10402;P25 Pacific TAC02;P25 Pacific TAC02
+10403;P25 Pacific TAC03;P25 Pacific TAC03
+28299;P25 USA Ragchew;P25 USA Ragchew
+31010;P25 Alabama Link;P25 Alabama Link
+31665;P25 P25-DMR Gateway;P25 P25-DMR Gateway
+31672;P25 Pi-Star Chat;P25 Pi-Star Chat
+50525;P25 to YSF NXDN and DMR;P25 to YSF NXDN and DMR

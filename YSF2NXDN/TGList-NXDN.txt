@@ -1,0 +1,21 @@
+# TGList_NXDN.txt downloaded from http://www.pistar.uk/downloads/TGList_NXDN.txt
+# sourced from https://raw.githubusercontent.com/g4klx/NXDNClients/master/NXDNGateway/NXDNHosts.txt
+# Please report issues at https://www.facebook.com/groups/pistar/
+# File created at Wednesday 23rd of May 2018 01:21:05 AM BST
+#
+# Dest ID;Name;Description
+#
+1200;NXDN Florida;NXDN Florida
+10200;NXDN North America;NXDN North America
+10268;NDXN 10268 Portuguese;NDXN 10268 Portuguese
+10301;NDXN 10301 Spanish;NDXN 10301 Spanish
+10302;NDXN 10302 BM Spain;NDXN 10302 BM Spain
+10303;NDXN 10303 Italy;NDXN 10303 Italy
+10400;NDXN 10400 Pacific;NDXN 10400 Pacific
+28299;NXDN USA Ragchew;NXDN USA Ragchew
+31010;NXDN Alabama Link;NXDN Alabama Link
+31665;NXDN NXDN-DMR Gateway;NXDN NXDN-DMR Gateway
+46000;NXDN China;NXDN China
+50525;NXDN DMR TG50525;NXDN DMR TG50525
+65000;NXDN World Wide;NXDN World Wide
+65208;NXDN France;NXDN France
