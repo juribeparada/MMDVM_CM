@@ -58,6 +58,3 @@ Then you need to configure YSF2DMR.ini (example):
     Daemon=0
 
 You could also see at "service" folder of this project to see an example of Systemd automatic startup for YSF2DMR. Please see [README](service/README.md) for more information about installation.
-
-
-
