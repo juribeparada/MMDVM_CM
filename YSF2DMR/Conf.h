@@ -40,6 +40,7 @@ public:
   std::string  getLocalAddress() const;
   unsigned int getLocalPort() const;
   bool         getEnableWiresX() const;
+  bool         getRemoteGateway() const;
   bool         getDaemon() const;
 
   // The Info section
@@ -68,6 +69,7 @@ public:
   bool         getDMRNetworkDebug() const;
   bool         getDMRNetworkJitterEnabled() const;
   unsigned int getDMRNetworkJitter() const;
+  unsigned int getDMRHangTime() const;
   bool         getDMRNetworkEnableUnlink() const;
   unsigned int getDMRNetworkIDUnlink() const;
   bool         getDMRNetworkPCUnlink() const;
@@ -101,6 +103,7 @@ private:
   std::string  m_localAddress;
   unsigned int m_localPort;
   bool         m_enableWiresX;
+  bool         m_remoteGateway;
   bool         m_daemon;
 
   unsigned int m_rxFrequency;
@@ -127,6 +130,7 @@ private:
   bool         m_dmrNetworkDebug;
   bool         m_dmrNetworkJitterEnabled;
   unsigned int m_dmrNetworkJitter;
+  unsigned int m_dmrHangTime;
   bool         m_dmrNetworkEnableUnlink;
   unsigned int m_dmrNetworkIDUnlink;
   bool         m_dmrNetworkPCUnlink;
