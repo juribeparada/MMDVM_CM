@@ -160,7 +160,6 @@ int CDMR2YSF::run()
 
 		::close(STDIN_FILENO);
 		::close(STDOUT_FILENO);
-		::close(STDERR_FILENO);
 
 		// If we are currently root...
 		if (getuid() == 0) {
@@ -198,6 +197,9 @@ int CDMR2YSF::run()
 		::fprintf(stderr, "DMR2YSF: unable to open the log file\n");
 		return 1;
 	}
+
+	if (m_daemon)
+		::close(STDERR_FILENO);
 
 	m_callsign = m_conf.getCallsign();
 	m_defsrcid = m_conf.getDMRId();
@@ -548,7 +550,7 @@ int CDMR2YSF::run()
 			
 			m_dmrLastDT = DataType;
 		}
-		
+
 		if (ysfWatch.elapsed() > YSF_FRAME_PER) {
 			unsigned int ysfFrameType = m_conv.getYSF(m_ysfFrame + 35U);
 
