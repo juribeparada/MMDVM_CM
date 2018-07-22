@@ -44,6 +44,7 @@ public:
 
 	void setFI(unsigned char fi);
 	void setCS(unsigned char cs);
+	void setCM(unsigned char cm);
 	void setFN(unsigned char fn);
 	void setFT(unsigned char ft);
 	void setBN(unsigned char bn);
