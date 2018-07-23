@@ -211,7 +211,6 @@ int CYSF2P25::run()
 
 		::close(STDIN_FILENO);
 		::close(STDOUT_FILENO);
-		::close(STDERR_FILENO);
 
 		// If we are currently root...
 		if (getuid() == 0) {
@@ -249,6 +248,9 @@ int CYSF2P25::run()
 		::fprintf(stderr, "YSF2P25: unable to open the log file\n");
 		return 1;
 	}
+
+	if (m_daemon)
+		::close(STDERR_FILENO);
 
 	m_callsign = m_conf.getCallsign();
 	m_defsrcid = m_conf.getP25Id();

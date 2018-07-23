@@ -157,7 +157,6 @@ int CDMR2NXDN::run()
 
 		::close(STDIN_FILENO);
 		::close(STDOUT_FILENO);
-		::close(STDERR_FILENO);
 
 		// If we are currently root...
 		if (getuid() == 0) {
@@ -195,6 +194,9 @@ int CDMR2NXDN::run()
 		::fprintf(stderr, "DMR2NXDN: unable to open the log file\n");
 		return 1;
 	}
+
+	if (m_daemon)
+		::close(STDERR_FILENO);
 
 	m_defsrcid = m_conf.getDMRId();
 

@@ -161,7 +161,6 @@ int CNXDN2DMR::run()
 
 		::close(STDIN_FILENO);
 		::close(STDOUT_FILENO);
-		::close(STDERR_FILENO);
 
 		// If we are currently root...
 		if (getuid() == 0) {
@@ -199,6 +198,9 @@ int CNXDN2DMR::run()
 		::fprintf(stderr, "NXDN2DMR: unable to open the log file\n");
 		return 1;
 	}
+
+	if (m_daemon)
+		::close(STDERR_FILENO);
 
 	m_callsign = m_conf.getCallsign();
 	m_nxdnTG = m_conf.getTG();

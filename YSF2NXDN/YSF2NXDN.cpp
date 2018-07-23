@@ -159,7 +159,6 @@ int CYSF2NXDN::run()
 
 		::close(STDIN_FILENO);
 		::close(STDOUT_FILENO);
-		::close(STDERR_FILENO);
 
 		//If we are currently root...
 		if (getuid() == 0) {
@@ -197,6 +196,9 @@ int CYSF2NXDN::run()
 		::fprintf(stderr, "YSF2NXDN: unable to open the log file\n");
 		return 1;
 	}
+
+	if (m_daemon)
+		::close(STDERR_FILENO);
 
 	m_callsign = m_conf.getCallsign();
 	m_suffix   = m_conf.getSuffix();
