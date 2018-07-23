@@ -114,7 +114,8 @@ m_ysfFrames(0U),
 m_dmrinfo(false),
 m_idUnlink(4000U),
 m_flcoUnlink(FLCO_GROUP),
-m_enableWiresX(false)
+m_enableWiresX(false),
+m_remoteGateway(false)
 {
 	::memset(m_ysfFrame, 0U, 200U);
 	::memset(m_dmrFrame, 0U, 50U);
@@ -166,7 +167,6 @@ int CYSF2DMR::run()
 
 		::close(STDIN_FILENO);
 		::close(STDOUT_FILENO);
-		::close(STDERR_FILENO);
 
 		// If we are currently root...
 		if (getuid() == 0) {
@@ -205,8 +205,13 @@ int CYSF2DMR::run()
 		return 1;
 	}
 
+	if (m_daemon)
+		::close(STDERR_FILENO);
+
 	m_callsign = m_conf.getCallsign();
 	m_suffix   = m_conf.getSuffix();
+
+	m_remoteGateway = m_conf.getRemoteGateway();
 
 	bool debug               = m_conf.getDMRNetworkDebug();
 	in_addr dstAddress       = CUDPSocket::lookup(m_conf.getDstAddress());
@@ -851,10 +856,19 @@ int CYSF2DMR::run()
 				fich.setFN(0U);
 				fich.setFT(7U);
 				fich.setDev(0U);
-				fich.setMR(2U);
 				fich.setDT(YSF_DT_VD_MODE2);
-				fich.setSQL(0U);
+				fich.setSQL(false);
 				fich.setSQ(0U);
+				fich.setCM(YSF_CM_GROUP2);
+
+				if (m_remoteGateway) {
+					fich.setVoIP(false);
+					fich.setMR(YSF_MR_NOT_BUSY);
+				} else {
+					fich.setVoIP(true);
+					fich.setMR(YSF_MR_BUSY);
+				}
+
 				fich.encode(m_ysfFrame + 35U);
 
 				unsigned char csd1[20U], csd2[20U];
@@ -886,10 +900,19 @@ int CYSF2DMR::run()
 				fich.setFN(0U);
 				fich.setFT(7U);
 				fich.setDev(0U);
-				fich.setMR(2U);
 				fich.setDT(YSF_DT_VD_MODE2);
-				fich.setSQL(0U);
+				fich.setSQL(false);
 				fich.setSQ(0U);
+				fich.setCM(YSF_CM_GROUP2);
+
+				if (m_remoteGateway) {
+					fich.setVoIP(false);
+					fich.setMR(YSF_MR_NOT_BUSY);
+				} else {
+					fich.setVoIP(true);
+					fich.setMR(YSF_MR_BUSY);
+				}
+
 				fich.encode(m_ysfFrame + 35U);
 
 				unsigned char csd1[20U], csd2[20U];
@@ -942,10 +965,19 @@ int CYSF2DMR::run()
 				fich.setFN(fn);
 				fich.setFT(7U);
 				fich.setDev(0U);
-				fich.setMR(YSF_MR_BUSY);
 				fich.setDT(YSF_DT_VD_MODE2);
-				fich.setSQL(0U);
+				fich.setSQL(false);
 				fich.setSQ(0U);
+				fich.setCM(YSF_CM_GROUP2);
+
+				if (m_remoteGateway) {
+					fich.setVoIP(false);
+					fich.setMR(YSF_MR_NOT_BUSY);
+				} else {
+					fich.setVoIP(true);
+					fich.setMR(YSF_MR_BUSY);
+				}
+
 				fich.encode(m_ysfFrame + 35U);
 
 				// Net frame counter
