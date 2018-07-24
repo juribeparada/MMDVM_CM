@@ -45,6 +45,7 @@ public:
   unsigned int getDMRRptPort() const;
   std::string  getDMRLocalAddress() const;
   unsigned int getDMRLocalPort() const;
+  unsigned int getDMRDefaultDstTG() const;
   bool         getDMRDebug() const;
 
   // The DMR Id section
@@ -71,6 +72,7 @@ private:
   unsigned int m_dmrRptPort;
   std::string  m_dmrLocalAddress;
   unsigned int m_dmrLocalPort;
+  unsigned int m_dmrDefaultDstTG;
   bool         m_dmrDebug;
 
   std::string  m_dmrIdLookupFile;

@@ -203,6 +203,7 @@ int CDMR2YSF::run()
 
 	m_callsign = m_conf.getCallsign();
 	m_defsrcid = m_conf.getDMRId();
+	m_dstid = m_conf.getDMRDefaultDstTG();
 
 	in_addr dstAddress       = CUDPSocket::lookup(m_conf.getDstAddress());
 	unsigned int dstPort     = m_conf.getDstPort();
