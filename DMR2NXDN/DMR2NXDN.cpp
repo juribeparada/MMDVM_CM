@@ -155,9 +155,6 @@ int CDMR2NXDN::run()
 			return -1;
 		}
 
-		::close(STDIN_FILENO);
-		::close(STDOUT_FILENO);
-
 		// If we are currently root...
 		if (getuid() == 0) {
 			struct passwd* user = ::getpwnam("mmdvm");
@@ -195,8 +192,13 @@ int CDMR2NXDN::run()
 		return 1;
 	}
 
-	if (m_daemon)
+#if !defined(_WIN32) && !defined(_WIN64)
+	if (m_daemon) {
+		::close(STDIN_FILENO);
+		::close(STDOUT_FILENO);
 		::close(STDERR_FILENO);
+	}
+#endif
 
 	m_defsrcid = m_conf.getDMRId();
 
