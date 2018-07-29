@@ -677,7 +677,7 @@ int CDMR2YSF::run()
 				// Net frame counter
 				m_ysfFrame[34U] = (ysf_cnt & 0x7FU) << 1;
 
-				// Send data to MMDVMHost
+				// Send data
 				m_ysfNetwork->write(m_ysfFrame);
 				
 				ysf_cnt++;
@@ -767,6 +767,84 @@ std::string CDMR2YSF::getSrcYSF(const unsigned char* buffer)
 	trimmed.erase(std::find_if(trimmed.rbegin(), trimmed.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), trimmed.end());
 	
 	return trimmed;
+}
+
+void CDMR2YSF::sendYSFConn(unsigned int id)
+{
+	unsigned char data[] = {0x00U, 0x5DU, 0x23U, 0x5FU, 0x24U, 0x20U, 0x20U, 0x20U, 0x20U,
+							0x20U, 0x20U, 0x20U, 0x20U, 0x20U, 0x20U, 0x03U, 0x00U, 0x00U,
+							0x00U, 0x00U};
+
+	if (id > 99999U)
+		return;
+
+	sprintf((char*) (data + 5U), "%05u", id);
+	data[16U] = CCRC::addCRC(data, 16U);
+
+	// Setup net header
+	::memcpy(m_ysfFrame + 0U, "YSFD", 4U);
+	::memcpy(m_ysfFrame + 4U, m_ysfNetwork->getCallsign().c_str(), YSF_CALLSIGN_LENGTH);
+	::memcpy(m_ysfFrame + 14U, m_netSrc.c_str(), YSF_CALLSIGN_LENGTH);
+	::memcpy(m_ysfFrame + 24U, "ALL       ", YSF_CALLSIGN_LENGTH);
+	m_ysfFrame[34U] = 0U;
+
+	CSync::addYSFSync(m_ysfFrame + 35U);
+
+	// Set the FICH
+	CYSFFICH fich;
+	fich.setFI(YSF_FI_COMMUNICATIONS);
+	fich.setCS(2U);
+	fich.setFN(1U);
+	fich.setFT(1U);
+	fich.setDev(0U);
+	fich.setMR(2U);
+	fich.setDT(YSF_DT_DATA_FR_MODE);
+	fich.setSQL(0U);
+	fich.setSQ(0U);
+	fich.encode(m_ysfFrame + 35U);
+
+	CYSFPayload payload;
+	payload.writeDataFRModeData2(data, m_ysfFrame + 35U);
+
+	m_ysfNetwork->write(m_ysfFrame);
+
+	LogMessage("Sending YSF connect command to reflector ID: %u", id);
+}
+
+void CDMR2YSF::sendYSFDisc()
+{
+	unsigned char data[] = {0x00U, 0x5DU, 0x2AU, 0x5FU, 0x24U, 0x20U, 0x20U, 0x20U, 0x20U,
+							0x20U, 0x20U, 0x20U, 0x20U, 0x20U, 0x20U, 0x03U, 0x4DU, 0x00U,
+							0x00U, 0x00U};
+
+	// Setup net header
+	::memcpy(m_ysfFrame + 0U, "YSFD", 4U);
+	::memcpy(m_ysfFrame + 4U, m_ysfNetwork->getCallsign().c_str(), YSF_CALLSIGN_LENGTH);
+	::memcpy(m_ysfFrame + 14U, m_netSrc.c_str(), YSF_CALLSIGN_LENGTH);
+	::memcpy(m_ysfFrame + 24U, "ALL       ", YSF_CALLSIGN_LENGTH);
+	m_ysfFrame[34U] = 0U;
+
+	CSync::addYSFSync(m_ysfFrame + 35U);
+
+	// Set the FICH
+	CYSFFICH fich;
+	fich.setFI(YSF_FI_COMMUNICATIONS);
+	fich.setCS(2U);
+	fich.setFN(1U);
+	fich.setFT(1U);
+	fich.setDev(0U);
+	fich.setMR(2U);
+	fich.setDT(YSF_DT_DATA_FR_MODE);
+	fich.setSQL(0U);
+	fich.setSQ(0U);
+	fich.encode(m_ysfFrame + 35U);
+
+	CYSFPayload payload;
+	payload.writeDataFRModeData2(data, m_ysfFrame + 35U);
+
+	m_ysfNetwork->write(m_ysfFrame);
+
+	LogMessage("Sending YSF disconnect command");
 }
 
 bool CDMR2YSF::createMMDVM()

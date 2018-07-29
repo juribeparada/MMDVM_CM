@@ -80,6 +80,8 @@ private:
 
 	unsigned int findYSFID(std::string cs, bool showdst);
 	std::string getSrcYSF(const unsigned char* source);
+	void sendYSFConn(unsigned int id);
+	void sendYSFDisc();
 	bool createMMDVM();
 
 };
