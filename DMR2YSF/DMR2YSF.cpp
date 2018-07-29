@@ -33,6 +33,8 @@
 const unsigned char dt1_temp[] = {0x31, 0x22, 0x62, 0x5F, 0x29, 0x00, 0x00, 0x00, 0x00, 0x00};
 const unsigned char dt2_temp[] = {0x00, 0x00, 0x00, 0x00, 0x6C, 0x20, 0x1C, 0x20, 0x03, 0x08};
 
+const unsigned char CONN_RESP[] = {0x5DU, 0x41U, 0x5FU, 0x26U};
+
 #define DMR_FRAME_PER       55U
 #define YSF_FRAME_PER       90U
 
@@ -108,14 +110,21 @@ m_dmrinfo(false),
 m_config(NULL),
 m_configLen(0U)
 {
+	m_ysfFrame = new unsigned char[200U];
+	m_dmrFrame = new unsigned char[50U];
+	m_config   = new unsigned char[400U];
+	m_command  = new unsigned char[300U];
+
 	::memset(m_ysfFrame, 0U, 200U);
 	::memset(m_dmrFrame, 0U, 50U);
-
-	m_config = new unsigned char[400U];
 }
 
 CDMR2YSF::~CDMR2YSF()
 {
+	delete[] m_ysfFrame;
+	delete[] m_dmrFrame;
+	delete[] m_config;
+	delete[] m_command;
 }
 
 int CDMR2YSF::run()
@@ -288,26 +297,32 @@ int CDMR2YSF::run()
 			if (valid) {
 				unsigned char fi = fich.getFI();
 				unsigned char dt = fich.getDT();
+				unsigned char fn = fich.getFN();
+				unsigned char ft = fich.getFT();
 
-				if ((::memcmp(buffer, "YSFD", 4U) == 0U) && (dt == YSF_DT_VD_MODE2)) {
-					CYSFPayload ysfPayload;
+				if (::memcmp(buffer, "YSFD", 4U) == 0U) {
+					processWiresX(buffer + 35U, fi, dt, fn, ft);
 
-					if (fi == YSF_FI_HEADER) {
-						if (ysfPayload.processHeaderData(buffer + 35U)) {
-							std::string ysfSrc = ysfPayload.getSource();
-							std::string ysfDst = ysfPayload.getDest();
-							LogMessage("Received YSF Header: Src: %s Dst: %s", ysfSrc.c_str(), ysfDst.c_str());
-							m_srcid = findYSFID(ysfSrc, true);
-							m_conv.putYSFHeader();
+					if (dt == YSF_DT_VD_MODE2) {
+						CYSFPayload ysfPayload;
+
+						if (fi == YSF_FI_HEADER) {
+							if (ysfPayload.processHeaderData(buffer + 35U)) {
+								std::string ysfSrc = ysfPayload.getSource();
+								std::string ysfDst = ysfPayload.getDest();
+								LogMessage("Received YSF Header: Src: %s Dst: %s", ysfSrc.c_str(), ysfDst.c_str());
+								m_srcid = findYSFID(ysfSrc, true);
+								m_conv.putYSFHeader();
+								m_ysfFrames = 0U;
+							}
+						} else if (fi == YSF_FI_TERMINATOR) {
+							LogMessage("YSF received end of voice transmission, %.1f seconds", float(m_ysfFrames) / 10.0F);
+							m_conv.putYSFEOT();
 							m_ysfFrames = 0U;
+						} else if (fi == YSF_FI_COMMUNICATIONS) {
+							m_conv.putYSF(buffer + 35U);
+							m_ysfFrames++;
 						}
-					} else if (fi == YSF_FI_TERMINATOR) {
-						LogMessage("YSF received end of voice transmission, %.1f seconds", float(m_ysfFrames) / 10.0F);
-						m_conv.putYSFEOT();
-						m_ysfFrames = 0U;
-					} else if (fi == YSF_FI_COMMUNICATIONS) {
-						m_conv.putYSF(buffer + 35U);
-						m_ysfFrames++;
 					}
 				}
 			}
@@ -845,6 +860,59 @@ void CDMR2YSF::sendYSFDisc()
 	m_ysfNetwork->write(m_ysfFrame);
 
 	LogMessage("Sending YSF disconnect command");
+}
+
+void CDMR2YSF::processWiresX(const unsigned char* data, unsigned char fi, unsigned char dt, unsigned char fn, unsigned char ft)
+{
+	assert(data != NULL);
+
+	if (dt != YSF_DT_DATA_FR_MODE)
+		return;
+
+	if (fi != YSF_FI_COMMUNICATIONS)
+		return;
+
+	CYSFPayload payload;
+
+	if (fn == 0U)
+		return;
+
+	if (fn == 1U) {
+		bool valid = payload.readDataFRModeData2(data, m_command + 0U);
+		if (!valid)
+			return;
+	} else {
+		bool valid = payload.readDataFRModeData1(data, m_command + (fn - 2U) * 40U + 20U);
+		if (!valid)
+			return;
+
+		valid = payload.readDataFRModeData2(data, m_command + (fn - 2U) * 40U + 40U);
+		if (!valid)
+			return;
+	}
+
+	if (fn == ft) {
+		bool valid = false;
+		// Find the end marker
+		for (unsigned int i = (fn - 1U) * 40U + 20U; i > 0U; i--) {
+			if (m_command[i] == 0x03U) {
+				unsigned char crc = CCRC::addCRC(m_command, i + 1U);
+				if (crc == m_command[i + 1U])
+					valid = true;
+				break;
+			}
+		}
+
+		if (!valid)
+			return;
+
+		if (::memcmp(m_command + 1U, CONN_RESP, 4U) == 0) {
+			LogMessage("Reflector connected OK");
+			return;
+		}
+	}
+
+	return;
 }
 
 bool CDMR2YSF::createMMDVM()

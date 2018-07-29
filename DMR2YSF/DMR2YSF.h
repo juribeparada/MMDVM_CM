@@ -68,8 +68,8 @@ private:
 	std::string      m_netDst;
 	std::string      m_ysfSrc;
 	unsigned char    m_dmrLastDT;
-	unsigned char    m_ysfFrame[200U];
-	unsigned char    m_dmrFrame[50U];
+	unsigned char*   m_ysfFrame;
+	unsigned char*   m_dmrFrame;
 	unsigned int     m_dmrFrames;
 	unsigned int     m_ysfFrames;
 	CDMREmbeddedData m_EmbeddedLC;
@@ -77,11 +77,13 @@ private:
 	bool             m_dmrinfo;
 	unsigned char*   m_config;
 	unsigned int     m_configLen;
+	unsigned char*   m_command;
 
 	unsigned int findYSFID(std::string cs, bool showdst);
 	std::string getSrcYSF(const unsigned char* source);
 	void sendYSFConn(unsigned int id);
 	void sendYSFDisc();
+	void processWiresX(const unsigned char* data, unsigned char fi, unsigned char dt, unsigned char fn, unsigned char ft);
 	bool createMMDVM();
 
 };
