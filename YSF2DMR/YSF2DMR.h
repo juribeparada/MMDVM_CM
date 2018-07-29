@@ -105,6 +105,7 @@ private:
 	CReflectors*     m_xlxReflectors;
 	unsigned int     m_xlxrefl;
 	bool             m_remoteGateway;
+	unsigned int     m_hangTime;
 
 	bool createDMRNetwork();
 	void createGPS();

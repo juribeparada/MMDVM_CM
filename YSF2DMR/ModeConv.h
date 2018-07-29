@@ -34,6 +34,7 @@ public:
 	void putDMREOT();
 
 	void putYSF(unsigned char* bytes);
+	void putDummyYSF();
 	void putYSFHeader();
 	void putYSFEOT();
 

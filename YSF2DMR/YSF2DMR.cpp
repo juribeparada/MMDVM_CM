@@ -115,7 +115,8 @@ m_dmrinfo(false),
 m_idUnlink(4000U),
 m_flcoUnlink(FLCO_GROUP),
 m_enableWiresX(false),
-m_remoteGateway(false)
+m_remoteGateway(false),
+m_hangTime(1000U)
 {
 	::memset(m_ysfFrame, 0U, 200U);
 	::memset(m_dmrFrame, 0U, 50U);
@@ -214,6 +215,7 @@ int CYSF2DMR::run()
 	m_suffix   = m_conf.getSuffix();
 
 	m_remoteGateway = m_conf.getRemoteGateway();
+	m_hangTime = m_conf.getHangTime();
 
 	bool debug               = m_conf.getDMRNetworkDebug();
 	in_addr dstAddress       = CUDPSocket::lookup(m_conf.getDstAddress());
@@ -227,6 +229,10 @@ int CYSF2DMR::run()
 
 	m_ysfNetwork = new CYSFNetwork(localAddress, localPort, m_callsign, debug);
 	m_ysfNetwork->setDestination(dstAddress, dstPort);
+
+	LogInfo("General Parameters");
+	LogInfo("    Remote Gateway: %s", m_remoteGateway ? "yes" : "no");
+	LogInfo("    Hang Time: %u ms", m_hangTime);
 
 	ret = m_ysfNetwork->open();
 	if (!ret) {
@@ -529,6 +535,9 @@ int CYSF2DMR::run()
 							m_ysfFrames = 0U;
 						}
 					} else if (fi == YSF_FI_TERMINATOR) {
+						int extraFrames = (m_hangTime / 100U) - m_ysfFrames - 2U;
+						for (int i = 0U; i < extraFrames; i++)
+							m_conv.putDummyYSF();
 						LogMessage("YSF received end of voice transmission, %.1f seconds", float(m_ysfFrames) / 10.0F);
 						m_conv.putYSFEOT();
 						m_ysfFrames = 0U;

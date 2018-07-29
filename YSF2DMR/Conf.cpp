@@ -48,6 +48,7 @@ m_localAddress(),
 m_localPort(0U),
 m_enableWiresX(false),
 m_remoteGateway(false),
+m_hangTime(1000U),
 m_daemon(false),
 m_rxFrequency(0U),
 m_txFrequency(0U),
@@ -72,7 +73,6 @@ m_dmrNetworkOptions(),
 m_dmrNetworkDebug(false),
 m_dmrNetworkJitterEnabled(true),
 m_dmrNetworkJitter(500U),
-m_dmrHangTime(1000U),
 m_dmrNetworkEnableUnlink(true),
 m_dmrNetworkIDUnlink(4000U),
 m_dmrNetworkPCUnlink(false),
@@ -168,6 +168,8 @@ bool CConf::read()
 			m_enableWiresX = ::atoi(value) == 1;
 		else if (::strcmp(key, "RemoteGateway") == 0)
 			m_remoteGateway = ::atoi(value) == 1;
+		else if (::strcmp(key, "HangTime") == 0)
+			m_hangTime = (unsigned int)::atoi(value);
 		else if (::strcmp(key, "Daemon") == 0)
 			m_daemon = ::atoi(value) == 1;
 	} else if (section == SECTION_INFO) {
@@ -221,8 +223,6 @@ bool CConf::read()
 			m_dmrNetworkJitterEnabled = ::atoi(value) == 1;
 		else if (::strcmp(key, "Jitter") == 0)
 			m_dmrNetworkJitter = (unsigned int)::atoi(value);
-		else if (::strcmp(key, "HangTime") == 0)
-			m_dmrHangTime = (unsigned int)::atoi(value);
 		else if (::strcmp(key, "EnableUnlink") == 0)
 			m_dmrNetworkEnableUnlink = ::atoi(value) == 1;
 		else if (::strcmp(key, "TGUnlink") == 0)
@@ -306,6 +306,11 @@ bool CConf::getEnableWiresX() const
 bool CConf::getRemoteGateway() const
 {
 	return m_remoteGateway;
+}
+
+unsigned int CConf::getHangTime() const
+{
+	return m_hangTime;
 }
 
 bool CConf::getDaemon() const
@@ -461,11 +466,6 @@ bool CConf::getDMRNetworkJitterEnabled() const
 unsigned int CConf::getDMRNetworkJitter() const
 {
 	return m_dmrNetworkJitter;
-}
-
-unsigned int CConf::getDMRHangTime() const
-{
-	return m_dmrHangTime;
 }
 
 bool CConf::getDMRNetworkEnableUnlink() const

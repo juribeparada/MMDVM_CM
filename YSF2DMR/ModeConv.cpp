@@ -687,6 +687,17 @@ void CModeConv::putAMBE2DMR(unsigned int dat_a, unsigned int dat_b, unsigned int
 	m_dmrN += 1U;
 }
 
+void CModeConv::putDummyYSF()
+{
+	// We have a total of 5 VCH sections
+	for (unsigned int j = 0U; j < 5U; j++) {
+		m_DMR.addData(&TAG_DATA, 1U);
+		m_DMR.addData(DMR_SILENCE, 9U);
+
+		m_dmrN += 1U;
+	}
+}
+
 void CModeConv::putDMRHeader()
 {
 	unsigned char vch[13U];
