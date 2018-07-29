@@ -261,6 +261,7 @@ int CYSF2DMR::run()
 
 	CTimer networkWatchdog(100U, 0U, 1500U);
 	CTimer pollTimer(1000U, 5U);
+	CTimer ysfWatchdog(1000U, 0U, 500U);
 
 	// CWiresX Control Object
 	if (m_enableWiresX) {
@@ -289,6 +290,7 @@ int CYSF2DMR::run()
 	ysfWatch.start();
 	dmrWatch.start();
 	pollTimer.start();
+	ysfWatchdog.stop();
 
 	unsigned char ysf_cnt = 0;
 	unsigned char dmr_cnt = 0;
@@ -527,6 +529,7 @@ int CYSF2DMR::run()
 
 					if (fi == YSF_FI_HEADER) {
 						if (ysfPayload.processHeaderData(buffer + 35U)) {
+							ysfWatchdog.start();
 							std::string ysfSrc = ysfPayload.getSource();
 							std::string ysfDst = ysfPayload.getDest();
 							LogMessage("Received YSF Header: Src: %s Dst: %s", ysfSrc.c_str(), ysfDst.c_str());
@@ -535,6 +538,7 @@ int CYSF2DMR::run()
 							m_ysfFrames = 0U;
 						}
 					} else if (fi == YSF_FI_TERMINATOR) {
+						ysfWatchdog.stop();
 						int extraFrames = (m_hangTime / 100U) - m_ysfFrames - 2U;
 						for (int i = 0U; i < extraFrames; i++)
 							m_conv.putDummyYSF();
@@ -542,6 +546,7 @@ int CYSF2DMR::run()
 						m_conv.putYSFEOT();
 						m_ysfFrames = 0U;
 					} else if (fi == YSF_FI_COMMUNICATIONS) {
+						ysfWatchdog.start();
 						m_conv.putYSF(buffer + 35U);
 						m_ysfFrames++;
 					}
@@ -1017,6 +1022,14 @@ int CYSF2DMR::run()
 		if (pollTimer.isRunning() && pollTimer.hasExpired()) {
 			m_ysfNetwork->writePoll();
 			pollTimer.start();
+		}
+
+		ysfWatchdog.clock(ms);
+		if (ysfWatchdog.isRunning() && ysfWatchdog.hasExpired()) {
+			int extraFrames = (m_hangTime / 100U) - m_ysfFrames;
+			for (int i = 0U; i < extraFrames; i++)
+				m_conv.putDummyYSF();
+			ysfWatchdog.stop();
 		}
 
 		if (m_xlxReflectors != NULL)
