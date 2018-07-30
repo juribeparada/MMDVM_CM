@@ -118,12 +118,17 @@ m_enableWiresX(false),
 m_remoteGateway(false),
 m_hangTime(1000U)
 {
+	m_ysfFrame = new unsigned char[200U];
+	m_dmrFrame = new unsigned char[50U];
+
 	::memset(m_ysfFrame, 0U, 200U);
 	::memset(m_dmrFrame, 0U, 50U);
 }
 
 CYSF2DMR::~CYSF2DMR()
 {
+	delete[] m_ysfFrame;
+	delete[] m_dmrFrame;
 }
 
 int CYSF2DMR::run()

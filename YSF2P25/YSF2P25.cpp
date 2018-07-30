@@ -161,12 +161,17 @@ m_p25Frames(0U),
 m_ysfFrames(0U),
 m_p25info(false)
 {
+	m_ysfFrame = new unsigned char[200U];
+	m_p25Frame = new unsigned char[100U];
+
 	::memset(m_ysfFrame, 0U, 200U);
 	::memset(m_p25Frame, 0U, 100U);
 }
 
 CYSF2P25::~CYSF2P25()
 {
+	delete[] m_ysfFrame;
+	delete[] m_p25Frame;
 }
 
 int CYSF2P25::run()

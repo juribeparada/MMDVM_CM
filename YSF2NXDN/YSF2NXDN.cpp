@@ -109,12 +109,17 @@ m_nxdnFrames(0U),
 m_ysfFrames(0U),
 m_nxdninfo(false)
 {
+	m_ysfFrame  = new unsigned char[200U];
+	m_nxdnFrame = new unsigned char[200U];
+
 	::memset(m_ysfFrame, 0U, 200U);
-	::memset(m_nxdnFrame, 0U, 50U);
+	::memset(m_nxdnFrame, 0U, 200U);
 }
 
 CYSF2NXDN::~CYSF2NXDN()
 {
+	delete[] m_ysfFrame;
+	delete[] m_nxdnFrame;
 }
 
 int CYSF2NXDN::run()

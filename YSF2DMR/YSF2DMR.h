@@ -86,8 +86,8 @@ private:
 	std::string      m_netDst;
 	std::string      m_ysfSrc;
 	unsigned char    m_dmrLastDT;
-	unsigned char    m_ysfFrame[200U];
-	unsigned char    m_dmrFrame[50U];
+	unsigned char*   m_ysfFrame;
+	unsigned char*   m_dmrFrame;
 	CGPS*            m_gps;
 	CDTMF*           m_dtmf;
 	CAPRSReader*     m_APRS;

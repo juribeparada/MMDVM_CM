@@ -66,8 +66,8 @@ private:
 	std::string      m_netSrc;
 	std::string      m_netDst;
 	std::string      m_ysfSrc;
-	unsigned char    m_ysfFrame[200U];
-	unsigned char    m_p25Frame[100U];
+	unsigned char*   m_ysfFrame;
+	unsigned char*   m_p25Frame;
 	CDTMF*           m_dtmf;
 	unsigned int     m_p25Frames;
 	unsigned int     m_ysfFrames;

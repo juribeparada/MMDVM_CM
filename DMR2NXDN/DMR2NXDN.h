@@ -73,8 +73,8 @@ private:
 	unsigned int     m_nxdnSrc;
 	unsigned int     m_nxdnDst;
 	unsigned char    m_dmrLastDT;
-	unsigned char    m_nxdnFrame[200U];
-	unsigned char    m_dmrFrame[50U];
+	unsigned char*   m_nxdnFrame;
+	unsigned char*   m_dmrFrame;
 	unsigned int     m_dmrFrames;
 	unsigned int     m_nxdnFrames;
 	CDMREmbeddedData m_EmbeddedLC;

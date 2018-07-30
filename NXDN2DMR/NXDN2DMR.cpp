@@ -111,12 +111,17 @@ m_dmrinfo(false),
 m_xlxmodule(),
 m_xlxConnected(false)
 {
+	m_nxdnFrame = new unsigned char[200U];
+	m_dmrFrame  = new unsigned char[50U];
+
 	::memset(m_nxdnFrame, 0U, 200U);
 	::memset(m_dmrFrame, 0U, 50U);
 }
 
 CNXDN2DMR::~CNXDN2DMR()
 {
+	delete[] m_nxdnFrame;
+	delete[] m_dmrFrame;
 }
 
 int CNXDN2DMR::run()

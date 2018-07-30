@@ -105,14 +105,19 @@ m_dmrinfo(false),
 m_config(NULL),
 m_configLen(0U)
 {
+	m_nxdnFrame = new unsigned char[200U];
+	m_dmrFrame  = new unsigned char[50U];
+	m_config    = new unsigned char[400U];
+
 	::memset(m_nxdnFrame, 0U, 200U);
 	::memset(m_dmrFrame, 0U, 50U);
-
-	m_config = new unsigned char[400U];
 }
 
 CDMR2NXDN::~CDMR2NXDN()
 {
+	delete[] m_nxdnFrame;
+	delete[] m_dmrFrame;
+	delete[] m_config;
 }
 
 int CDMR2NXDN::run()
