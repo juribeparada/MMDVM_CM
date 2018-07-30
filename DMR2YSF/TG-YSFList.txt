@@ -1,0 +1,7 @@
+# This is just an example of DMR TG - YSF ID mapping
+#
+# DMR TG ID;YSF reflector ID
+#
+730;72350
+31010;2034
+7227;66099

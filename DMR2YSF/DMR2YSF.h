@@ -44,6 +44,18 @@
 
 #include <string>
 
+class CTGReg {
+public:
+	CTGReg() :
+	m_tg(),
+	m_ysf()
+	{
+	}
+
+	unsigned int m_tg;
+	unsigned int m_ysf;
+};
+
 class CDMR2YSF
 {
 public:
@@ -78,9 +90,14 @@ private:
 	unsigned char*   m_config;
 	unsigned int     m_configLen;
 	unsigned char*   m_command;
+	unsigned int     m_tgUnlink;
+	std::vector<CTGReg*> m_currTGList;
+	unsigned int     m_lastTG;
 
+	void readTGList(std::string filename);
 	unsigned int findYSFID(std::string cs, bool showdst);
 	std::string getSrcYSF(const unsigned char* source);
+	void connectYSF(unsigned int id);
 	void sendYSFConn(unsigned int id);
 	void sendYSFDisc();
 	void processWiresX(const unsigned char* data, unsigned char fi, unsigned char dt, unsigned char fn, unsigned char ft);

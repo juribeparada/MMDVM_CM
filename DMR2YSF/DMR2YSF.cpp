@@ -108,7 +108,11 @@ m_dmrFrames(0U),
 m_ysfFrames(0U),
 m_dmrinfo(false),
 m_config(NULL),
-m_configLen(0U)
+m_configLen(0U),
+m_command(),
+m_tgUnlink(4000U),
+m_currTGList(),
+m_lastTG(0U)
 {
 	m_ysfFrame = new unsigned char[200U];
 	m_dmrFrame = new unsigned char[50U];
@@ -215,6 +219,15 @@ int CDMR2YSF::run()
 	m_callsign = m_conf.getCallsign();
 	m_defsrcid = m_conf.getDMRId();
 	m_dstid = m_conf.getDMRDefaultDstTG();
+	m_tgUnlink = m_conf.getDMRNetworkTGUnlink();
+	std::string tgFile = m_conf.getDMRTGListFile();
+
+	LogInfo("General Parameters");
+	LogInfo("    Default Dst TG: %u", m_dstid);
+	LogInfo("    Unlink TG: %u", m_tgUnlink);
+	LogInfo("    TG File: %s", tgFile.c_str());
+
+	readTGList(tgFile);
 
 	in_addr dstAddress       = CUDPSocket::lookup(m_conf.getDstAddress());
 	unsigned int dstPort     = m_conf.getDstPort();
@@ -524,6 +537,7 @@ int CDMR2YSF::run()
 					m_netDst.resize(YSF_CALLSIGN_LENGTH, ' ');
 					
 					m_dmrFrames = 0U;
+					connectYSF(m_dstid);
 				}
 
 				if(DataType == DT_VOICE_SYNC || DataType == DT_VOICE) {
@@ -541,6 +555,8 @@ int CDMR2YSF::run()
 
 						m_netSrc.resize(YSF_CALLSIGN_LENGTH, ' ');
 						m_netDst.resize(YSF_CALLSIGN_LENGTH, ' ');
+
+						connectYSF(m_dstid);
 
 						m_dmrinfo = true;
 					}
@@ -726,6 +742,33 @@ int CDMR2YSF::run()
 	return 0;
 }
 
+void CDMR2YSF::readTGList(std::string filename)
+{
+	// Load file with TG List
+	FILE* fp = ::fopen(filename.c_str(), "rt");
+	if (fp != NULL) {
+		char buffer[100U];
+		while (::fgets(buffer, 100U, fp) != NULL) {
+			if (buffer[0U] == '#')
+				continue;
+
+			char* p1 = ::strtok(buffer, ";\r\n");
+			char* p2 = ::strtok(NULL, ";\r\n");
+
+			if (p1 != NULL && p2 != NULL) {
+				CTGReg* tgreg = new CTGReg;
+
+				tgreg->m_tg = atoi(p1);
+				tgreg->m_ysf = atoi(p2);
+
+				m_currTGList.push_back(tgreg);
+			}
+		}
+
+		::fclose(fp);
+	}
+}
+
 unsigned int CDMR2YSF::findYSFID(std::string cs, bool showdst)
 {
 	std::string cstrim;
@@ -782,6 +825,17 @@ std::string CDMR2YSF::getSrcYSF(const unsigned char* buffer)
 	trimmed.erase(std::find_if(trimmed.rbegin(), trimmed.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), trimmed.end());
 	
 	return trimmed;
+}
+
+void CDMR2YSF::connectYSF(unsigned int id)
+{
+	if (id == m_lastTG)
+		return;
+
+	if (id == m_tgUnlink)
+		sendYSFDisc();
+
+	// TODO: connection ID search
 }
 
 void CDMR2YSF::sendYSFConn(unsigned int id)
@@ -907,6 +961,7 @@ void CDMR2YSF::processWiresX(const unsigned char* data, unsigned char fi, unsign
 			return;
 
 		if (::memcmp(m_command + 1U, CONN_RESP, 4U) == 0) {
+			m_lastTG = m_dstid;
 			LogMessage("Reflector connected OK");
 			return;
 		}

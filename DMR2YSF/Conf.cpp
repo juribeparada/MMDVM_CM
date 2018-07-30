@@ -49,6 +49,8 @@ m_dmrRptPort(0U),
 m_dmrLocalAddress(),
 m_dmrLocalPort(0U),
 m_dmrDefaultDstTG(9U),
+m_dmrNetworkTGUnlink(4000U),
+m_dmrTGListFile(),
 m_dmrDebug(false),
 m_dmrIdLookupFile(),
 m_dmrIdLookupTime(0U),
@@ -137,6 +139,10 @@ bool CConf::read()
 			m_dmrLocalPort = (unsigned int)::atoi(value);
 		else if (::strcmp(key, "DefaultDstTG") == 0)
 			m_dmrDefaultDstTG = (unsigned int)::atoi(value);
+		else if (::strcmp(key, "TGUnlink") == 0)
+			m_dmrNetworkTGUnlink = (unsigned int)::atoi(value);
+		else if (::strcmp(key, "TGListFile") == 0)
+			m_dmrTGListFile = value;
 		else if (::strcmp(key, "Debug") == 0)
 			m_dmrDebug = ::atoi(value) == 1;
 	} else if (section == SECTION_DMRID_LOOKUP) {
@@ -219,6 +225,16 @@ unsigned int CConf::getDMRLocalPort() const
 unsigned int CConf::getDMRDefaultDstTG() const
 {
 	return m_dmrDefaultDstTG;
+}
+
+unsigned int CConf::getDMRNetworkTGUnlink() const
+{
+	return m_dmrNetworkTGUnlink;
+}
+
+std::string CConf::getDMRTGListFile() const
+{
+	return m_dmrTGListFile;
 }
 
 bool CConf::getDMRDebug() const
