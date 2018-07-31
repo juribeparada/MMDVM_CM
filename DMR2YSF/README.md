@@ -6,4 +6,6 @@ You can use this software with MMDVMHost and YSFGateway, with the default UDP po
 
 MMDVMHost <-> DMR2YSF <-> YSFGateway
 
+You can select a YSF reflector from your DMR radio, associating each radio TG with a specific YSF reflector. Please edit the file TG-YSFList.txt and enter only your preferred DMR ID - YSF reflector mapping list. 
+
 This software is licenced under the GPL v2 and is intended for amateur and educational use only. Use of this software for commercial purposes is strictly forbidden.
