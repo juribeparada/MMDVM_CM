@@ -511,10 +511,14 @@ int CDMR2YSF::run()
 				if(DataType == DT_TERMINATOR_WITH_LC && m_dmrFrames > 0U) {
 					LogMessage("DMR received end of voice transmission, %.1f seconds", float(m_dmrFrames) / 16.667F);
 
-					m_conv.putDMREOT();
 					networkWatchdog.stop();
 					m_dmrFrames = 0U;
 					m_dmrinfo = false;
+
+					if (m_dstid != m_lastTG)
+						break;
+
+					m_conv.putDMREOT();
 				}
 
 				if((DataType == DT_VOICE_LC_HEADER) && (DataType != m_dmrLastDT)) {
@@ -528,16 +532,22 @@ int CDMR2YSF::run()
 
 					m_netDst = (netflco == FLCO_GROUP ? "TG " : "") + m_lookup->findCS(DstId);
 
-					m_conv.putDMRHeader();
+					connectYSF(m_dstid);
+
 					LogMessage("DMR audio received from %s to %s", m_netSrc.c_str(), m_netDst.c_str());
 
 					m_dmrinfo = true;
+					m_dmrFrames = 0U;
 
 					m_netSrc.resize(YSF_CALLSIGN_LENGTH, ' ');
 					m_netDst.resize(YSF_CALLSIGN_LENGTH, ' ');
-					
-					m_dmrFrames = 0U;
-					connectYSF(m_dstid);
+
+					if (m_dstid != m_lastTG) {
+						m_dmrLastDT = DataType;
+						break;
+					}
+
+					m_conv.putDMRHeader();
 				}
 
 				if(DataType == DT_VOICE_SYNC || DataType == DT_VOICE) {
@@ -561,16 +571,25 @@ int CDMR2YSF::run()
 						m_dmrinfo = true;
 					}
 
-					m_conv.putDMR(dmr_frame); // Add DMR frame for YSF conversion
 					m_dmrFrames++;
+
+					if (m_dstid != m_lastTG)
+						break;
+
+					m_conv.putDMR(dmr_frame); // Add DMR frame for YSF conversion
 				}
 			}
 			else {
 				if(DataType == DT_VOICE_SYNC || DataType == DT_VOICE) {
 					unsigned char dmr_frame[50];
 					tx_dmrdata.getData(dmr_frame);
-					m_conv.putDMR(dmr_frame); // Add DMR frame for YSF conversion
+
 					m_dmrFrames++;
+
+					if (m_dstid != m_lastTG)
+						break;
+
+					m_conv.putDMR(dmr_frame); // Add DMR frame for YSF conversion
 				}
 
 				networkWatchdog.clock(ms);
@@ -835,7 +854,16 @@ void CDMR2YSF::connectYSF(unsigned int id)
 	if (id == m_tgUnlink)
 		sendYSFDisc();
 
-	// TODO: connection ID search
+	for (std::vector<CTGReg*>::iterator it = m_currTGList.begin(); it != m_currTGList.end(); ++it) {
+		if (id == (*it)->m_tg) {
+			sendYSFConn((*it)->m_ysf);
+			return;
+		}
+	}
+
+	LogMessage("DMR TG not found in TGList");
+
+	return;
 }
 
 void CDMR2YSF::sendYSFConn(unsigned int id)
