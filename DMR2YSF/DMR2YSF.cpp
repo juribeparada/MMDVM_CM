@@ -44,6 +44,11 @@ const char* DEFAULT_INI_FILE = "DMR2YSF.ini";
 const char* DEFAULT_INI_FILE = "/etc/DMR2YSF.ini";
 #endif
 
+const char* HEADER1 = "This software is for use on amateur radio networks only,";
+const char* HEADER2 = "it is to be used for educational purposes only. Its use on";
+const char* HEADER3 = "commercial networks is strictly prohibited.";
+const char* HEADER4 = "Copyright(C) 2018 by CA6JAU, G4KLX and others";
+
 #include <functional>
 #include <algorithm>
 #include <cstdio>
@@ -221,6 +226,11 @@ int CDMR2YSF::run()
 	m_dstid = m_conf.getDMRDefaultDstTG();
 	m_tgUnlink = m_conf.getDMRNetworkTGUnlink();
 	std::string tgFile = m_conf.getDMRTGListFile();
+
+	LogInfo(HEADER1);
+	LogInfo(HEADER2);
+	LogInfo(HEADER3);
+	LogInfo(HEADER4);
 
 	LogInfo("General Parameters");
 	LogInfo("    Default Dst TG: %u", m_dstid);

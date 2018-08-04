@@ -98,6 +98,11 @@ const char* DEFAULT_INI_FILE = "YSF2P25.ini";
 const char* DEFAULT_INI_FILE = "/etc/YSF2P25.ini";
 #endif
 
+const char* HEADER1 = "This software is for use on amateur radio networks only,";
+const char* HEADER2 = "it is to be used for educational purposes only. Its use on";
+const char* HEADER3 = "commercial networks is strictly prohibited.";
+const char* HEADER4 = "Copyright(C) 2018 by CA6JAU, G4KLX and others";
+
 #include <functional>
 #include <algorithm>
 #include <cstdio>
@@ -258,6 +263,11 @@ int CYSF2P25::run()
 		::close(STDERR_FILENO);
 	}
 #endif
+
+	LogInfo(HEADER1);
+	LogInfo(HEADER2);
+	LogInfo(HEADER3);
+	LogInfo(HEADER4);
 
 	m_callsign = m_conf.getCallsign();
 	m_defsrcid = m_conf.getP25Id();
