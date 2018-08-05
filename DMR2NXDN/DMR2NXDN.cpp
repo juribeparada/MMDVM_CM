@@ -97,16 +97,29 @@ int main(int argc, char** argv)
 }
 
 CDMR2NXDN::CDMR2NXDN(const std::string& configFile) :
+m_nxdnTG(1U),
 m_conf(configFile),
 m_dmrNetwork(NULL),
-m_dmrSrc(0U),
-m_dmrDst(0U),
-m_nxdnSrc(0U),
-m_nxdnDst(0U),
+m_nxdnNetwork(NULL),
+m_dmrlookup(NULL),
+m_nxdnlookup(NULL),
+m_conv(),
+m_colorcode(1U),
+m_defsrcid(1U),
+m_dstid(1U),
+m_dmrSrc(1U),
+m_dmrDst(1U),
+m_nxdnSrc(1U),
+m_nxdnDst(1U),
 m_dmrLastDT(0U),
+m_nxdnFrame(NULL),
+m_dmrFrame(NULL),
 m_dmrFrames(0U),
 m_nxdnFrames(0U),
+m_EmbeddedLC(),
+m_dmrflco(FLCO_GROUP),
 m_dmrinfo(false),
+m_nxdninfo(false),
 m_config(NULL),
 m_configLen(0U)
 {
