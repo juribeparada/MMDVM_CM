@@ -44,7 +44,8 @@ enum WXSI_STATUS {
 	WXSI_CONNECT,
 	WXSI_DISCONNECT,
 	WXSI_ALL,
-	WXSI_SEARCH
+	WXSI_SEARCH,
+	WXSI_CATEGORY
 };
 
 class CTGReg {
@@ -76,6 +77,7 @@ public:
 	unsigned int getOpt(unsigned int id);
 	unsigned int getFullDstID();
 
+	CTGReg* findById(unsigned int id);
 	std::vector<CTGReg*>& TGSearch(const std::string& name);
 
 	void processConnect(int reflector);
@@ -107,15 +109,19 @@ private:
 	std::string          m_search;
 	std::vector<CTGReg*> m_currTGList;
 	std::vector<CTGReg*> m_TGSearch;
+	std::vector<CTGReg*> m_category;
 
 	WX_STATUS processConnect(const unsigned char* source, const unsigned char* data);
 	void processDX(const unsigned char* source);
 	void processAll(const unsigned char* source, const unsigned char* data);
+	void processCategory(const unsigned char* source, const unsigned char* data);
 
 	void sendDXReply();
 	void sendAllReply();
 	void sendSearchReply();
 	void sendSearchNotFoundReply();
+	void sendCategoryReply();
+
 	void createReply(const unsigned char* data, unsigned int length);
 	unsigned char calculateFT(unsigned int length, unsigned int offset) const;
 };
