@@ -83,6 +83,7 @@ private:
 	bool             m_nxdninfo;
 	unsigned char*   m_config;
 	unsigned int     m_configLen;
+	unsigned int     m_defaultID;
 
 	unsigned int findNXDNID(unsigned int dmrid);
 	unsigned int findDMRID(unsigned int nxdnid);

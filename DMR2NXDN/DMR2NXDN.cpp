@@ -121,7 +121,8 @@ m_dmrflco(FLCO_GROUP),
 m_dmrinfo(false),
 m_nxdninfo(false),
 m_config(NULL),
-m_configLen(0U)
+m_configLen(0U),
+m_defaultID(65519U)
 {
 	m_nxdnFrame = new unsigned char[200U];
 	m_dmrFrame  = new unsigned char[50U];
@@ -234,6 +235,8 @@ int CDMR2NXDN::run()
 	unsigned int gatewayPort   = m_conf.getDstPort();
 	std::string localAddress   = m_conf.getLocalAddress();
 	unsigned int localPort     = m_conf.getLocalPort();
+
+	m_defaultID = m_conf.getDefaultID();
 
 	m_nxdnNetwork = new CNXDNNetwork(localAddress, localPort, gatewayAddress, gatewayPort, false);
 	m_nxdnNetwork->enable(true);
@@ -755,11 +758,8 @@ unsigned int CDMR2NXDN::truncID(unsigned int id)
 	snprintf(temp, 8, "%07d", id);
 	unsigned int newid = atoi(temp + 2);
 
-	if (newid > 65519)
-		newid = 65519;
-
-	if (newid == 0)
-		newid = 1;
+	if (newid > 65519 || newid == 0)
+		newid = m_defaultID;
 
 	return newid;
 }

@@ -131,7 +131,8 @@ m_nxdninfo(false),
 m_xlxmodule(),
 m_xlxConnected(false),
 m_xlxReflectors(NULL),
-m_xlxrefl(0U)
+m_xlxrefl(0U),
+m_defaultID(65519U)
 {
 	m_nxdnFrame = new unsigned char[200U];
 	m_dmrFrame  = new unsigned char[50U];
@@ -244,6 +245,8 @@ int CNXDN2DMR::run()
 	unsigned int dstPort     = m_conf.getDstPort();
 	std::string localAddress = m_conf.getLocalAddress();
 	unsigned int localPort   = m_conf.getLocalPort();
+
+	m_defaultID = m_conf.getDefaultID();
 
 	std::string fileName    = m_conf.getDMRXLXFile();
 	m_xlxReflectors = new CReflectors(fileName, 60U);
@@ -786,11 +789,8 @@ unsigned int CNXDN2DMR::truncID(unsigned int id)
 	snprintf(temp, 8, "%07d", id);
 	unsigned int newid = atoi(temp + 2);
 
-	if (newid > 65519)
-		newid = 65519;
-
-	if (newid == 0)
-		newid = 1;
+	if (newid > 65519 || newid == 0)
+		newid = m_defaultID;
 
 	return newid;
 }

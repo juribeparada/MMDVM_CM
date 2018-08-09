@@ -96,6 +96,7 @@ private:
 	bool             m_xlxConnected;
 	CReflectors*     m_xlxReflectors;
 	unsigned int     m_xlxrefl;
+	unsigned int     m_defaultID;
 
 	bool createDMRNetwork();
 	unsigned int findNXDNID(unsigned int dmrid);

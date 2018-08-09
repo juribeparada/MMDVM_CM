@@ -31,12 +31,13 @@ public:
 
   bool read();
 
-  // The YSF Network section
+  // The NXDN Network section
   std::string  getCallsign() const;
   std::string  getDstAddress() const;
   unsigned int getDstPort() const;
   std::string  getLocalAddress() const;
   unsigned int getLocalPort() const;
+  unsigned int getDefaultID() const;
   bool         getDaemon() const;
   
   // The DMR Network section
@@ -68,6 +69,7 @@ private:
   unsigned int m_dstPort;
   std::string  m_localAddress;
   unsigned int m_localPort;
+  unsigned int m_defaultID;
   bool         m_daemon;
   
   unsigned int m_dmrId;
