@@ -42,6 +42,7 @@ m_dstAddress(),
 m_dstPort(0U),
 m_localAddress(),
 m_localPort(0U),
+m_fcsFile(),
 m_daemon(false),
 m_dmrId(0U),
 m_dmrRptAddress(),
@@ -124,6 +125,8 @@ bool CConf::read()
 			m_localAddress = value;
 		else if (::strcmp(key, "LocalPort") == 0)
 			m_localPort = (unsigned int)::atoi(value);
+		else if (::strcmp(key, "FCSRooms") == 0)
+			m_fcsFile = value;
 		else if (::strcmp(key, "Daemon") == 0)
 			m_daemon = ::atoi(value) == 1;
 	} else if (section == SECTION_DMR_NETWORK) {
@@ -190,6 +193,11 @@ std::string CConf::getLocalAddress() const
 unsigned int CConf::getLocalPort() const
 {
 	return m_localPort;
+}
+
+std::string CConf::getFCSFile() const
+{
+	return m_fcsFile;
 }
 
 bool CConf::getDaemon() const

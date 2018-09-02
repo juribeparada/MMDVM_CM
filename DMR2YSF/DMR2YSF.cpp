@@ -129,6 +129,7 @@ m_configLen(0U),
 m_command(NULL),
 m_tgUnlink(4000U),
 m_currTGList(),
+m_FCSList(),
 m_lastTG(0U)
 {
 	m_ysfFrame = new unsigned char[200U];
@@ -238,6 +239,7 @@ int CDMR2YSF::run()
 	m_dstid = m_conf.getDMRDefaultDstTG();
 	m_tgUnlink = m_conf.getDMRNetworkTGUnlink();
 	std::string tgFile = m_conf.getDMRTGListFile();
+	std::string fcsFile = m_conf.getFCSFile();
 
 	LogInfo(HEADER1);
 	LogInfo(HEADER2);
@@ -247,8 +249,10 @@ int CDMR2YSF::run()
 	LogInfo("General Parameters");
 	LogInfo("    Default Dst TG: %u", m_dstid);
 	LogInfo("    Unlink TG: %u", m_tgUnlink);
+	LogInfo("    FCS Rooms File: %s", fcsFile.c_str());
 	LogInfo("    TG File: %s", tgFile.c_str());
 
+	readFCSRoomsFile(fcsFile);
 	readTGList(tgFile);
 
 	in_addr dstAddress       = CUDPSocket::lookup(m_conf.getDstAddress());
@@ -787,6 +791,9 @@ void CDMR2YSF::readTGList(std::string filename)
 {
 	// Load file with TG List
 	FILE* fp = ::fopen(filename.c_str(), "rt");
+
+	unsigned int count = 0U;
+
 	if (fp != NULL) {
 		char buffer[100U];
 		while (::fgets(buffer, 100U, fp) != NULL) {
@@ -800,14 +807,62 @@ void CDMR2YSF::readTGList(std::string filename)
 				CTGReg* tgreg = new CTGReg;
 
 				tgreg->m_tg = atoi(p1);
-				tgreg->m_ysf = atoi(p2);
+				int ysf_id = atoi(p2);
+
+				if (ysf_id) {
+					tgreg->m_ysf = ysf_id;
+				} else {
+					for (std::vector<CFCSReg*>::iterator it = m_FCSList.begin(); it != m_FCSList.end(); ++it) {
+						std::string fcsname = p2;
+						if (fcsname == (*it)->m_fcs) {
+							LogInfo("FCS: %d, %s", (*it)->m_id, (*it)->m_fcs.c_str());
+							tgreg->m_ysf = (*it)->m_id;
+						}
+					}
+				}
 
 				m_currTGList.push_back(tgreg);
+
+				count++;
 			}
 		}
 
 		::fclose(fp);
 	}
+
+	LogInfo("Loaded %u DMR-TG / YSF-ID pairs", count);
+}
+
+void CDMR2YSF::readFCSRoomsFile(const std::string& filename)
+{
+	FILE* fp = ::fopen(filename.c_str(), "rt");
+	if (fp == NULL)
+		return;
+
+	unsigned int count = 0U;
+
+	char buffer[200U];
+	while (::fgets(buffer, 200, fp) != NULL) {
+		if (buffer[0U] == '#')
+			continue;
+
+		char* p1 = ::strtok(buffer, ";");
+
+		if (p1 != NULL) {
+			CFCSReg* fcsreg = new CFCSReg;
+
+			fcsreg->m_id = count + 10U;
+			fcsreg->m_fcs = p1;
+
+			m_FCSList.push_back(fcsreg);
+
+			count++;
+		}
+	}
+
+	::fclose(fp);
+
+	LogInfo("Loaded %u FCS room descriptions", count);
 }
 
 unsigned int CDMR2YSF::findYSFID(std::string cs, bool showdst)

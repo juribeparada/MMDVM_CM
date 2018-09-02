@@ -37,6 +37,7 @@ public:
   unsigned int getDstPort() const;
   std::string  getLocalAddress() const;
   unsigned int getLocalPort() const;
+  std::string  getFCSFile() const;
   bool         getDaemon() const;
   
   // The DMR Network section
@@ -67,6 +68,7 @@ private:
   unsigned int m_dstPort;
   std::string  m_localAddress;
   unsigned int m_localPort;
+  std::string  m_fcsFile;
   bool         m_daemon;
   
   unsigned int m_dmrId;
