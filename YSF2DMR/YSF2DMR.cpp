@@ -913,7 +913,7 @@ int CYSF2DMR::run()
 				fich.setDT(YSF_DT_VD_MODE2);
 				fich.setSQL(false);
 				fich.setSQ(0U);
-				fich.setCM(YSF_CM_GROUP2);
+				fich.setMR(2U);
 
 				if (m_remoteGateway) {
 					fich.setVoIP(false);
@@ -957,7 +957,7 @@ int CYSF2DMR::run()
 				fich.setDT(YSF_DT_VD_MODE2);
 				fich.setSQL(false);
 				fich.setSQ(0U);
-				fich.setCM(YSF_CM_GROUP2);
+				fich.setMR(2U);
 
 				if (m_remoteGateway) {
 					fich.setVoIP(false);
@@ -1022,7 +1022,6 @@ int CYSF2DMR::run()
 				fich.setDT(YSF_DT_VD_MODE2);
 				fich.setSQL(false);
 				fich.setSQ(0U);
-				fich.setCM(YSF_CM_GROUP2);
 
 				if (m_remoteGateway) {
 					fich.setVoIP(false);
