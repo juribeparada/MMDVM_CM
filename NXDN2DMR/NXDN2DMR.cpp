@@ -347,6 +347,8 @@ int CNXDN2DMR::run()
 						std::string netDst = m_nxdnlookup->findCS(m_nxdnDst);
 						LogMessage("Received NXDN header from %s to %s%s", netSrc.c_str(), grp ? "TG " : "", netDst.c_str());
 
+						m_dmrNetwork->reset(2U);	// OE1KBC fix
+
 						m_conv.putNXDNHeader();
 						m_nxdnFrames = 0U;
 						m_nxdninfo = true;
@@ -357,6 +359,9 @@ int CNXDN2DMR::run()
 							std::string netSrc = m_nxdnlookup->findCS(m_nxdnSrc);
 							std::string netDst = m_nxdnlookup->findCS(m_nxdnDst);
 							LogMessage("Received NXDN late entry from %s to %s%s", netSrc.c_str(), grp ? "TG " : "", netDst.c_str());
+
+							m_dmrNetwork->reset(2U);	// OE1KBC fix
+
 							m_conv.putNXDNHeader();
 							m_nxdninfo = true;
 						}

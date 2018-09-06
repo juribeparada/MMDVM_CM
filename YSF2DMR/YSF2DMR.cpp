@@ -571,6 +571,9 @@ int CYSF2DMR::run()
 							std::string ysfSrc = ysfPayload.getSource();
 							std::string ysfDst = ysfPayload.getDest();
 							LogMessage("Received YSF Header: Src: %s Dst: %s", ysfSrc.c_str(), ysfDst.c_str());
+							
+							m_dmrNetwork->reset(2U);	// OE1KBC fix
+							
 							m_srcid = findYSFID(ysfSrc, true);
 							m_conv.putYSFHeader();
 							m_ysfFrames = 0U;
