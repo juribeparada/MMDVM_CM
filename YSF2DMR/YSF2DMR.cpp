@@ -144,7 +144,8 @@ m_xlxConnected(false),
 m_xlxReflectors(NULL),
 m_xlxrefl(0U),
 m_remoteGateway(false),
-m_hangTime(1000U)
+m_hangTime(1000U),
+m_firstSync(false)
 {
 	m_ysfFrame = new unsigned char[200U];
 	m_dmrFrame = new unsigned char[50U];
@@ -774,6 +775,14 @@ int CYSF2DMR::run()
 				networkWatchdog.start();
 
 				if(DataType == DT_TERMINATOR_WITH_LC) {
+					if (m_dmrFrames == 0U) {
+						m_dmrNetwork->reset(2U);
+						networkWatchdog.stop();
+						m_dmrinfo = false;
+						m_firstSync = false;
+						break;
+					}
+
 					LogMessage("DMR received end of voice transmission, %.1f seconds", float(m_dmrFrames) / 16.667F);
 
 					if (SrcId == 4000)
@@ -784,6 +793,7 @@ int CYSF2DMR::run()
 					networkWatchdog.stop();
 					m_dmrFrames = 0U;
 					m_dmrinfo = false;
+					m_firstSync = false;
 				}
 
 				if((DataType == DT_VOICE_LC_HEADER) && (DataType != m_dmrLastDT)) {
@@ -828,7 +838,10 @@ int CYSF2DMR::run()
 					m_dmrFrames = 0U;
 				}
 
-				if(DataType == DT_VOICE_SYNC || DataType == DT_VOICE) {
+				if(DataType == DT_VOICE_SYNC)
+					m_firstSync = true;
+
+				if((DataType == DT_VOICE_SYNC || DataType == DT_VOICE) && m_firstSync) {
 					unsigned char dmr_frame[50];
 
 					tx_dmrdata.getData(dmr_frame);
@@ -845,8 +858,8 @@ int CYSF2DMR::run()
 
 						m_netDst = (netflco == FLCO_GROUP ? "TG " : "") + m_lookup->findCS(DstId);
 
-						LogMessage("DMR audio received from %s to %s", m_netSrc.c_str(), m_netDst.c_str());
-						
+						LogMessage("DMR audio late entry received from %s to %s", m_netSrc.c_str(), m_netDst.c_str());
+
 						if (m_lookup->exists(SrcId) && (m_APRS != NULL)) {
 							int lat, lon, resp;
 							resp = m_APRS->findCall(m_netSrc, &lat, &lon);

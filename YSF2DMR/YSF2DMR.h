@@ -106,6 +106,7 @@ private:
 	unsigned int     m_xlxrefl;
 	bool             m_remoteGateway;
 	unsigned int     m_hangTime;
+	bool             m_firstSync;
 
 	bool createDMRNetwork();
 	void createGPS();
