@@ -836,6 +836,7 @@ int CYSF2DMR::run()
 					m_netDst.resize(YSF_CALLSIGN_LENGTH, ' ');
 					
 					m_dmrFrames = 0U;
+					m_firstSync = false;
 				}
 
 				if(DataType == DT_VOICE_SYNC)

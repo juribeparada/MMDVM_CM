@@ -132,7 +132,8 @@ m_xlxmodule(),
 m_xlxConnected(false),
 m_xlxReflectors(NULL),
 m_xlxrefl(0U),
-m_defaultID(65519U)
+m_defaultID(65519U),
+m_firstSync(false)
 {
 	m_nxdnFrame = new unsigned char[200U];
 	m_dmrFrame  = new unsigned char[50U];
@@ -546,6 +547,14 @@ int CNXDN2DMR::run()
 				networkWatchdog.start();
 
 				if(DataType == DT_TERMINATOR_WITH_LC) {
+					if (m_dmrFrames == 0U) {
+						m_dmrNetwork->reset(2U);
+						networkWatchdog.stop();
+						m_dmrinfo = false;
+						m_firstSync = false;
+						break;
+					}
+
 					LogMessage("DMR received end of voice transmission, %.1f seconds", float(m_dmrFrames) / 16.667F);
 
 					m_conv.putDMREOT();
@@ -553,6 +562,7 @@ int CNXDN2DMR::run()
 					networkWatchdog.stop();
 					m_dmrFrames = 0U;
 					m_dmrinfo = false;
+					m_firstSync = false;
 				}
 
 				if((DataType == DT_VOICE_LC_HEADER) && (DataType != m_dmrLastDT)) {
@@ -565,17 +575,13 @@ int CNXDN2DMR::run()
 					m_dmrinfo = true;
 
 					m_dmrFrames = 0U;
+					m_firstSync = false;
 				}
 
-				if(DataType == DT_VOICE_SYNC || DataType == DT_VOICE) {
-					unsigned char dmr_frame[50];
-					tx_dmrdata.getData(dmr_frame);
-					m_conv.putDMR(dmr_frame); // Add DMR frame for NXDN conversion
-					m_dmrFrames++;
-				}
-			}
-			else {
-				if(DataType == DT_VOICE_SYNC || DataType == DT_VOICE) {
+				if(DataType == DT_VOICE_SYNC)
+					m_firstSync = true;
+
+				if((DataType == DT_VOICE_SYNC || DataType == DT_VOICE) && m_firstSync) {
 					unsigned char dmr_frame[50];
 					tx_dmrdata.getData(dmr_frame);
 
@@ -589,6 +595,14 @@ int CNXDN2DMR::run()
 						m_dmrinfo = true;
 					}
 
+					m_conv.putDMR(dmr_frame); // Add DMR frame for NXDN conversion
+					m_dmrFrames++;
+				}
+			}
+			else {
+				if(DataType == DT_VOICE_SYNC || DataType == DT_VOICE) {
+					unsigned char dmr_frame[50];
+					tx_dmrdata.getData(dmr_frame);
 					m_conv.putDMR(dmr_frame); // Add DMR frame for NXDN conversion
 					m_dmrFrames++;
 				}
