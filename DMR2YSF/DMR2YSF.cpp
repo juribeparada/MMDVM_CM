@@ -259,8 +259,9 @@ int CDMR2YSF::run()
 	unsigned int dstPort     = m_conf.getDstPort();
 	std::string localAddress = m_conf.getLocalAddress();
 	unsigned int localPort   = m_conf.getLocalPort();
+	unsigned int ysfdebug    = m_conf.getDebug();
 
-	m_ysfNetwork = new CYSFNetwork(localAddress, localPort, m_callsign, false);
+	m_ysfNetwork = new CYSFNetwork(localAddress, localPort, m_callsign, ysfdebug);
 	m_ysfNetwork->setDestination(dstAddress, dstPort);
 
 	ret = m_ysfNetwork->open();

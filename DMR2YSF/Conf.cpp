@@ -44,6 +44,7 @@ m_localAddress(),
 m_localPort(0U),
 m_fcsFile(),
 m_daemon(false),
+m_debug(false),
 m_dmrId(0U),
 m_dmrRptAddress(),
 m_dmrRptPort(0U),
@@ -129,6 +130,8 @@ bool CConf::read()
 			m_fcsFile = value;
 		else if (::strcmp(key, "Daemon") == 0)
 			m_daemon = ::atoi(value) == 1;
+		else if (::strcmp(key, "Debug") == 0)
+			m_debug = ::atoi(value) == 1;
 	} else if (section == SECTION_DMR_NETWORK) {
 		if (::strcmp(key, "Id") == 0)
 			m_dmrId = (unsigned int)::atoi(value);
@@ -203,6 +206,11 @@ std::string CConf::getFCSFile() const
 bool CConf::getDaemon() const
 {
 	return m_daemon;
+}
+
+bool CConf::getDebug() const
+{
+	return m_debug;
 }
 
 unsigned int CConf::getDMRId() const
