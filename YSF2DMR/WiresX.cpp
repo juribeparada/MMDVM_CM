@@ -933,7 +933,7 @@ static bool refComparison(const CTGReg* r1, const CTGReg* r2)
 CTGReg* CWiresX::findById(unsigned int id)
 {
 	for (std::vector<CTGReg*>::const_iterator it = m_currTGList.cbegin(); it != m_currTGList.cend(); ++it) {
-		if (id == atoi((*it)->m_id.c_str()))
+		if (id == (unsigned int)atoi((*it)->m_id.c_str()))
 			return *it;
 	}
 
