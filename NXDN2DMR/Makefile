@@ -1,8 +1,8 @@
-CC      = gcc
-CXX     = g++
-CFLAGS  = -g -O3 -Wall -std=c++0x -pthread
+CC      ?= gcc
+CXX     ?= g++
+CFLAGS  ?= -g -O3 -Wall -std=c++0x -pthread
 LIBS    = -lm -lpthread
-LDFLAGS = -g
+LDFLAGS ?= -g
 
 OBJECTS = 	BPTC19696.o Conf.o CRC.o DelayBuffer.cpp DMRData.o DMREMB.o DMREmbeddedData.o \
 			DMRFullLC.o DMRLC.o DMRLookup.o DMRNetwork.o DMRSlotType.o  Golay2087.o \

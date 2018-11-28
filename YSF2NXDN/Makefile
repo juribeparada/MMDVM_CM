@@ -1,8 +1,8 @@
-CC      = gcc
-CXX     = g++
-CFLAGS  = -g -O3 -Wall -std=c++0x -pthread
+CC      ?= gcc
+CXX     ?= g++
+CFLAGS  ?= -g -O3 -Wall -std=c++0x -pthread
 LIBS    = -lm -lpthread
-LDFLAGS = -g
+LDFLAGS ?= -g
 
 OBJECTS =   APRSReader.o APRSWriter.o APRSWriterThread.o Conf.o CRC.o DTMF.o Golay24128.o \
 			GPS.o Log.o ModeConv.o Mutex.o NXDNConvolution.o NXDNCRC.o NXDNLayer3.o NXDNLICH.o \
