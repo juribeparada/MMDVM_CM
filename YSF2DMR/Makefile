@@ -1,8 +1,8 @@
-CC      = gcc
-CXX     = g++
-CFLAGS  = -g -O3 -Wall -std=c++0x -pthread
+CC      ?= gcc
+CXX     ?= g++
+CFLAGS  ?= -g -O3 -Wall -std=c++0x -pthread
 LIBS    = -lm -lpthread
-LDFLAGS = -g
+LDFLAGS ?= -g
 
 OBJECTS = 	BPTC19696.o Conf.o GPS.o TCPSocket.o DTMF.o APRSWriter.o APRSWriterThread.o CRC.o \
 			DelayBuffer.cpp DMRLookup.o DMREMB.o DMREmbeddedData.o APRSReader.o \
