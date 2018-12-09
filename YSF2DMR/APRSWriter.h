@@ -1,5 +1,7 @@
 /*
  *   Copyright (C) 2010,2011,2012,2016,2017 by Jonathan Naylor G4KLX
+ *   Copyright (C) 2018 by Manuel Sanchez EA7EE
+ *   Copyright (C) 2018 by Andy Uribe CA6JAU
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -33,7 +35,7 @@ public:
 
 	void setInfo(unsigned int txFrequency, unsigned int rxFrequency, float latitude, float longitude, int height, const std::string& desc);
 
-	void write(const unsigned char* source, const char* type, unsigned char radio, float latitude, float longitude);
+	void write(const unsigned char* source, const char* type, unsigned char radio, float latitude, float longitude, unsigned int tg_qrv);
 
 	void clock(unsigned int ms);
 

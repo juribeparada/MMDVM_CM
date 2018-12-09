@@ -86,6 +86,7 @@ m_aprsEnabled(false),
 m_aprsServer(),
 m_aprsPort(0U),
 m_aprsPassword(),
+m_aprsCallsign(),
 m_aprsAPIKey(),
 m_aprsRefresh(120),
 m_aprsDescription()
@@ -246,7 +247,12 @@ bool CConf::read()
 		else if (::strcmp(key, "DisplayLevel") == 0)
 			m_logDisplayLevel = (unsigned int)::atoi(value);
 	} else if (section == SECTION_APRS_FI) {
-		if (::strcmp(key, "Enable") == 0)
+		if (::strcmp(key, "AprsCallsign") == 0) {
+			// Convert the callsign to upper case
+			for (unsigned int i = 0U; value[i] != 0; i++)
+				value[i] = ::toupper(value[i]);
+			m_aprsCallsign = value;
+		} else if (::strcmp(key, "Enable") == 0)
 			m_aprsEnabled = ::atoi(value) == 1;
 		else if (::strcmp(key, "Server") == 0)
 			m_aprsServer = value;
@@ -406,6 +412,11 @@ std::string CConf::getAPRSServer() const
 unsigned int CConf::getAPRSPort() const
 {
 	return m_aprsPort;
+}
+
+std::string CConf::getAPRSCallsign() const
+{
+	return m_aprsCallsign;
 }
 
 std::string CConf::getAPRSPassword() const

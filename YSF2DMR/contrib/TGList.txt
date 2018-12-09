@@ -1,0 +1,41 @@
+# Example TGList.txt file
+# Enter only your preferred DMR ID list
+#
+# Format:
+# Dest ID;Option;Name;Description
+#
+# Option: TG:0, REF:1, PC:2
+#
+9;0;Local;Local
+91;0;World-wide;World-wide
+92;0;Europe;Europe
+93;0;North America;North America
+208;0;France;France
+214;0;Spain;Spain
+222;0;Italia;Italia
+232;0;Austria;Austria
+235;0;United Kingdom;United Kingdom
+262;0;Germany;Germany
+310;0;TAC-310 USA;TAC-310 USA
+334;0;Mexico;Mexico
+722;0;Argentina;Argentina
+724;0;Brazil;Brazil
+730;0;Chile;Chile
+913;0;English;English
+914;0;Spanish;Spanish
+3100;0;USA Nationwide;USA Nationwide
+4000;1;Ref Unlink;Ref Unlink
+4300;1;Ref France;France
+4326;1;Ref Canada;Canada
+4373;1;Ref CT Catalana;CT Catalana
+4374;1;Ref Spain 4;Ref Spain 4
+4400;1;Ref UK;United Kingdom
+4426;1;Ref Allstar;Allstar Link
+4639;1;Ref WorldWide;WorldWide
+4640;1;Ref USA;USA - Area 0
+4790;1;Ref Mexico;XE (334)
+5000;1;Ref Status; Ref Status
+9990;2;Parrot;Parrot
+21461;0;YSF-EA5SPAIN;YSF-EA5SPAIN
+94790;1;Ref2 Mexico;DMRGateway
+

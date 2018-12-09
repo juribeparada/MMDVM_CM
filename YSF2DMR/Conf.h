@@ -54,7 +54,7 @@ public:
   std::string  getLocation() const;
   std::string  getDescription() const;
   std::string  getURL() const;
-  
+
   // The DMR Network section
   unsigned int getDMRId() const;
   std::string  getDMRXLXFile() const;
@@ -90,9 +90,10 @@ public:
   std::string  getAPRSServer() const;
   unsigned int getAPRSPort() const;
   std::string  getAPRSPassword() const;
+  std::string  getAPRSCallsign() const;
   std::string  getAPRSAPIKey() const;
-  unsigned int getAPRSRefresh() const;  
-  std::string  getAPRSDescription() const;  
+  unsigned int getAPRSRefresh() const;
+  std::string  getAPRSDescription() const;
 
 private:
   std::string  m_file;
@@ -116,7 +117,7 @@ private:
   std::string  m_location;
   std::string  m_description;
   std::string  m_url;
-  
+
   unsigned int m_dmrId;
   std::string  m_dmrXLXFile;
   std::string  m_dmrXLXModule;
@@ -148,6 +149,7 @@ private:
   std::string  m_aprsServer;
   unsigned int m_aprsPort;
   std::string  m_aprsPassword;
+  std::string  m_aprsCallsign;
   std::string  m_aprsAPIKey;
   unsigned int m_aprsRefresh;
   std::string  m_aprsDescription;

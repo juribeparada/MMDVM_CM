@@ -1,5 +1,7 @@
 /*
  *   Copyright (C) 2010-2014,2016,2017 by Jonathan Naylor G4KLX
+ *   Copyright (C) 2018 by Manuel Sanchez EA7EE
+ *   Copyright (C) 2018 by Andy Uribe CA6JAU
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -70,7 +72,7 @@ bool CAPRSWriter::open()
 	return m_thread->start();
 }
 
-void CAPRSWriter::write(const unsigned char* source, const char* type, unsigned char radio, float fLatitude, float fLongitude)
+void CAPRSWriter::write(const unsigned char* source, const char* type, unsigned char radio, float fLatitude, float fLongitude, unsigned int tg_qrv)
 {
 	assert(source != NULL);
 	assert(type != NULL);
@@ -99,29 +101,38 @@ void CAPRSWriter::write(const unsigned char* source, const char* type, unsigned 
 	::sprintf(lon, "%08.2lf", longitude);
 
 	char symbol;
+	char suffix[3];
 	switch (radio) {
 	case 0x24U:
 	case 0x28U:
 		symbol = '[';
+		strcpy(suffix, "-7");
 		break;
 	case 0x25U:
 	case 0x29U:
 		symbol = '>';
+		strcpy(suffix, "-9");
 		break;
 	case 0x26U:
 		symbol = 'r';
+		strcpy(suffix, "-1");
 		break;
+	case 0x27U:
+		symbol = '-';
+		strcpy(suffix, "-2");
+		break;		
 	default:
 		symbol = '-';
+		strcpy(suffix, "-2");
 		break;
 	}
 	
 	char output[300U];
-	::sprintf(output, "%s-Y>APDPRS,C4FM*,qAR,%s:!%s%c/%s%c%c %s via MMDVM",
-		callsign, m_callsign.c_str(),
+	::sprintf(output, "%s%s>APDPRS,C4FM*,qAR,%s:!%s%c/%s%c%c %s QRV TG %d via MMDVM",
+		callsign, suffix, m_callsign.c_str(),
 		lat, (fLatitude < 0.0F) ? 'S' : 'N',
 		lon, (fLongitude < 0.0F) ? 'W' : 'E',
-		symbol, type);
+		symbol, type, tg_qrv);
 
 	m_thread->write(output);
 }

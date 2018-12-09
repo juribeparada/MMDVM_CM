@@ -1,5 +1,7 @@
 /*
 *   Copyright (C) 2016,2017 by Jonathan Naylor G4KLX
+*   Copyright (C) 2018 by Manuel Sanchez EA7EE
+*   Copyright (C) 2018 by Andy Uribe CA6JAU
 *
 *   This program is free software; you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
@@ -59,7 +61,7 @@ bool CGPS::open()
 	return m_writer.open();
 }
 
-void CGPS::data(const unsigned char* source, const unsigned char* data, unsigned char fi, unsigned char dt, unsigned char fn, unsigned char ft)
+void CGPS::data(const unsigned char* source, const unsigned char* data, unsigned char fi, unsigned char dt, unsigned char fn, unsigned char ft, unsigned int tg_qrv)
 {
 	if (m_sent)
 		return;
@@ -68,6 +70,7 @@ void CGPS::data(const unsigned char* source, const unsigned char* data, unsigned
 		return;
 
 	CYSFPayload payload;
+	m_tg_qrv = tg_qrv;
 
 	if (dt == YSF_DT_VD_MODE1) {
 		if (fn == 0U || fn == 1U || fn == 2U)
@@ -93,12 +96,12 @@ void CGPS::data(const unsigned char* source, const unsigned char* data, unsigned
 
 			if (valid) {
 				if (::memcmp(m_buffer + 1U, SHRT_GPS, 2U) == 0) {
-					CUtils::dump("Short GPS data received", m_buffer, (fn - 2U) * 20U);
+					// CUtils::dump("Short GPS data received", m_buffer, (fn - 2U) * 20U);
 					transmitGPS(source);
 				}
 
 				if (::memcmp(m_buffer + 1U, LONG_GPS, 2U) == 0) {
-					CUtils::dump("Long GPS data received", m_buffer, (fn - 2U) * 20U);
+					// CUtils::dump("Long GPS data received", m_buffer, (fn - 2U) * 20U);
 					transmitGPS(source);
 				}
 
@@ -128,18 +131,56 @@ void CGPS::data(const unsigned char* source, const unsigned char* data, unsigned
 
 			if (valid) {
 				if (::memcmp(m_buffer + 1U, SHRT_GPS, 2U) == 0) {
-					CUtils::dump("Short GPS data received", m_buffer, (fn - 5U) * 10U);
+					// CUtils::dump("Short GPS data received", m_buffer, (fn - 5U) * 10U);
 					transmitGPS(source);
 				}
 
 				if (::memcmp(m_buffer + 1U, LONG_GPS, 2U) == 0) {
-					CUtils::dump("Long GPS data received", m_buffer, (fn - 5U) * 10U);
+					// CUtils::dump("Long GPS data received", m_buffer, (fn - 5U) * 10U);
 					transmitGPS(source);
 				}
 
 				m_sent = true;
 			}
 		}
+	} else if (dt == YSF_DT_DATA_FR_MODE) {
+		if (fn == 1U) {
+			bool valid = payload.readDataFRModeData2(data, m_buffer + 0U);
+			if (!valid) return;
+		} else {
+			bool valid = payload.readDataFRModeData1(data, m_buffer + (fn - 1U) * 20U + 0U);
+			if (!valid) return;
+
+			valid = payload.readDataFRModeData2(data, m_buffer + (fn - 1U) * 20U + 20U);
+			if (!valid) return;
+		}
+		
+		if (fn == ft) {
+			bool valid = false;
+			// Find the end marker
+			for (unsigned int i = fn * 20U; i > 0U; i--) {
+				if (m_buffer[i] == 0x03U) {
+					unsigned char crc = CCRC::addCRC(m_buffer, i + 1U);
+					if (crc == m_buffer[i + 1U])
+						valid = true;
+					break;
+				}
+			}
+
+			if (valid) {
+				if (::memcmp(m_buffer + 1U, SHRT_GPS, 2U) == 0) {
+					// CUtils::dump("Short GPS data received", m_buffer, fn * 20U);
+					transmitGPS(source);
+				}
+
+				if (::memcmp(m_buffer + 1U, LONG_GPS, 2U) == 0) {
+					// CUtils::dump("Long GPS data received", m_buffer, fn * 20U);
+					transmitGPS(source);
+				}
+
+				m_sent = true;
+			}
+		}		
 	}
 }
 
@@ -262,6 +303,9 @@ void CGPS::transmitGPS(const unsigned char* source)
 	case 0x26U:
 		::strcpy(radio, "DR-1X");
 		break;
+	case 0x27U:
+		::strcpy(radio, "FT-991");
+		break;		
 	case 0x28U:
 		::strcpy(radio, "FT-2D");
 		break;
@@ -275,7 +319,7 @@ void CGPS::transmitGPS(const unsigned char* source)
 
 	LogMessage("GPS Position from %10.10s of radio=%s lat=%f long=%f", source, radio, latitude, longitude);
 
-	m_writer.write(source, radio, m_buffer[4U], latitude, longitude);
+	m_writer.write(source, radio, m_buffer[4U], latitude, longitude, m_tg_qrv);
 
 	m_sent = true;
 }

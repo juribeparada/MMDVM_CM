@@ -595,7 +595,7 @@ int CYSF2DMR::run()
 				}
 
 				if (m_gps != NULL)
-					m_gps->data(buffer + 14U, buffer + 35U, fi, dt, fn, ft);
+					m_gps->data(buffer + 14U, buffer + 35U, fi, dt, fn, ft, m_dstid);
 				
 			}
 
@@ -1127,15 +1127,20 @@ void CYSF2DMR::createGPS()
 	std::string hostname = m_conf.getAPRSServer();
 	unsigned int port    = m_conf.getAPRSPort();
 	std::string password = m_conf.getAPRSPassword();
+	std::string callsign = m_conf.getAPRSCallsign();
 	std::string desc     = m_conf.getAPRSDescription();
 
+	if (callsign.empty())
+		callsign = m_callsign;
+
 	LogMessage("APRS Parameters");
+	LogMessage("    Callsign: %s", callsign.c_str());
 	LogMessage("    Server: %s", hostname.c_str());
 	LogMessage("    Port: %u", port);
 	LogMessage("    Passworwd: %s", password.c_str());
 	LogMessage("    Description: %s", desc.c_str());
 
-	m_gps = new CGPS(m_callsign, m_suffix, password, hostname, port);
+	m_gps = new CGPS(callsign, m_suffix, password, hostname, port);
 
 	unsigned int txFrequency = m_conf.getTxFrequency();
 	unsigned int rxFrequency = m_conf.getRxFrequency();

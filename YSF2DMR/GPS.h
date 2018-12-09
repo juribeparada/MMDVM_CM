@@ -1,5 +1,7 @@
 /*
 *   Copyright (C) 2016,2017 by Jonathan Naylor G4KLX
+*   Copyright (C) 2018 by Manuel Sanchez EA7EE
+*   Copyright (C) 2018 by Andy Uribe CA6JAU
 *
 *   This program is free software; you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
@@ -32,7 +34,7 @@ public:
 
 	bool open();
 
-	void data(const unsigned char* source, const unsigned char* data, unsigned char fi, unsigned char dt, unsigned char fn, unsigned char ft);
+	void data(const unsigned char* source, const unsigned char* data, unsigned char fi, unsigned char dt, unsigned char fn, unsigned char ft, unsigned int tg_qrv);
 
 	void clock(unsigned int ms);
 
@@ -44,6 +46,7 @@ private:
 	CAPRSWriter    m_writer;
 	unsigned char* m_buffer;
 	bool           m_sent;
+	unsigned int   m_tg_qrv;
 
 	void transmitGPS(const unsigned char* source);
 };
