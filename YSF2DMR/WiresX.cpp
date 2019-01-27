@@ -1,7 +1,7 @@
 /*
 *   Copyright (C) 2016,2017 by Jonathan Naylor G4KLX
 *   Copyright (C) 2018 by Manuel Sanchez EA7EE
-*   Copyright (C) 2018 by Andy Uribe CA6JAU
+*   Copyright (C) 2018,2019 by Andy Uribe CA6JAU
 *
 *   This program is free software; you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ const unsigned char DEFAULT_FICH[] = {0x20U, 0x00U, 0x01U, 0x00U};
 
 const unsigned char NET_HEADER[] = "YSFD                    ALL      ";
 
-CWiresX::CWiresX(const std::string& callsign, const std::string& suffix, CYSFNetwork* network, std::string tgfile) :
+CWiresX::CWiresX(const std::string& callsign, const std::string& suffix, CYSFNetwork* network, std::string tgfile, bool makeUpper) :
 m_callsign(callsign),
 m_node(),
 m_id(),
@@ -68,7 +68,8 @@ m_csd3(NULL),
 m_status(WXSI_NONE),
 m_start(0U),
 m_search(),
-m_category()
+m_category(),
+m_makeUpper(makeUpper)
 {
 	assert(network != NULL);
 
@@ -114,6 +115,11 @@ m_category()
 				tgreg->m_opt = std::string(p2);
 				tgreg->m_name = std::string(p3);
 				tgreg->m_desc = std::string(p4);
+
+				if (m_makeUpper) {
+					std::transform(tgreg->m_name.begin(), tgreg->m_name.end(), tgreg->m_name.begin(), ::toupper);
+					std::transform(tgreg->m_desc.begin(), tgreg->m_desc.end(), tgreg->m_desc.begin(), ::toupper);
+				}
 
 				tgreg->m_name.resize(16U, ' ');
 				tgreg->m_desc.resize(14U, ' ');
