@@ -1,6 +1,6 @@
 /*
- *   Copyright (C) 2015,2016,2017 by Jonathan Naylor G4KLX
- *   Copyright (C) 2018 by Andy Uribe CA6JAU
+ *   Copyright (C) 2015-2019 by Jonathan Naylor G4KLX
+ *   Copyright (C) 2018,2019 by Andy Uribe CA6JAU
  *   Copyright (C) 2018 by Manuel Sanchez EA7EE
  *
  *   This program is free software; you can redistribute it and/or modify
@@ -49,6 +49,7 @@ m_localPort(0U),
 m_enableWiresX(false),
 m_remoteGateway(false),
 m_hangTime(1000U),
+m_wiresXMakeUpper(true),
 m_daemon(false),
 m_rxFrequency(0U),
 m_txFrequency(0U),
@@ -171,6 +172,8 @@ bool CConf::read()
 			m_remoteGateway = ::atoi(value) == 1;
 		else if (::strcmp(key, "HangTime") == 0)
 			m_hangTime = (unsigned int)::atoi(value);
+		else if (::strcmp(key, "WiresXMakeUpper") == 0)
+			m_wiresXMakeUpper = ::atoi(value) == 1;
 		else if (::strcmp(key, "Daemon") == 0)
 			m_daemon = ::atoi(value) == 1;
 	} else if (section == SECTION_INFO) {
@@ -317,6 +320,11 @@ bool CConf::getRemoteGateway() const
 unsigned int CConf::getHangTime() const
 {
 	return m_hangTime;
+}
+
+bool CConf::getWiresXMakeUpper() const
+{
+	return m_wiresXMakeUpper;
 }
 
 bool CConf::getDaemon() const

@@ -1,6 +1,6 @@
 /*
- *   Copyright (C) 2015,2016,2017 by Jonathan Naylor G4KLX
- *   Copyright (C) 2018 by Andy Uribe CA6JAU
+ *   Copyright (C) 2015-2019 by Jonathan Naylor G4KLX
+ *   Copyright (C) 2018,2019 by Andy Uribe CA6JAU
  *   Copyright (C) 2018 by Manuel Sanchez EA7EE
  *
  *   This program is free software; you can redistribute it and/or modify
@@ -42,6 +42,7 @@ public:
   bool         getEnableWiresX() const;
   bool         getRemoteGateway() const;
   unsigned int getHangTime() const;
+  bool         getWiresXMakeUpper() const;
   bool         getDaemon() const;
 
   // The Info section
@@ -106,6 +107,7 @@ private:
   bool         m_enableWiresX;
   bool         m_remoteGateway;
   unsigned int m_hangTime;
+  bool         m_wiresXMakeUpper;
   bool         m_daemon;
 
   unsigned int m_rxFrequency;
