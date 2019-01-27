@@ -1,6 +1,6 @@
 /*
- *   Copyright (C) 2015,2016,2017 by Jonathan Naylor G4KLX
- *   Copyright (C) 2018 by Andy Uribe CA6JAU
+ *   Copyright (C) 2015-2019 by Jonathan Naylor G4KLX
+ *   Copyright (C) 2018,2019 by Andy Uribe CA6JAU
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -47,6 +47,7 @@ public:
   std::string  getLocalAddress() const;
   unsigned int getLocalPort() const;
   bool         getEnableWiresX() const;
+  bool         getWiresXMakeUpper() const;
   bool         getDaemon() const;
 
   // The NXDN Network section
@@ -88,6 +89,7 @@ private:
   std::string  m_localAddress;
   unsigned int m_localPort;
   bool         m_enableWiresX;
+  bool         m_wiresXMakeUpper;
   bool         m_daemon;
 
   unsigned int m_rxFrequency;

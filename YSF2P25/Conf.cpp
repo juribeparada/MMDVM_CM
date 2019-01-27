@@ -1,6 +1,6 @@
 /*
- *   Copyright (C) 2015,2016,2017 by Jonathan Naylor G4KLX
- *   Copyright (C) 2018 by Andy Uribe CA6JAU
+ *   Copyright (C) 2015-2019 by Jonathan Naylor G4KLX
+ *   Copyright (C) 2018,2019 by Andy Uribe CA6JAU
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ m_dstPort(0U),
 m_localAddress(),
 m_localPort(0U),
 m_enableWiresX(false),
+m_wiresXMakeUpper(true),
 m_daemon(false),
 m_networkDebug(false),
 m_rxFrequency(0U),
@@ -146,6 +147,8 @@ bool CConf::read()
 			m_localPort = (unsigned int)::atoi(value);
 		else if (::strcmp(key, "EnableWiresX") == 0)
 			m_enableWiresX = ::atoi(value) == 1;
+		else if (::strcmp(key, "WiresXMakeUpper") == 0)
+			m_wiresXMakeUpper = ::atoi(value) == 1;
 		else if (::strcmp(key, "Daemon") == 0)
 			m_daemon = ::atoi(value) == 1;
 		else if (::strcmp(key, "Debug") == 0)
@@ -237,6 +240,11 @@ unsigned int CConf::getLocalPort() const
 bool CConf::getEnableWiresX() const
 {
 	return m_enableWiresX;
+}
+
+bool CConf::getWiresXMakeUpper() const
+{
+	return m_wiresXMakeUpper;
 }
 
 bool CConf::getDaemon() const

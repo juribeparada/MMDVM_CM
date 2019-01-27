@@ -1,6 +1,6 @@
 /*
 *   Copyright (C) 2016,2017 by Jonathan Naylor G4KLX
-*   Copyright (C) 2018 by Andy Uribe CA6JAU
+*   Copyright (C) 2018,2019 by Andy Uribe CA6JAU
 *   Copyright (C) 2018 by Manuel Sanchez EA7EE
 *
 *   This program is free software; you can redistribute it and/or modify
@@ -280,7 +280,8 @@ int CYSF2NXDN::run()
 
 	// CWiresX Control Object
 	if (enableWiresX) {
-		m_wiresX = new CWiresX(m_callsign, m_suffix, m_ysfNetwork, TGList);
+		bool makeUpper = m_conf.getWiresXMakeUpper();
+		m_wiresX = new CWiresX(m_callsign, m_suffix, m_ysfNetwork, TGList, makeUpper);
 		m_dtmf = new CDTMF;
 	}
 
