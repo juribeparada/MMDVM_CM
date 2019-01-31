@@ -30,6 +30,9 @@
 #include <pwd.h>
 #endif
 
+// Unpacked IMBE silence
+const unsigned char IMBE_SILENCE[] = {0x04U, 0x0CU, 0xFDU, 0x7BU, 0xFBU, 0x7DU, 0xF2U, 0x7BU, 0x3DU, 0x9EU, 0x44};
+
 const unsigned char REC62[] = {
 	0x62U, 0x02U, 0x02U, 0x0CU, 0x0BU, 0x12U, 0x64U, 0x00U, 0x00U, 0x80U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U,
 	0x00U, 0x00U, 0x00U, 0x00U, 0x00U};
@@ -791,5 +794,26 @@ std::string CYSF2P25::getSrcYSF(const unsigned char* buffer)
 
 void CYSF2P25::sendP25PTT(unsigned int src, unsigned int dst)
 {
+	unsigned char buffer[20U];
 
+	// Just send records 65 & 66 to activate linking in P25Gateway
+
+	// Send record 65
+	::memcpy(buffer, REC65, 17U);
+	::memcpy(buffer + 5U, IMBE_SILENCE, 11U);
+	buffer[1U] = (dst >> 16) & 0xFFU;
+	buffer[2U] = (dst >> 8) & 0xFFU;
+	buffer[3U] = (dst >> 0) & 0xFFU;
+	m_p25Network->writeData(buffer, 17U);
+
+	// Send record 66
+	::memcpy(buffer, REC66, 17U);
+	::memcpy(buffer + 5U, IMBE_SILENCE, 11U);
+	buffer[1U] = (src >> 16) & 0xFFU;
+	buffer[2U] = (src >> 8) & 0xFFU;
+	buffer[3U] = (src >> 0) & 0xFFU;
+	m_p25Network->writeData(buffer, 17U);
+
+	// Send EOT
+	m_p25Network->writeData(REC80, 17U);
 }
