@@ -388,6 +388,12 @@ int CYSF2P25::run()
 							break;
 
 						case WXS_DX:
+							if (!m_wiresX->getDstID()) {
+								sendP25PTT(m_srcid, 10U);
+								sendP25PTT(m_srcid, 9999U);
+							} else {
+								sendP25PTT(m_srcid, m_wiresX->getDstID());
+							}
 							break;
 
 						case WXS_DISCONNECT:
