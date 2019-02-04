@@ -25,6 +25,8 @@
 #include "DMRNetwork.h"
 #include "Thread.h"
 #include "Timer.h"
+#include "StopWatch.h"
+#include "RingBuffer.h"
 
 #include <vector>
 #include <string>
@@ -70,6 +72,7 @@ public:
 	~CWiresX();
 
 	bool start();
+	bool isBusy() const;
 
 	WX_STATUS process(const unsigned char* data, const unsigned char* source, unsigned char fi, unsigned char dt, unsigned char fn, unsigned char ft);
 
@@ -111,6 +114,10 @@ private:
 	std::vector<CTGReg*> m_TGSearch;
 	std::vector<CTGReg*> m_category;
 	bool                 m_makeUpper;
+	bool                 m_busy;
+	CTimer               m_busyTimer;
+	CStopWatch           m_txWatch;
+	CRingBuffer<unsigned char> m_bufferTX;
 
 	WX_STATUS processConnect(const unsigned char* source, const unsigned char* data);
 	void processDX(const unsigned char* source);
@@ -124,6 +131,7 @@ private:
 	void sendCategoryReply();
 
 	void createReply(const unsigned char* data, unsigned int length);
+	void writeData(const unsigned char* data);
 	unsigned char calculateFT(unsigned int length, unsigned int offset) const;
 };
 

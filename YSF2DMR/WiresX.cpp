@@ -69,7 +69,10 @@ m_status(WXSI_NONE),
 m_start(0U),
 m_search(),
 m_category(),
-m_makeUpper(makeUpper)
+m_makeUpper(makeUpper),
+m_busy(false),
+m_busyTimer(3000U, 1U),
+m_bufferTX(10000U, "YSF Wires-X TX Buffer")
 {
 	assert(network != NULL);
 
@@ -130,6 +133,8 @@ m_makeUpper(makeUpper)
 
 		::fclose(fp);
 	}
+
+	m_txWatch.start();
 }
 
 CWiresX::~CWiresX()
@@ -377,6 +382,9 @@ WX_STATUS CWiresX::processConnect(const unsigned char* source, const unsigned ch
 {
 	//::LogDebug("Received Connect to %6.6s from %10.10s", data, source);
 
+	m_busy = true;
+	m_busyTimer.start();
+
 	std::string id = std::string((char*)data, 6U);
 
 	m_dstID = atoi(id.c_str());
@@ -391,6 +399,9 @@ WX_STATUS CWiresX::processConnect(const unsigned char* source, const unsigned ch
 
 void CWiresX::processConnect(int dstID)
 {
+	m_busy = true;
+	m_busyTimer.start();
+
 	m_dstID = dstID;
 
 	m_status = WXSI_CONNECT;
@@ -408,6 +419,8 @@ void CWiresX::processDisconnect(const unsigned char* source)
 
 void CWiresX::clock(unsigned int ms)
 {
+	unsigned char buffer[200U];
+
 	m_timer.clock(ms);
 	if (m_timer.isRunning() && m_timer.hasExpired()) {
 		switch (m_status) {
@@ -434,6 +447,24 @@ void CWiresX::clock(unsigned int ms)
 
 		m_status = WXSI_NONE;
 		m_timer.stop();
+	}
+
+	if (m_txWatch.elapsed() > 90U) {
+		if (!m_bufferTX.isEmpty() && m_bufferTX.dataSize() >= 155U) {
+			unsigned char len = 0U;
+			m_bufferTX.getData(&len, 1U);
+			if (len == 155U) {
+				m_bufferTX.getData(buffer, 155U);
+				m_network->write(buffer);
+			}
+		}
+		m_txWatch.start();
+	}
+
+	m_busyTimer.clock(ms);
+	if (m_busyTimer.isRunning() && m_busyTimer.hasExpired()) {
+		m_busy = false;
+		m_busyTimer.stop();
 	}
 }
 
@@ -483,7 +514,7 @@ void CWiresX::createReply(const unsigned char* data, unsigned int length)
 	buffer[34U] = seqNo;
 	seqNo += 2U;
 
-	m_network->write(buffer);
+	writeData(buffer);
 
 	fich.setFI(YSF_FI_COMMUNICATIONS);
 
@@ -530,7 +561,7 @@ void CWiresX::createReply(const unsigned char* data, unsigned int length)
 		buffer[34U] = seqNo;
 		seqNo += 2U;
 
-		m_network->write(buffer);
+		writeData(buffer);
 
 		fn++;
 		if (fn >= 8U) {
@@ -550,7 +581,15 @@ void CWiresX::createReply(const unsigned char* data, unsigned int length)
 
 	buffer[34U] = seqNo | 0x01U;
 
-	m_network->write(buffer);
+	writeData(buffer);
+}
+
+void CWiresX::writeData(const unsigned char* buffer)
+{
+	// Send host Wires-X reply using ring buffer
+	unsigned char len = 155U;
+	m_bufferTX.addData(&len, 1U);
+	m_bufferTX.addData(buffer, len);
 }
 
 unsigned char CWiresX::calculateFT(unsigned int length, unsigned int offset) const
@@ -1085,4 +1124,9 @@ void CWiresX::sendCategoryReply()
 	createReply(data, offset + 2U);
 
 	m_seqNo++;
+}
+
+bool CWiresX::isBusy() const
+{
+	return m_busy;
 }
