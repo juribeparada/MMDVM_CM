@@ -70,8 +70,6 @@ m_start(0U),
 m_search(),
 m_category(),
 m_makeUpper(makeUpper),
-m_busy(false),
-m_busyTimer(3000U, 1U),
 m_bufferTX(10000U, "YSF Wires-X TX Buffer")
 {
 	assert(network != NULL);
@@ -382,9 +380,6 @@ WX_STATUS CWiresX::processConnect(const unsigned char* source, const unsigned ch
 {
 	//::LogDebug("Received Connect to %6.6s from %10.10s", data, source);
 
-	m_busy = true;
-	m_busyTimer.start();
-
 	std::string id = std::string((char*)data, 6U);
 
 	m_dstID = atoi(id.c_str());
@@ -399,9 +394,6 @@ WX_STATUS CWiresX::processConnect(const unsigned char* source, const unsigned ch
 
 void CWiresX::processConnect(int dstID)
 {
-	m_busy = true;
-	m_busyTimer.start();
-
 	m_dstID = dstID;
 
 	m_status = WXSI_CONNECT;
@@ -459,12 +451,6 @@ void CWiresX::clock(unsigned int ms)
 			}
 		}
 		m_txWatch.start();
-	}
-
-	m_busyTimer.clock(ms);
-	if (m_busyTimer.isRunning() && m_busyTimer.hasExpired()) {
-		m_busy = false;
-		m_busyTimer.stop();
 	}
 }
 
@@ -1124,9 +1110,4 @@ void CWiresX::sendCategoryReply()
 	createReply(data, offset + 2U);
 
 	m_seqNo++;
-}
-
-bool CWiresX::isBusy() const
-{
-	return m_busy;
 }

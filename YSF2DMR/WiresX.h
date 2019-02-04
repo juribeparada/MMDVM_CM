@@ -72,7 +72,6 @@ public:
 	~CWiresX();
 
 	bool start();
-	bool isBusy() const;
 
 	WX_STATUS process(const unsigned char* data, const unsigned char* source, unsigned char fi, unsigned char dt, unsigned char fn, unsigned char ft);
 
@@ -114,8 +113,6 @@ private:
 	std::vector<CTGReg*> m_TGSearch;
 	std::vector<CTGReg*> m_category;
 	bool                 m_makeUpper;
-	bool                 m_busy;
-	CTimer               m_busyTimer;
 	CStopWatch           m_txWatch;
 	CRingBuffer<unsigned char> m_bufferTX;
 
