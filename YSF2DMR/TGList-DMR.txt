@@ -121,12 +121,12 @@
 2067;0;Belgium OnDemand 7;Belgium OnDemand 7
 2068;0;Belgium OnDemand 8;Belgium OnDemand 8
 2069;0;Belgium OnDemand 9;Belgium OnDemand 9
-2080;0;France Ile De France 10;France Ile De France 10
-2081;0;France Mediterranee 1;France Mediterranee 1
-2082;0;France Alpes 2;France Alpes 2
-2083;0;France Midi Pyrenees 3;France Midi Pyrenees 3
-2084;0;France Est 4;France Est 4
-2085;0;France Ouest;France Ouest
+2080;0;Urgences FR 10;Urgences FR 10
+2081;0;France Ile de France 1;France Ile de France 1
+2082;0;France Nord-ouest 2;France Nord-ouest 2
+2083;0;France Nord-est 3;France Nord-est 3
+2084;0;France Sud-est 4;France Sud-est 4
+2085;0;France Sud-ouest 5;France Sud-ouest 5
 2086;0;France Atlantique 6;France Atlantique 6
 2087;0;France Nord 7;France Nord 7
 2088;0;France Centre 8;France Centre 8
@@ -484,8 +484,9 @@
 20494;0;YSF444;YSF444
 20601;0;Belgium North YSF Bridge;Belgium North YSF Bridge
 20602;0;Belgium South YSF Bridge;Belgium South YSF Bridge
-20811;0;YSF France;YSF France
+20800;0;YSF France;YSF France
 20821;0;Corsica;Corsica
+20833;0;Gironde;Gironde
 20859;0;Les amis du Nord;Les amis du Nord
 20869;0;Lyon Rhone-Alpes;Lyon Rhone-Alpes
 20883;0;Departement du Var;Departement du Var
