@@ -14,6 +14,7 @@
 10401;P25 Pacific TAC01;P25 Pacific TAC01
 10402;P25 Pacific TAC02;P25 Pacific TAC02
 10403;P25 Pacific TAC03;P25 Pacific TAC03
+10404;P25 Taiwan TYARC;P25 Taiwan TYARC
 28299;P25 USA Ragchew;P25 USA Ragchew
 31010;P25 Alabama Link;P25 Alabama Link
 31665;P25 P25-DMR Gateway;P25 P25-DMR Gateway
