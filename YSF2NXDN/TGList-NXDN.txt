@@ -5,6 +5,8 @@
 #
 # Dest ID;Name;Description
 #
+505;NXDN Australia;NXDN Australia
+530;NXDN New Zealand;NXDN New Zealand
 1200;NXDN Florida;NXDN Florida
 10200;NXDN North America;NXDN North America
 10268;NDXN 10268 Portuguese;NDXN 10268 Portuguese
