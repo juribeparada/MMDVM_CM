@@ -356,6 +356,10 @@ int CYSF2DMR::run()
 			LogMessage("XLX, Linking to reflector XLX%03u, module %s", m_xlxrefl, m_xlxmodule.c_str());
 			m_xlxConnected = true;
 		}
+		else if (!m_dmrNetwork->isConnected() && !m_xlxmodule.empty() && m_xlxConnected) {
+			LogMessage("XLX, Disconnected from reflector XLX%03u, module %s", m_xlxrefl, m_xlxmodule.c_str());
+			m_xlxConnected = false;
+		}
 
 		if (m_wiresX != NULL) {
 			switch (TG_connect_state) {
