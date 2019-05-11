@@ -79,6 +79,7 @@ public:
   // The DMR Id section
   std::string  getDMRIdLookupFile() const;
   unsigned int getDMRIdLookupTime() const;
+  bool         getDMRDropUnknown() const;
 
   // The Log section
   unsigned int getLogDisplayLevel() const;
@@ -141,6 +142,7 @@ private:
 
   std::string  m_dmrIdLookupFile;
   unsigned int m_dmrIdLookupTime;
+  bool         m_dmrDropUnknown;
 
   unsigned int m_logDisplayLevel;
   unsigned int m_logFileLevel;

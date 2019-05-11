@@ -240,6 +240,8 @@ bool CConf::read()
 			m_dmrIdLookupFile = value;
 		else if (::strcmp(key, "Time") == 0)
 			m_dmrIdLookupTime = (unsigned int)::atoi(value);
+		if (::strcmp(key, "DropUnknown") == 0)
+			m_dmrDropUnknown = ::atoi(value) == 1;
 	} else if (section == SECTION_LOG) {
 		if (::strcmp(key, "FilePath") == 0)
 			m_logFilePath = value;
@@ -515,6 +517,11 @@ std::string CConf::getDMRIdLookupFile() const
 unsigned int CConf::getDMRIdLookupTime() const
 {
 	return m_dmrIdLookupTime;
+}
+
+bool CConf::getDMRDropUnknown() const
+{
+	return m_dmrDropUnknown;
 }
 
 unsigned int CConf::getLogDisplayLevel() const

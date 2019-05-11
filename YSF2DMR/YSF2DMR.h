@@ -107,6 +107,7 @@ private:
 	bool             m_remoteGateway;
 	unsigned int     m_hangTime;
 	bool             m_firstSync;
+	bool             m_dropUnknown;
 
 	bool createDMRNetwork();
 	void createGPS();
