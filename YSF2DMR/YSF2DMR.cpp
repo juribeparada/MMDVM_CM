@@ -292,6 +292,7 @@ int CYSF2DMR::run()
 
 	m_lookup = new CDMRLookup(lookupFile, reloadTime);
 	m_lookup->read();
+	m_dropUnknown = m_conf.getDMRDropUnknown();
 
 	if (m_dmrpc)
 		m_dmrflco = FLCO_USER_USER;
@@ -581,21 +582,33 @@ int CYSF2DMR::run()
 							m_dmrNetwork->reset(2U);	// OE1KBC fix
 							
 							m_srcid = findYSFID(ysfSrc, true);
-							m_conv.putYSFHeader();
-							m_ysfFrames = 0U;
+							if (m_dropUnknown == 0 || m_srcid != 0) {
+								ysfWatchdog.start();
+								m_dmrNetwork->reset(2U);	// OE1KBC fix
+								 m_conv.putYSFHeader();
+								m_ysfFrames = 0U;
+							}
+							else
+							{
+								LogMessage("Dropped source without DMR ID: %s", ysfSrc.c_str());
+							}
 						}
 					} else if (fi == YSF_FI_TERMINATOR) {
-						ysfWatchdog.stop();
-						int extraFrames = (m_hangTime / 100U) - m_ysfFrames - 2U;
-						for (int i = 0U; i < extraFrames; i++)
-							m_conv.putDummyYSF();
-						LogMessage("YSF received end of voice transmission, %.1f seconds", float(m_ysfFrames) / 10.0F);
-						m_conv.putYSFEOT();
-						m_ysfFrames = 0U;
+						if (m_dropUnknown == 0 || m_srcid != 0) {
+							ysfWatchdog.stop();
+							int extraFrames = (m_hangTime / 100U) - m_ysfFrames - 2U;
+							for (int i = 0U; i < extraFrames; i++)
+								m_conv.putDummyYSF();
+							LogMessage("YSF received end of voice transmission, %.1f seconds", float(m_ysfFrames) / 10.0F);
+							m_conv.putYSFEOT();
+							m_ysfFrames = 0U;
+						}
 					} else if (fi == YSF_FI_COMMUNICATIONS) {
-						ysfWatchdog.start();
-						m_conv.putYSF(buffer + 35U);
-						m_ysfFrames++;
+						if (m_dropUnknown == 0 || m_srcid != 0) {
+							ysfWatchdog.start();
+							m_conv.putYSF(buffer + 35U);
+							m_ysfFrames++;
+						}
 					}
 				}
 
@@ -1255,7 +1268,7 @@ unsigned int CYSF2DMR::findYSFID(std::string cs, bool showdst)
 		dmrpc = false;
 
 	if (id == 0) {
-		id = m_defsrcid;
+		if (m_dropUnknown == 0) id = m_defsrcid;
 		if (showdst)
 			LogMessage("Not DMR ID found, using default ID: %u, DstID: %s%u", id, dmrpc ? "" : "TG ", m_dstid);
 		else
