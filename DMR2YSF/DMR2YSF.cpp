@@ -720,7 +720,7 @@ int CDMR2YSF::run()
 				CYSFPayload ysfPayload;
 				unsigned char dch[10U];
 
-				unsigned int fn = (ysf_cnt - 1U) % 7U;
+				unsigned int fn = (ysf_cnt - 1U) % (m_conf.getFICHFrameTotal() + 1);
 
 				::memcpy(m_ysfFrame + 0U, "YSFD", 4U);
 				::memcpy(m_ysfFrame + 4U, m_ysfNetwork->getCallsign().c_str(), YSF_CALLSIGN_LENGTH);
