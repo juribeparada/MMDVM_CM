@@ -44,6 +44,17 @@ public:
   unsigned int getHangTime() const;
   bool         getWiresXMakeUpper() const;
   bool         getDaemon() const;
+  unsigned char getFICHCallSign() const;
+  unsigned char getFICHCallMode() const;
+  unsigned char getFICHFrameTotal() const;
+  unsigned char getFICHMessageRoute() const;
+  unsigned char getFICHVOIP() const;
+  unsigned char getFICHDataType() const;
+  unsigned char getFICHSQLType() const;
+  unsigned char getFICHSQLCode() const;
+  unsigned char* getYsfDT1();
+  unsigned char* getYsfDT2();
+  char* getYsfRadioID();
 
   // The Info section
   unsigned int getRxFrequency() const;
