@@ -545,7 +545,8 @@ int CYSF2NXDN::run()
 						::memcpy(gps_buffer + 10U, dt2_temp, 10U);
 
 						m_netSrc = m_lookup->findCS(srcId);
-						m_netDst = m_lookup->findCS(dstId);
+						//m_netDst = m_lookup->findCS(dstId);
+						if (srcId != 9999U) { m_netDst = m_lookup->findCS(dstId); } else { m_netDst = std::to_string(dstId); }
 						LogMessage("Received NXDN Header: Src: %s Dst: %s", m_netSrc.c_str(), m_netDst.c_str());
 
 						m_conv.putNXDNHeader();
