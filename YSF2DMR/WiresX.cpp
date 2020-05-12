@@ -635,9 +635,10 @@ void CWiresX::sendDXReply()
 		sprintf(buf, "%05d", m_dstID);
 		::memcpy(data + 36U, buf, 5U);
 		
-		if (m_dstID > 99999U)
-			sprintf(buf1, "CALL %d", m_dstID);
-		else if (m_dstID == 9U)
+		//if (m_dstID > 99999U)
+		//	sprintf(buf1, "CALL %d", m_dstID);
+		//else if (m_dstID == 9U)
+		if (m_dstID == 9U)
 			strcpy(buf1, "LOCAL");
 		else if (m_dstID == 9990U)
 			strcpy(buf1, "PARROT");
@@ -721,9 +722,10 @@ void CWiresX::sendConnectReply(unsigned int dstID)
 	sprintf(buf, "%05d", m_dstID);
 	::memcpy(data + 36U, buf, 5U);
 
-	if (m_dstID > 99999U)
-		sprintf(buf1, "CALL %d", m_dstID);
-	else if (m_dstID == 9U)
+	//if (m_dstID > 99999U)
+	//	sprintf(buf1, "CALL %d", m_dstID);
+	//else if (m_dstID == 9U)
+	if (m_dstID == 9U)
 		strcpy(buf1, "LOCAL");
 	else if (m_dstID == 9990U)
 		strcpy(buf1, "PARROT");

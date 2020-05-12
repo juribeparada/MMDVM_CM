@@ -33,6 +33,9 @@
 const unsigned char dt1_temp[] = {0x31, 0x22, 0x62, 0x5F, 0x29, 0x00, 0x00, 0x00, 0x00, 0x00};
 const unsigned char dt2_temp[] = {0x00, 0x00, 0x00, 0x00, 0x6C, 0x20, 0x1C, 0x20, 0x03, 0x08};
 
+// Added by AD8DP for FICH FT=6 transmissions
+const uint8_t dt1[10] = {0x01, 0x22, 0x61, 0x5f, 0x2b, 0x03, 0x11, 0x00, 0x00, 0x00};
+
 const unsigned char CONN_RESP[] = {0x5DU, 0x41U, 0x5FU, 0x26U};
 
 #define DMR_FRAME_PER       55U
@@ -48,6 +51,7 @@ const char* HEADER1 = "This software is for use on amateur radio networks only,"
 const char* HEADER2 = "it is to be used for educational purposes only. Its use on";
 const char* HEADER3 = "commercial networks is strictly prohibited.";
 const char* HEADER4 = "Copyright(C) 2018 by CA6JAU, G4KLX and others";
+const char ysf_radioid[] = {'H', '5', '0', '0', '0'};
 
 #include <functional>
 #include <algorithm>
@@ -649,17 +653,22 @@ int CDMR2YSF::run()
 				CYSFFICH fich;
 				fich.setFI(YSF_FI_HEADER);
 				fich.setCS(2U);
+				fich.setCM(1U);
+				fich.setBN(0U);
+				fich.setBT(0U);
 				fich.setFN(0U);
-				fich.setFT(7U);
+				fich.setFT(6U);
 				fich.setDev(0U);
-				fich.setMR(2U);
+				fich.setMR(0U);
+				fich.setVoIP(false);
 				fich.setDT(YSF_DT_VD_MODE2);
 				fich.setSQL(0U);
 				fich.setSQ(0U);
 				fich.encode(m_ysfFrame + 35U);
 
 				unsigned char csd1[20U], csd2[20U];
-				memset(csd1, '*', YSF_CALLSIGN_LENGTH);
+				memset(csd1, '*', YSF_CALLSIGN_LENGTH/2);
+				memcpy(csd1 + YSF_CALLSIGN_LENGTH/2, ysf_radioid, YSF_CALLSIGN_LENGTH/2);
 				memcpy(csd1 + YSF_CALLSIGN_LENGTH, m_netSrc.c_str(), YSF_CALLSIGN_LENGTH);
 				memset(csd2, ' ', YSF_CALLSIGN_LENGTH + YSF_CALLSIGN_LENGTH);
 
@@ -685,17 +694,22 @@ int CDMR2YSF::run()
 				CYSFFICH fich;
 				fich.setFI(YSF_FI_TERMINATOR);
 				fich.setCS(2U);
+				fich.setCM(1U);
+				fich.setBN(0U);
+				fich.setBT(0U);
 				fich.setFN(0U);
-				fich.setFT(7U);
+				fich.setFT(6U);
 				fich.setDev(0U);
-				fich.setMR(2U);
+				fich.setMR(0U);
+				fich.setVoIP(false);
 				fich.setDT(YSF_DT_VD_MODE2);
 				fich.setSQL(0U);
 				fich.setSQ(0U);
 				fich.encode(m_ysfFrame + 35U);
 
 				unsigned char csd1[20U], csd2[20U];
-				memset(csd1, '*', YSF_CALLSIGN_LENGTH);
+				memset(csd1, '*', YSF_CALLSIGN_LENGTH/2);
+				memcpy(csd1 + YSF_CALLSIGN_LENGTH/2, ysf_radioid, YSF_CALLSIGN_LENGTH/2);
 				memcpy(csd1 + YSF_CALLSIGN_LENGTH, m_netSrc.c_str(), YSF_CALLSIGN_LENGTH);
 				memset(csd2, ' ', YSF_CALLSIGN_LENGTH + YSF_CALLSIGN_LENGTH);
 
@@ -708,8 +722,9 @@ int CDMR2YSF::run()
 
 				CYSFFICH fich;
 				CYSFPayload ysfPayload;
+				unsigned char dch[10U];
 
-				unsigned int fn = (ysf_cnt - 1U) % 8U;
+				unsigned int fn = (ysf_cnt - 1U) % 7U;
 
 				::memcpy(m_ysfFrame + 0U, "YSFD", 4U);
 				::memcpy(m_ysfFrame + 4U, m_ysfNetwork->getCallsign().c_str(), YSF_CALLSIGN_LENGTH);
@@ -721,7 +736,9 @@ int CDMR2YSF::run()
 
 				switch (fn) {
 					case 0:
-						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, (const unsigned char*)"**********");
+						memset(dch, '*', YSF_CALLSIGN_LENGTH/2);
+						memcpy(dch + YSF_CALLSIGN_LENGTH/2, ysf_radioid, YSF_CALLSIGN_LENGTH/2);
+						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, dch);
 						break;
 					case 1:
 						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, (const unsigned char*)m_netSrc.c_str());
@@ -729,11 +746,16 @@ int CDMR2YSF::run()
 					case 2:
 						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, (const unsigned char*)m_netDst.c_str());
 						break;
+					case 5:
+						memset(dch, ' ', YSF_CALLSIGN_LENGTH/2);
+						memcpy(dch + YSF_CALLSIGN_LENGTH/2, ysf_radioid, YSF_CALLSIGN_LENGTH/2);
+						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, dch);	// Rem3/4
+						break;
 					case 6:
-						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, gps_buffer);
+						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, dt1);
 						break;
 					case 7:
-						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, gps_buffer+10U);
+						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, dt2_temp);
 						break;
 					default:
 						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, (const unsigned char*)"          ");
@@ -742,10 +764,14 @@ int CDMR2YSF::run()
 				// Set the FICH
 				fich.setFI(YSF_FI_COMMUNICATIONS);
 				fich.setCS(2U);
+				fich.setCM(1U);
+				fich.setBN(0U);
+				fich.setBT(0U);
 				fich.setFN(fn);
-				fich.setFT(7U);
+				fich.setFT(6U);
 				fich.setDev(0U);
-				fich.setMR(YSF_MR_BUSY);
+				fich.setMR(0U);
+				fich.setVoIP(false);
 				fich.setDT(YSF_DT_VD_MODE2);
 				fich.setSQL(0U);
 				fich.setSQ(0U);
