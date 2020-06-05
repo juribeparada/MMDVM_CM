@@ -92,8 +92,6 @@ const unsigned char REC73[] = {
 const unsigned char REC80[] = {
 	0x80U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U};
 
-const uint8_t dt1[10] = {0x01, 0x22, 0x61, 0x5f, 0x2b, 0x03, 0x11, 0x00, 0x00, 0x00};
-
 #define P25_FRAME_PER       15U
 #define YSF_FRAME_PER       90U
 
@@ -107,7 +105,6 @@ const char* HEADER1 = "This software is for use on amateur radio networks only,"
 const char* HEADER2 = "it is to be used for educational purposes only. Its use on";
 const char* HEADER3 = "commercial networks is strictly prohibited.";
 const char* HEADER4 = "Copyright(C) 2018,2019 by CA6JAU, G4KLX and others";
-const char ysf_radioid[] = {'H', '5', '0', '0', '0'};
 
 #include <functional>
 #include <algorithm>
@@ -451,7 +448,7 @@ int CYSF2P25::run()
 						m_conv.putYSF(buffer + 35U);
 						m_ysfFrames++;
 					}
-				}	
+				}
 			}
 		}
 
@@ -623,23 +620,23 @@ int CYSF2P25::run()
 				// Set the FICH
 				CYSFFICH fich;
 				fich.setFI(YSF_FI_HEADER);
-				fich.setCS(2U);
-				fich.setCM(1U);
+				fich.setCS(m_conf.getFICHCallSign());
+ 				fich.setCM(m_conf.getFICHCallMode());
  				fich.setBN(0U);
  				fich.setBT(0U);
 				fich.setFN(0U);
-				fich.setFT(6U);
+				fich.setFT(m_conf.getFICHFrameTotal());
 				fich.setDev(0U);
-				fich.setMR(0U);
-				fich.setVoIP(false);
-				fich.setDT(YSF_DT_VOICE_FR_MODE);
-				fich.setSQL(0U);
-				fich.setSQ(0U);
+				fich.setMR(m_conf.getFICHMessageRoute());
+ 				fich.setVoIP(m_conf.getFICHVOIP());
+ 				fich.setDT(m_conf.getFICHDataType());
+ 				fich.setSQL(m_conf.getFICHSQLType());
+ 				fich.setSQ(m_conf.getFICHSQLCode());
 				fich.encode(m_ysfFrame + 35U);
 
 				unsigned char csd1[20U], csd2[20U];
 				memset(csd1, '*', YSF_CALLSIGN_LENGTH/2);
- 				memcpy(csd1 + YSF_CALLSIGN_LENGTH/2, ysf_radioid, YSF_CALLSIGN_LENGTH/2);
+ 				memcpy(csd1 + YSF_CALLSIGN_LENGTH/2, m_conf.getYsfRadioID(), YSF_CALLSIGN_LENGTH/2);
 				memcpy(csd1 + YSF_CALLSIGN_LENGTH, m_netSrc.c_str(), YSF_CALLSIGN_LENGTH);
 				memset(csd2, ' ', YSF_CALLSIGN_LENGTH + YSF_CALLSIGN_LENGTH);
 
@@ -647,7 +644,7 @@ int CYSF2P25::run()
 				payload.writeHeader(m_ysfFrame + 35U, csd1, csd2);
 
 				m_ysfNetwork->write(m_ysfFrame);
-				
+
 				ysf_cnt++;
 				ysfWatch.start();
 			}
@@ -663,23 +660,23 @@ int CYSF2P25::run()
 				// Set the FICH
 				CYSFFICH fich;
 				fich.setFI(YSF_FI_TERMINATOR);
-				fich.setCS(2U);
-				fich.setCM(1U);
+				fich.setCS(m_conf.getFICHCallSign());
+ 				fich.setCM(m_conf.getFICHCallMode());
  				fich.setBN(0U);
  				fich.setBT(0U);
-				fich.setFN(0U);
-				fich.setFT(6U);
-				fich.setDev(0U);
-				fich.setMR(0U);
-				fich.setVoIP(false);
-				fich.setDT(YSF_DT_VOICE_FR_MODE);
-				fich.setSQL(0U);
-				fich.setSQ(0U);
+ 				fich.setFN(0U);
+				fich.setFT(m_conf.getFICHFrameTotal());
+ 				fich.setDev(0U);
+				fich.setMR(m_conf.getFICHMessageRoute());
+ 				fich.setVoIP(m_conf.getFICHVOIP());
+ 				fich.setDT(m_conf.getFICHDataType());
+ 				fich.setSQL(m_conf.getFICHSQLType());
+ 				fich.setSQ(m_conf.getFICHSQLCode());
 				fich.encode(m_ysfFrame + 35U);
 
 				unsigned char csd1[20U], csd2[20U];
 				memset(csd1, '*', YSF_CALLSIGN_LENGTH/2);
- 				memcpy(csd1 + YSF_CALLSIGN_LENGTH/2, ysf_radioid, YSF_CALLSIGN_LENGTH/2);
+ 				memcpy(csd1 + YSF_CALLSIGN_LENGTH/2, m_conf.getYsfRadioID(), YSF_CALLSIGN_LENGTH/2);
 				memcpy(csd1 + YSF_CALLSIGN_LENGTH, m_netSrc.c_str(), YSF_CALLSIGN_LENGTH);
 				memset(csd2, ' ', YSF_CALLSIGN_LENGTH + YSF_CALLSIGN_LENGTH);
 
@@ -705,18 +702,18 @@ int CYSF2P25::run()
 
 				// Set the FICH
 				fich.setFI(YSF_FI_COMMUNICATIONS);
-				fich.setCS(2U);
-				fich.setCM(1U);
+				fich.setCS(m_conf.getFICHCallSign());
+ 				fich.setCM(m_conf.getFICHCallMode());
  				fich.setBN(0U);
  				fich.setBT(0U);
-				fich.setFN(fn);
-				fich.setFT(6U);
+ 				fich.setFN(fn);
+				fich.setFT(m_conf.getFICHFrameTotal());
 				fich.setDev(0U);
-				fich.setMR(0U);
-				fich.setVoIP(false);
-				fich.setDT(YSF_DT_VOICE_FR_MODE);
-				fich.setSQL(0U);
-				fich.setSQ(0U);
+				fich.setMR(m_conf.getFICHMessageRoute());
+ 				fich.setVoIP(m_conf.getFICHVOIP());
+ 				fich.setDT(m_conf.getFICHDataType());
+ 				fich.setSQL(m_conf.getFICHSQLType());
+ 				fich.setSQ(m_conf.getFICHSQLCode());
 				fich.encode(m_ysfFrame + 35U);
 
 				// Net frame counter
@@ -724,7 +721,7 @@ int CYSF2P25::run()
 
 				// Send data to MMDVMHost
 				m_ysfNetwork->write(m_ysfFrame);
-				
+
 				ysf_cnt++;
 				ysfWatch.start();
 			}
@@ -749,7 +746,7 @@ int CYSF2P25::run()
 
 	m_ysfNetwork->close();
 	m_p25Network->close();
-	
+
 	delete m_p25Network;
 	delete m_ysfNetwork;
 

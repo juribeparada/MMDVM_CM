@@ -43,7 +43,6 @@ public:
   bool         getRemoteGateway() const;
   unsigned int getHangTime() const;
   bool         getWiresXMakeUpper() const;
-  bool         getDaemon() const;
   unsigned char getFICHCallSign() const;
   unsigned char getFICHCallMode() const;
   unsigned char getFICHFrameTotal() const;
@@ -54,7 +53,8 @@ public:
   unsigned char getFICHSQLCode() const;
   unsigned char* getYsfDT1();
   unsigned char* getYsfDT2();
-  char* getYsfRadioID();
+  char*        getYsfRadioID();
+  bool         getDaemon() const;
 
   // The Info section
   unsigned int getRxFrequency() const;
@@ -120,6 +120,17 @@ private:
   bool         m_remoteGateway;
   unsigned int m_hangTime;
   bool         m_wiresXMakeUpper;
+  unsigned char m_fichCallSign;
+  unsigned char m_fichCallMode;
+  unsigned char m_fichFrameTotal;
+  unsigned char m_fichMessageRoute;
+  unsigned char m_fichVOIP;
+  unsigned char m_fichDataType;
+  unsigned char m_fichSQLType;
+  unsigned char m_fichSQLCode;
+  unsigned char m_ysfDT1[10U];
+  unsigned char m_ysfDT2[10U];
+  char         m_ysfRadioID[5];
   bool         m_daemon;
 
   unsigned int m_rxFrequency;
@@ -168,18 +179,6 @@ private:
   std::string  m_aprsAPIKey;
   unsigned int m_aprsRefresh;
   std::string  m_aprsDescription;
-
-  unsigned char m_fichCallSign;
-  unsigned char m_fichCallMode;
-  unsigned char m_fichFrameTotal;
-  unsigned char m_fichMessageRoute;
-  unsigned char m_fichVOIP;
-  unsigned char m_fichDataType;
-  unsigned char m_fichSQLType;
-  unsigned char m_fichSQLCode;
-  unsigned char m_ysfDT1[10U];
-  unsigned char m_ysfDT2[10U];
-  char m_ysfRadioID[5];
 };
 
 #endif

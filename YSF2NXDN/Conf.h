@@ -48,6 +48,17 @@ public:
   unsigned int getLocalPort() const;
   bool         getEnableWiresX() const;
   bool         getWiresXMakeUpper() const;
+  unsigned char getFICHCallSign() const;
+  unsigned char getFICHCallMode() const;
+  unsigned char getFICHFrameTotal() const;
+  unsigned char getFICHMessageRoute() const;
+  unsigned char getFICHVOIP() const;
+  unsigned char getFICHDataType() const;
+  unsigned char getFICHSQLType() const;
+  unsigned char getFICHSQLCode() const;
+  unsigned char* getYsfDT1();
+  unsigned char* getYsfDT2();
+  char*        getYsfRadioID();
   bool         getDaemon() const;
 
   // The NXDN Network section
@@ -90,6 +101,17 @@ private:
   unsigned int m_localPort;
   bool         m_enableWiresX;
   bool         m_wiresXMakeUpper;
+  unsigned char m_fichCallSign;
+  unsigned char m_fichCallMode;
+  unsigned char m_fichFrameTotal;
+  unsigned char m_fichMessageRoute;
+  unsigned char m_fichVOIP;
+  unsigned char m_fichDataType;
+  unsigned char m_fichSQLType;
+  unsigned char m_fichSQLCode;
+  unsigned char m_ysfDT1[10U];
+  unsigned char m_ysfDT2[10U];
+  char         m_ysfRadioID[5];
   bool         m_daemon;
 
   unsigned int m_rxFrequency;
