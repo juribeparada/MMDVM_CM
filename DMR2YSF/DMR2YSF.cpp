@@ -920,9 +920,9 @@ unsigned int CDMR2YSF::findYSFID(std::string cs, bool showdst)
 	if (id == 0) {
 		id = m_defsrcid;
 		if (showdst)
-			LogMessage("Not DMR ID found, using default ID: %u, DstID: %s%u", id, dmrpc ? "" : "TG ", m_dstid);
+			LogMessage("DMR ID not found, using default ID: %u, DstID: %s%u", id, dmrpc ? "" : "TG ", m_dstid);
 		else
-			LogMessage("Not DMR ID found, using default ID: %u", id);
+			LogMessage("DMR ID not found, using default ID: %u", id);
 	}
 	else {
 		if (showdst)
