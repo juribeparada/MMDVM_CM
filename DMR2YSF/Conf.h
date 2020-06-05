@@ -110,8 +110,8 @@ private:
   unsigned char m_fichDataType;
   unsigned char m_fichSQLType;
   unsigned char m_fichSQLCode;
-  unsigned char m_ysfDT1[10];
-  unsigned char m_ysfDT2[10];
+  unsigned char m_ysfDT1[10U];
+  unsigned char m_ysfDT2[10U];
   char m_ysfRadioID[5];
 };
 
