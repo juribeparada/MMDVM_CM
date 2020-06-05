@@ -44,6 +44,17 @@ public:
   unsigned int getHangTime() const;
   bool         getWiresXMakeUpper() const;
   bool         getDaemon() const;
+  unsigned char getFICHCallSign() const;
+  unsigned char getFICHCallMode() const;
+  unsigned char getFICHFrameTotal() const;
+  unsigned char getFICHMessageRoute() const;
+  unsigned char getFICHVOIP() const;
+  unsigned char getFICHDataType() const;
+  unsigned char getFICHSQLType() const;
+  unsigned char getFICHSQLCode() const;
+  unsigned char* getYsfDT1();
+  unsigned char* getYsfDT2();
+  char* getYsfRadioID();
 
   // The Info section
   unsigned int getRxFrequency() const;
@@ -148,7 +159,7 @@ private:
   unsigned int m_logFileLevel;
   std::string  m_logFilePath;
   std::string  m_logFileRoot;
-  
+
   bool         m_aprsEnabled;
   std::string  m_aprsServer;
   unsigned int m_aprsPort;
@@ -158,6 +169,17 @@ private:
   unsigned int m_aprsRefresh;
   std::string  m_aprsDescription;
 
+  unsigned char m_fichCallSign;
+  unsigned char m_fichCallMode;
+  unsigned char m_fichFrameTotal;
+  unsigned char m_fichMessageRoute;
+  unsigned char m_fichVOIP;
+  unsigned char m_fichDataType;
+  unsigned char m_fichSQLType;
+  unsigned char m_fichSQLCode;
+  unsigned char m_ysfDT1[10];
+  unsigned char m_ysfDT2[10];
+  char m_ysfRadioID[5];
 };
 
 #endif

@@ -238,6 +238,12 @@ void CYSFFICH::setCM(unsigned char cm)
 	m_fich[0U] |= (cm << 2) & 0x0CU;
 }
 
+void CYSFFICH::setCM(unsigned char cm)
+{
+ 	m_fich[0U] &= 0xF3U;
+ 	m_fich[0U] |= (cm << 2) & 0x0CU;
+}
+
 void CYSFFICH::setFN(unsigned char fn)
 {
 	m_fich[1U] &= 0xC7U;
