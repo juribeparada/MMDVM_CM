@@ -1,0 +1,256 @@
+/* This file contains symbols for version D02.032 of the firmware. */
+
+/* For maximum portability, try to use only symbols that cleanly */
+/* port to other versions.  Good candidates have long prologues. */
+
+/* Startup routines, very handy for hooking our startup. */
+toplinetext = 0x08021883;
+botlinetext = 0x08021895;
+
+/* Graphics functions. */
+gfx_drawtext                           = 0x800D88B;
+gfx_drawbmp                            = 0x8022887;
+gfx_drawtext2                          = 0x801cf1d;
+
+gfx_select_font                        = 0x8020975;
+gfx_font_small                         = 0x809bcec;
+gfx_font_norm                          = 0x80d0fac;
+
+gfx_set_bg_color                       = 0x801c5e1;
+gfx_set_fg_color                       = 0x801c5e9;
+gfx_blockfill                          = 0x801cb05;
+
+/* Function that handles the end of a DMR call. */
+dmr_call_end                           = 0x803f33d;
+/* Function that handles a DMR call. */
+dmr_call_start                         = 0x0803ec87;
+/* Function that handles a DMR SMS. */
+dmr_handle_data                        = 0x0804b66d;
+/* Function that handles an incoming SMS. */
+dmr_sms_arrive                         = 0x0803f03d;
+/* Called before unsquelching. */
+dmr_before_squelch                     = 0x0803ef6d;
+
+
+
+/* Upload and download handlers. */
+usb_upld_handle = 0x0808d3d9;
+usb_dnld_handle = 0x0808ccbf;
+
+/* This returns a USB packet to the host from the upload handler. */
+usb_send_packet = 0x080577af;
+
+/* Higher-level USB functions.  These need stub hooks. */
+usb_modestring = 0x080969bd;
+usb_manufacturer = 0x080969df;
+usb_serialnumber = 0x080969ef;
+usb_setcallbacks = 0x08052c0d;
+usb_do_setup = 0x0808cc01;
+
+/* USB DFU functions. */
+usb_dfu_write = 0x0808e441;
+usb_dfu_read = 0x0808e491;
+
+/* Function pointer at this address calls DNLD. */
+md380_dfutargetadr	= 0x2000112c;  /* from D002.032 @ 0x0808cd1a func 0x0808ccbe usb_dnld_handle() */
+md380_packet		= 0x200199f0;  /* from D002.032 @ 0x0808cd00 func 0x0808ccbe usb_dnld_handle() */ 
+md380_packetlen		= 0x2001d20c;  /* from D002.032 @ 0x0808cce4 func 0x0808ccbe usb_dnld_handle() */
+md380_blockadr		= 0x2001d208;  /* from D002.032 @ 0x0808ccce func 0x0808ccbe usb_dnld_handle() */
+md380_dfu_state		= 0x2001d405;  /* from D002.032 @ 0x0808ccc2 func 0x0808ccbe usb_dnld_handle() */
+md380_dfu_target_adr	= 0x2000112c;  /* from D002.032 @ 0x0808cd1a func 0x0808ccbe usb_dnld_handle() */
+md380_thingy2		= 0x2001d041;  /* from D002.032 @ 0x0808d234 !!! +1 !!! func 0x0808ccbe usb_dnld_handle() */
+md380_usbstring		= 0x2001c080;  /* from D002.032 @ 0x080969e4 func 0x080969de */
+print_buffer 		= 0x2001cc0c;  /* from D002.032 @ 0x080154de func 0x080154de */
+
+
+
+
+/* spi-flash */
+md380_spiflash_read                    = 0x802fd83;
+md380_spiflash_write                   = 0x802fe6b;
+md380_spiflash_security_registers_read = 0x80301bd;
+md380_spiflash_enable                  = 0x802fe37;
+md380_spiflash_disable                 = 0x802fe53;
+md380_spiflash_wait                    = 0x802fe15;
+md380_spiflash_block_erase64k          = 0x802fbb7;
+md380_spiflash_sektor_erase4k          = 0x802fb83;
+md380_spi_sendrecv                     = 0x802fdc9;
+
+
+
+/* i2c */
+md380_I2C_GenerateSTART                = 0x804fdc5;
+md380_I2C_GenerateSTOP                 = 0x804fde1;
+md380_I2C_ReceiveData                  = 0x804fe19;
+md380_I2C_Send7bitAddress              = 0x804fdfd;
+md380_I2C_SendData                     = 0x804fe13;
+
+/* Function that handles uC/OS-II settings */
+OSTaskCreateExt   = 0x804bbf5;
+OSTaskNameSet     = 0x804bcc1;
+
+OS_ENTER_CRITICAL = 0x08041df9;
+OS_EXIT_CRITICAL  = 0x08041e01;
+
+OSSemCreate       = 0x803da2d;
+
+OSSemPend         = 0x803da79;
+OSSemPost         = 0x803db69;
+
+md380_OSMboxPost = 0x080303b5;
+md380_OSMboxPend = 0x0803029d;
+
+
+/* //! Functions and Variabes regarding the menu */
+main_menu                              = 0x08039c23;
+md380_create_menu_entry                = 0x0800c731;
+md380_create_main_menu_entry           = 0x0800c189;
+md380_menu_numerical_input             = 0x0801a2d7;
+md380_create_menu_entry                = 0x0800c731;
+md380_menu_entry_back                  = 0x0800f453;
+md380_menu_entry_programradio          = 0x080127d1;
+
+md380_menu_0x200011e4                  = 0x200011e4; /* from D002.032 @ 0x80127f4 func 0x80127d0 */
+md380_menu_0x2001d3c1                  = 0x2001d3c1; /* from D002.032 @ 0x8012a7a func 0x80127d0 */
+md380_menu_0x2001d3ed                  = 0x2001d3ed; /* from D002.032 @ 0x8012ab2 func 0x80127d0 */
+md380_menu_0x2001d3ee                  = 0x2001d3ee; /* from D002.032 @ 0x8012aba func 0x80127d0 */
+md380_menu_0x2001d3ef                  = 0x2001d3ef; /* from D002.032 @ 0x8012ac2 func 0x80127d0 */
+md380_menu_0x2001d3f0                  = 0x2001d3f0; /* from D002.032 @ 0x8012ad2 func 0x80127d0 */
+md380_menu_0x2001d3f1                  = 0x2001d3f1; /* from D002.032 @ 0x8012aca func 0x80127d0 */
+md380_menu_0x2001d3f4                  = 0x2001d3f4; /* from D002.032 @ 0x8012a86 func 0x80127d0 */
+md380_menu_depth                       = 0x200011e4; /* from D002.032 @ 0x8012ada func 0x80127d0 */
+
+md380_menu_entry_selected              = 0x2001d3b2; /* from D002.032 @ 0x801a038 func 0x8019fd0 */
+md380_menu_id                          = 0x2001d3c2; /* from D002.032 @ 0x801a00c func 0x8019fd0 */
+md380_program_radio_unprohibited       = 0x2001d030; /* from D002.032 @ 0x8012740 func 0x80126a8 */
+md380_wt_programradio                  = 0x080d175c;
+mn_editbuffer_poi		       = 0x20001114; /* from D002.032 @ 0x802c566 func 0x802c55e */
+md380_menu_mem_base		       = 0x20019df0; /* from D002.032 @ 0x801a014 func 0x8019fd0 */
+md380_menu_memory	               = 0x2001c148; /* from D002.032 @ 0x8019fda func 0x8019fd0 */
+md380_menu_edit_buf		       = 0x2001b716; /* from D002.032 @ 0x802c9a8 func 0x802c99c */
+
+/* c5000 */
+c5000_spi0_readreg = 0x0803e2f5;
+c5000_spi0_writereg = 0x0803e2a9;
+
+/* aes */
+aes_loadkey = 0x08035739;
+aes_cipher = 0x080356b1;
+aes_startup_check = 0x0802168d;
+
+/* Unknown AMBE2+ thing. */
+ambe_encode_thing = 0x08050d91;
+/* Decodes an AMBE2+ frame into bits. */
+ambe_unpack = 0x08048c9d;
+
+/* Populates the audio buffer */
+ambe_decode_wav = 0x08051249;
+
+
+/* useful md380 firmware functions and variables*/
+md380_itow = 0x080172ed;
+md380_RTC_GetDate = 0x08026461;
+md380_RTC_GetTime = 0x0802634b;
+read_channel_switch = 0x0804d269;
+channelnum = 0x2001d376; /* D002.032 @ 0x0804d35c func 0x804d338 */
+
+/* useful md380 variables */
+
+md380_radio_config = 0x2001c658; /* from D002.032 @ 0x0803eefe func 0x803ec86 */
+
+/* stuff to handle different display (flip (380/390) type */
+md380_copy_spiflash_security_bank2_to_ram = 0x8021655;
+
+/* from the spiflash Security Registers */
+md380_radio_config_bank2 = 0x2001c974; /* from D002.032 @ 0x0802165c func 0x8021654 */
+
+ 
+/* Functions and Variabes from the "RTC Timer" - task */
+md380_f_4137 = 0x080290c9;
+md380_f_4520 = 0x08027ae9;
+md380_f_4098 = 0x0804c1d1;
+md380_f_4102 = 0x0804c2ab;
+f_4225 = 0x0801f045;
+
+/* relevant display functions */
+md380_Write_Command_2display = 0x08031f75;
+md380_Write_Data_2display = 0x08031f7d;
+
+/* Chinese font region. */
+chinese_font = 0x0809D000;
+
+/* Determines the squelching of an incoming call. */
+dmr_squelch_mode	=	0x2001d35f; /* from D002.032 @ 0x0803ed30 func 0x803ec86 */
+/* Unknown function involved in squelching. */
+dmr_squelch_firstthing	=	0x2001d118; /* from D002.032 @ 0x0803ee9a func 0x803ec86 */
+
+
+  
+
+
+
+/* Pointer to the buffer that stores the bottom line of screen text. */
+botlinetext		=	0x2001cee0; /* from D002.032 @ 0x0802189c func 0x8021894 */
+
+/* ROM copy of the welcome bitmap. */
+welcomebmp		=	0x080f9ca8;
+
+/* Variabes regarding the beep_process. */
+bp_freq	=	0x2001d178; /* from D002.032 @ 0x0802ba58 func 0x802ba44 */
+
+/* Variabes regarding rtc_timer process. */
+gui_opmode1 =	0x2001d3f7;  /* from D002.032 @ 0x0803ba0e func 0x803b524 */
+
+
+/* AMBE Buffer variables */
+ambe_inbuffer = 0x20011c8e;
+ambe_outbuffer0 = 0x20011aa8;
+ambe_outbuffer1 = 0x20011b48;
+ambe_mystery = 0x20011224;
+ambe_en_mystery = 0x2000c730;
+wav_inbuffer0 = 0x2000de82;
+wav_inbuffer1 = 0x2000df22;
+ambe_outbuffer = 0x2000dfc6;
+
+/* symgrate failed to find these non matched symbols */
+chinese_font_p_start = 0x809c714;
+RTC_Timer = 0x8044549;
+Get_Welcome_Line1_from_spi_flash = 0x8021883;
+Get_Welcome_Line2_from_spi_flash = 0x8021895;
+Start = 0x0804403d;
+Start_multiple_tasks = 0x0804429d;
+Print_Date_and_Time = 0x800d8af;
+Volume_Menu = 0x800df85;
+FUNC_F_286-0x80286e8 = 0x80286e9;
+FUNC_F_287-0x8028960 = 0x8028961;
+FUNC_F_4140-0x800c7e8 = 0x800c7e9;
+FUNC_F_4154 = 0x800dad5;
+FUNC_F_4170 = 0x801d7fd;
+FUNC_F_4171 = 0x801dcf1;
+F0x080969de = 0x080969df;
+loadfirmwareversion = 0x080154df;
+fcn.0808e328 = 0x0808e329;
+Create_Menu_Entry_Quick = 0x802c169;
+Edit_Message_Confirm_Send_Contacts = 0x802c8fb;
+F_588 = 0x0804b633;
+F_586 = 0x0804b5f3;
+F_587 = 0x0804b60f;
+x80126a8 = 0x80126a9;
+x80127d0 = 0x80127d1; 
+x8019fd0 = 0x8019fd1;
+x802c55e = 0x802c55f;
+x802c99c = 0x802c99d;
+x80127d0 = 0x80127d1;
+Ask_Test_PowerOnPassword = 0x0801a4fd;
+Create_Menu_Utilies = 0x080126a9;
+x0803b524 = 0x0803b525;
+x0803b55c = 0x0803b55d;
+x0802e240 = 0x0802e241;
+
+/* dummy entry. do not activate f_4315_hook() until found. */
+F_4315 = 0x0;
+
+/* dont hook before fixing this */
+draw_statusline = 0x0 ;
+
+gui_opmode2 = 0x2001d3f5 ;
