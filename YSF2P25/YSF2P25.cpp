@@ -636,7 +636,7 @@ int CYSF2P25::run()
 
 				unsigned char csd1[20U], csd2[20U];
 				memset(csd1, '*', YSF_CALLSIGN_LENGTH/2);
- 				memcpy(csd1 + YSF_CALLSIGN_LENGTH/2, m_conf.getYsfRadioID(), YSF_CALLSIGN_LENGTH/2);
+ 				memcpy(csd1 + YSF_CALLSIGN_LENGTH/2, m_conf.getYsfRadioID().c_str(), YSF_CALLSIGN_LENGTH/2);
 				memcpy(csd1 + YSF_CALLSIGN_LENGTH, m_netSrc.c_str(), YSF_CALLSIGN_LENGTH);
 				memset(csd2, ' ', YSF_CALLSIGN_LENGTH + YSF_CALLSIGN_LENGTH);
 
@@ -676,7 +676,7 @@ int CYSF2P25::run()
 
 				unsigned char csd1[20U], csd2[20U];
 				memset(csd1, '*', YSF_CALLSIGN_LENGTH/2);
- 				memcpy(csd1 + YSF_CALLSIGN_LENGTH/2, m_conf.getYsfRadioID(), YSF_CALLSIGN_LENGTH/2);
+ 				memcpy(csd1 + YSF_CALLSIGN_LENGTH/2, m_conf.getYsfRadioID().c_str(), YSF_CALLSIGN_LENGTH/2);
 				memcpy(csd1 + YSF_CALLSIGN_LENGTH, m_netSrc.c_str(), YSF_CALLSIGN_LENGTH);
 				memset(csd2, ' ', YSF_CALLSIGN_LENGTH + YSF_CALLSIGN_LENGTH);
 

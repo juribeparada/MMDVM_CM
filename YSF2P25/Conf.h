@@ -53,9 +53,9 @@ public:
   unsigned char getFICHDataType() const;
   unsigned char getFICHSQLType() const;
   unsigned char getFICHSQLCode() const;
-  unsigned char* getYsfDT1();
-  unsigned char* getYsfDT2();
-  char*        getYsfRadioID();
+  std::vector<unsigned char> getYsfDT1();
+  std::vector<unsigned char> getYsfDT2();
+  std::string  getYsfRadioID();
   bool         getDaemon() const;
   bool         getNetworkDebug() const;
 
@@ -97,9 +97,9 @@ private:
   unsigned char m_fichDataType;
   unsigned char m_fichSQLType;
   unsigned char m_fichSQLCode;
-  unsigned char m_ysfDT1[10];
-  unsigned char m_ysfDT2[10];
-  char         m_ysfRadioID[5];
+  std::vector<unsigned char> m_ysfDT1;
+  std::vector<unsigned char> m_ysfDT2;
+  std::string  m_ysfRadioID;
   bool         m_daemon;
   bool         m_networkDebug;
 
