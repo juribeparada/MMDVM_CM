@@ -51,10 +51,13 @@ public:
   unsigned char getFICHDataType() const;
   unsigned char getFICHSQLType() const;
   unsigned char getFICHSQLCode() const;
+  std::vector<unsigned char> getYsfDT1();
+  std::vector<unsigned char> getYsfDT2();
+  std::string  getYsfRadioID();
   unsigned char* getYsfDT1();
   unsigned char* getYsfDT2();
-  char*        getYsfRadioID();
-  bool         getDaemon() const;
+  char*         getYsfRadioID();
+  bool          getDaemon() const;
 
   // The Info section
   unsigned int getRxFrequency() const;
@@ -128,9 +131,9 @@ private:
   unsigned char m_fichDataType;
   unsigned char m_fichSQLType;
   unsigned char m_fichSQLCode;
-  unsigned char m_ysfDT1[10U];
-  unsigned char m_ysfDT2[10U];
-  char         m_ysfRadioID[5];
+  std::vector<unsigned char> m_ysfDT1;
+  std::vector<unsigned char> m_ysfDT2;
+  std::string  m_ysfRadioID;
   bool         m_daemon;
 
   unsigned int m_rxFrequency;
