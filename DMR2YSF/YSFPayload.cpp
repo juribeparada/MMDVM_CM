@@ -25,7 +25,7 @@
 #include <cstdint>
 
 const unsigned int INTERLEAVE_TABLE_9_20[] = {
-        0U, 40U,  80U, 120U, 160U, 200U, 240U, 280U, 320U, 
+        0U, 40U,  80U, 120U, 160U, 200U, 240U, 280U, 320U,
         2U, 42U,  82U, 122U, 162U, 202U, 242U, 282U, 322U,
         4U, 44U,  84U, 124U, 164U, 204U, 244U, 284U, 324U,
         6U, 46U,  86U, 126U, 166U, 206U, 246U, 286U, 326U,
@@ -609,7 +609,7 @@ std::string CYSFPayload::getDest()
 	std::string tmp;
 
 	if (m_dest)
-		tmp.assign((const char *)m_dest, YSF_CALLSIGN_LENGTH);
+		tmp.assign((const char *)m_dest, 5);
 	else
 		tmp = "";
 

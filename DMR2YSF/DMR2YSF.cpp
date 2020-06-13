@@ -33,9 +33,6 @@
 const unsigned char dt1_temp[] = {0x31, 0x22, 0x62, 0x5F, 0x29, 0x00, 0x00, 0x00, 0x00, 0x00};
 const unsigned char dt2_temp[] = {0x00, 0x00, 0x00, 0x00, 0x6C, 0x20, 0x1C, 0x20, 0x03, 0x08};
 
-// Added by AD8DP for FICH FT=6 transmissions
-const uint8_t dt1[10] = {0x01, 0x22, 0x61, 0x5f, 0x2b, 0x03, 0x11, 0x00, 0x00, 0x00};
-
 const unsigned char CONN_RESP[] = {0x5DU, 0x41U, 0x5FU, 0x26U};
 
 #define DMR_FRAME_PER       55U
@@ -51,7 +48,6 @@ const char* HEADER1 = "This software is for use on amateur radio networks only,"
 const char* HEADER2 = "it is to be used for educational purposes only. Its use on";
 const char* HEADER3 = "commercial networks is strictly prohibited.";
 const char* HEADER4 = "Copyright(C) 2018 by CA6JAU, G4KLX and others";
-const char ysf_radioid[] = {'H', '5', '0', '0', '0'};
 
 #include <functional>
 #include <algorithm>
@@ -652,23 +648,24 @@ int CDMR2YSF::run()
 				// Set the FICH
 				CYSFFICH fich;
 				fich.setFI(YSF_FI_HEADER);
-				fich.setCS(2U);
-				fich.setCM(1U);
-				fich.setBN(0U);
-				fich.setBT(0U);
+				fich.setCS(m_conf.getFICHCallSign());
+ 				fich.setCM(m_conf.getFICHCallMode());
+ 				fich.setBN(0U);
+ 				fich.setBT(0U);
 				fich.setFN(0U);
-				fich.setFT(6U);
+				fich.setFT(m_conf.getFICHFrameTotal());
 				fich.setDev(0U);
-				fich.setMR(0U);
-				fich.setVoIP(false);
-				fich.setDT(YSF_DT_VD_MODE2);
-				fich.setSQL(0U);
-				fich.setSQ(0U);
+				fich.setMR(m_conf.getFICHMessageRoute());
+ 				fich.setVoIP(m_conf.getFICHVOIP());
+ 				fich.setDT(m_conf.getFICHDataType());
+ 				fich.setSQL(m_conf.getFICHSQLType());
+ 				fich.setSQ(m_conf.getFICHSQLCode());
 				fich.encode(m_ysfFrame + 35U);
 
 				unsigned char csd1[20U], csd2[20U];
-				memset(csd1, '*', YSF_CALLSIGN_LENGTH/2);
-				memcpy(csd1 + YSF_CALLSIGN_LENGTH/2, ysf_radioid, YSF_CALLSIGN_LENGTH/2);
+				memset(csd1, '*', YSF_CALLSIGN_LENGTH);
+ 				memset(csd1, '*', YSF_CALLSIGN_LENGTH/2);
+ 				memcpy(csd1 + YSF_CALLSIGN_LENGTH/2, m_conf.getYsfRadioID().c_str(), YSF_CALLSIGN_LENGTH/2);
 				memcpy(csd1 + YSF_CALLSIGN_LENGTH, m_netSrc.c_str(), YSF_CALLSIGN_LENGTH);
 				memset(csd2, ' ', YSF_CALLSIGN_LENGTH + YSF_CALLSIGN_LENGTH);
 
@@ -676,7 +673,7 @@ int CDMR2YSF::run()
 				payload.writeHeader(m_ysfFrame + 35U, csd1, csd2);
 
 				m_ysfNetwork->write(m_ysfFrame);
-				
+
 				ysf_cnt++;
 				ysfWatch.start();
 			}
@@ -693,23 +690,23 @@ int CDMR2YSF::run()
 				// Set the FICH
 				CYSFFICH fich;
 				fich.setFI(YSF_FI_TERMINATOR);
-				fich.setCS(2U);
-				fich.setCM(1U);
-				fich.setBN(0U);
-				fich.setBT(0U);
-				fich.setFN(0U);
-				fich.setFT(6U);
-				fich.setDev(0U);
-				fich.setMR(0U);
-				fich.setVoIP(false);
-				fich.setDT(YSF_DT_VD_MODE2);
-				fich.setSQL(0U);
-				fich.setSQ(0U);
+				fich.setCS(m_conf.getFICHCallSign());
+ 				fich.setCM(m_conf.getFICHCallMode());
+ 				fich.setBN(0U);
+ 				fich.setBT(0U);
+ 				fich.setFN(0U);
+				fich.setFT(m_conf.getFICHFrameTotal());
+ 				fich.setDev(0U);
+				fich.setMR(m_conf.getFICHMessageRoute());
+ 				fich.setVoIP(m_conf.getFICHVOIP());
+ 				fich.setDT(m_conf.getFICHDataType());
+ 				fich.setSQL(m_conf.getFICHSQLType());
+ 				fich.setSQ(m_conf.getFICHSQLCode());
 				fich.encode(m_ysfFrame + 35U);
 
 				unsigned char csd1[20U], csd2[20U];
 				memset(csd1, '*', YSF_CALLSIGN_LENGTH/2);
-				memcpy(csd1 + YSF_CALLSIGN_LENGTH/2, ysf_radioid, YSF_CALLSIGN_LENGTH/2);
+ 				memcpy(csd1 + YSF_CALLSIGN_LENGTH/2, m_conf.getYsfRadioID().c_str(), YSF_CALLSIGN_LENGTH/2);
 				memcpy(csd1 + YSF_CALLSIGN_LENGTH, m_netSrc.c_str(), YSF_CALLSIGN_LENGTH);
 				memset(csd2, ' ', YSF_CALLSIGN_LENGTH + YSF_CALLSIGN_LENGTH);
 
@@ -724,7 +721,7 @@ int CDMR2YSF::run()
 				CYSFPayload ysfPayload;
 				unsigned char dch[10U];
 
-				unsigned int fn = (ysf_cnt - 1U) % 7U;
+				unsigned int fn = (ysf_cnt - 1U) % (m_conf.getFICHFrameTotal() + 1);
 
 				::memcpy(m_ysfFrame + 0U, "YSFD", 4U);
 				::memcpy(m_ysfFrame + 4U, m_ysfNetwork->getCallsign().c_str(), YSF_CALLSIGN_LENGTH);
@@ -737,44 +734,52 @@ int CDMR2YSF::run()
 				switch (fn) {
 					case 0:
 						memset(dch, '*', YSF_CALLSIGN_LENGTH/2);
-						memcpy(dch + YSF_CALLSIGN_LENGTH/2, ysf_radioid, YSF_CALLSIGN_LENGTH/2);
-						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, dch);
+ 						memcpy(dch + YSF_CALLSIGN_LENGTH/2, m_conf.getYsfRadioID().c_str(), YSF_CALLSIGN_LENGTH/2);
+ 						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, dch);
 						break;
 					case 1:
-						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, (const unsigned char*)m_netSrc.c_str());
+						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, (unsigned char*)m_netSrc.c_str());
 						break;
 					case 2:
-						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, (const unsigned char*)m_netDst.c_str());
+						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, (unsigned char*)m_netDst.c_str());
 						break;
 					case 5:
 						memset(dch, ' ', YSF_CALLSIGN_LENGTH/2);
-						memcpy(dch + YSF_CALLSIGN_LENGTH/2, ysf_radioid, YSF_CALLSIGN_LENGTH/2);
-						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, dch);	// Rem3/4
+ 						memcpy(dch + YSF_CALLSIGN_LENGTH/2, m_conf.getYsfRadioID().c_str(), YSF_CALLSIGN_LENGTH/2);
+ 						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, dch);	// Rem3/4
+ 						break;
+					case 6: {
+							unsigned char dt1[10U] = {0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U};
+							for (unsigned int i = 0U; i < m_conf.getYsfDT1().size() && i < 10U; i++)
+								dt1[i] = m_conf.getYsfDT1()[i];
+							ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, dt1);
+						}
 						break;
-					case 6:
-						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, dt1);
-						break;
-					case 7:
-						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, dt2_temp);
+					case 7: {
+							unsigned char dt2[10U] = {0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U};
+							for (unsigned int i = 0U; i < m_conf.getYsfDT2().size() && i < 10U; i++)
+								dt2[i] = m_conf.getYsfDT2()[i];
+							ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, dt2);
+						}
 						break;
 					default:
 						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, (const unsigned char*)"          ");
 				}
-				
+
 				// Set the FICH
 				fich.setFI(YSF_FI_COMMUNICATIONS);
-				fich.setCS(2U);
-				fich.setCM(1U);
-				fich.setBN(0U);
-				fich.setBT(0U);
-				fich.setFN(fn);
-				fich.setFT(6U);
+				fich.setCS(m_conf.getFICHCallSign());
+ 				fich.setCM(m_conf.getFICHCallMode());
+ 				fich.setBN(0U);
+ 				fich.setBT(0U);
+ 				fich.setFN(fn);
+				fich.setFT(m_conf.getFICHFrameTotal());
 				fich.setDev(0U);
-				fich.setMR(0U);
-				fich.setVoIP(false);
-				fich.setDT(YSF_DT_VD_MODE2);
-				fich.setSQL(0U);
-				fich.setSQ(0U);
+				fich.setMR(m_conf.getFICHMessageRoute());
+ 				fich.setVoIP(m_conf.getFICHVOIP());
+ 				fich.setDT(m_conf.getFICHDataType());
+ 				fich.setSQL(m_conf.getFICHSQLType());
+ 				fich.setSQ(m_conf.getFICHSQLCode());
 				fich.encode(m_ysfFrame + 35U);
 
 				// Net frame counter
@@ -782,7 +787,7 @@ int CDMR2YSF::run()
 
 				// Send data
 				m_ysfNetwork->write(m_ysfFrame);
-				
+
 				ysf_cnt++;
 				ysfWatch.start();
 			}
@@ -901,7 +906,7 @@ unsigned int CDMR2YSF::findYSFID(std::string cs, bool showdst)
 	int mid1 = cs.find_last_of('-');
 	int mid2 = cs.find_last_of('/');
 	int last = cs.find_last_not_of(' ');
-	
+
 	if (mid1 == -1 && mid2 == -1 && first == -1 && last == -1)
 		cstrim = "N0CALL";
 	else if (mid1 == -1 && mid2 == -1)
@@ -923,9 +928,9 @@ unsigned int CDMR2YSF::findYSFID(std::string cs, bool showdst)
 	if (id == 0) {
 		id = m_defsrcid;
 		if (showdst)
-			LogMessage("Not DMR ID found, using default ID: %u, DstID: %s%u", id, dmrpc ? "" : "TG ", m_dstid);
+			LogMessage("DMR ID not found, using default ID: %u, DstID: %s%u", id, dmrpc ? "" : "TG ", m_dstid);
 		else
-			LogMessage("Not DMR ID found, using default ID: %u", id);
+			LogMessage("DMR ID not found, using default ID: %u", id);
 	}
 	else {
 		if (showdst)
@@ -943,10 +948,10 @@ std::string CDMR2YSF::getSrcYSF(const unsigned char* buffer)
 
 	::memcpy(temp, buffer + 14U, YSF_CALLSIGN_LENGTH);
 	temp[YSF_CALLSIGN_LENGTH] = 0U;
-	
+
 	std::string trimmed = reinterpret_cast<char const*>(temp);
 	trimmed.erase(std::find_if(trimmed.rbegin(), trimmed.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), trimmed.end());
-	
+
 	return trimmed;
 }
 

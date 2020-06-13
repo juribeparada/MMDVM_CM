@@ -43,7 +43,21 @@ public:
   bool         getRemoteGateway() const;
   unsigned int getHangTime() const;
   bool         getWiresXMakeUpper() const;
-  bool         getDaemon() const;
+  unsigned char getFICHCallSign() const;
+  unsigned char getFICHCallMode() const;
+  unsigned char getFICHFrameTotal() const;
+  unsigned char getFICHMessageRoute() const;
+  unsigned char getFICHVOIP() const;
+  unsigned char getFICHDataType() const;
+  unsigned char getFICHSQLType() const;
+  unsigned char getFICHSQLCode() const;
+  std::vector<unsigned char> getYsfDT1();
+  std::vector<unsigned char> getYsfDT2();
+  std::string  getYsfRadioID();
+  unsigned char* getYsfDT1();
+  unsigned char* getYsfDT2();
+  char*         getYsfRadioID();
+  bool          getDaemon() const;
 
   // The Info section
   unsigned int getRxFrequency() const;
@@ -109,6 +123,17 @@ private:
   bool         m_remoteGateway;
   unsigned int m_hangTime;
   bool         m_wiresXMakeUpper;
+  unsigned char m_fichCallSign;
+  unsigned char m_fichCallMode;
+  unsigned char m_fichFrameTotal;
+  unsigned char m_fichMessageRoute;
+  unsigned char m_fichVOIP;
+  unsigned char m_fichDataType;
+  unsigned char m_fichSQLType;
+  unsigned char m_fichSQLCode;
+  std::vector<unsigned char> m_ysfDT1;
+  std::vector<unsigned char> m_ysfDT2;
+  std::string  m_ysfRadioID;
   bool         m_daemon;
 
   unsigned int m_rxFrequency;
@@ -148,7 +173,7 @@ private:
   unsigned int m_logFileLevel;
   std::string  m_logFilePath;
   std::string  m_logFileRoot;
-  
+
   bool         m_aprsEnabled;
   std::string  m_aprsServer;
   unsigned int m_aprsPort;
@@ -157,7 +182,6 @@ private:
   std::string  m_aprsAPIKey;
   unsigned int m_aprsRefresh;
   std::string  m_aprsDescription;
-
 };
 
 #endif

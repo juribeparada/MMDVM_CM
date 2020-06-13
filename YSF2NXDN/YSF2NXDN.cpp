@@ -33,7 +33,6 @@
 // DT1 and DT2, suggested by Manuel EA7EE
 const unsigned char dt1_temp[] = {0x31, 0x22, 0x62, 0x5F, 0x29, 0x00, 0x00, 0x00, 0x00, 0x00};
 const unsigned char dt2_temp[] = {0x00, 0x00, 0x00, 0x00, 0x6C, 0x20, 0x1C, 0x20, 0x03, 0x08};
-const uint8_t dt1[10] = {0x01, 0x22, 0x61, 0x5f, 0x2b, 0x03, 0x11, 0x00, 0x00, 0x00};
 
 #define NXDN_FRAME_PER      75U
 #define YSF_FRAME_PER       90U
@@ -48,7 +47,6 @@ const char* HEADER1 = "This software is for use on amateur radio networks only,"
 const char* HEADER2 = "it is to be used for educational purposes only. Its use on";
 const char* HEADER3 = "commercial networks is strictly prohibited.";
 const char* HEADER4 = "Copyright(C) 2018,2019 by CA6JAU, G4KLX and others";
-const char ysf_radioid[] = {'H', '5', '0', '0', '0'};
 
 #include <functional>
 #include <algorithm>
@@ -397,7 +395,7 @@ int CYSF2NXDN::run()
 
 				if (m_gps != NULL)
 					m_gps->data(buffer + 14U, buffer + 35U, fi, dt, fn, ft);
-				
+
 			}
 
 			if ((buffer[34U] & 0x01U) == 0x01U) {
@@ -519,7 +517,7 @@ int CYSF2NXDN::run()
 
 				// Send data to MMDVMHost
 				m_nxdnNetwork->write(m_nxdnFrame, false);
-				
+
 				nxdn_cnt++;
 				nxdnWatch.start();
 			}
@@ -539,7 +537,7 @@ int CYSF2NXDN::run()
 
 				dstId  = (m_nxdnFrame[10U] << 8) & 0xFF00U;
 				dstId |= (m_nxdnFrame[11U] << 0) & 0x00FFU;
-				
+
 				if (grp && m_dstid == dstId) {
 					if (m_nxdnFrame[5U] == 0x01) {
 						// DT1 & DT2 without GPS info
@@ -588,7 +586,7 @@ int CYSF2NXDN::run()
 				m_nxdnFrames++;
 			}
 		}
-		
+
 		if (ysfWatch.elapsed() > YSF_FRAME_PER) {
 			unsigned int ysfFrameType = m_conv.getYSF(m_ysfFrame + 35U);
 
@@ -606,24 +604,23 @@ int CYSF2NXDN::run()
 				// Set the FICH
 				CYSFFICH fich;
 				fich.setFI(YSF_FI_HEADER);
-				fich.setCS(2U);
-				fich.setCM(1U);
+				fich.setCS(m_conf.getFICHCallSign());
+ 				fich.setCM(m_conf.getFICHCallMode());
  				fich.setBN(0U);
  				fich.setBT(0U);
 				fich.setFN(0U);
-				fich.setFT(6U);
+				fich.setFT(m_conf.getFICHFrameTotal());
 				fich.setDev(0U);
-				fich.setMR(0U);
-				fich.setVoIP(false);
-				fich.setDT(YSF_DT_VD_MODE2);
-				fich.setSQL(0U);
-				fich.setSQ(0U);
+				fich.setMR(m_conf.getFICHMessageRoute());
+ 				fich.setVoIP(m_conf.getFICHVOIP());
+ 				fich.setDT(m_conf.getFICHDataType());
+ 				fich.setSQL(m_conf.getFICHSQLType());
+ 				fich.setSQ(m_conf.getFICHSQLCode());
 				fich.encode(m_ysfFrame + 35U);
 
 				unsigned char csd1[20U], csd2[20U];
 				memset(csd1, '*', YSF_CALLSIGN_LENGTH/2);
-				memcpy(csd1 + YSF_CALLSIGN_LENGTH/2, ysf_radioid, YSF_CALLSIGN_LENGTH/2);
-				//memset(csd1, '*', YSF_CALLSIGN_LENGTH);
+				memcpy(csd1 + YSF_CALLSIGN_LENGTH/2, m_conf.getYsfRadioID().c_str(), YSF_CALLSIGN_LENGTH/2);
 				memcpy(csd1 + YSF_CALLSIGN_LENGTH, m_netSrc.c_str(), YSF_CALLSIGN_LENGTH);
 				memset(csd2, ' ', YSF_CALLSIGN_LENGTH + YSF_CALLSIGN_LENGTH);
 
@@ -646,27 +643,26 @@ int CYSF2NXDN::run()
 
 				// Set the FICH
 				CYSFFICH fich;
-				fich.setFI(YSF_FI_TERMINATOR);
-				fich.setCS(2U);
-				fich.setCM(1U);
- 				fich.setBN(0U);
- 				fich.setBT(0U);
-				fich.setFN(0U);
-				fich.setFT(6U);
-				fich.setDev(0U);
-				fich.setMR(0U);
-				fich.setVoIP(false);
-				fich.setDT(YSF_DT_VD_MODE2);
-				fich.setSQL(0U);
-				fich.setSQ(0U);
-				fich.encode(m_ysfFrame + 35U);
+                                fich.setFI(YSF_FI_HEADER);
+                                fich.setCS(m_conf.getFICHCallSign());
+                                fich.setCM(m_conf.getFICHCallMode());
+                                fich.setBN(0U);
+                                fich.setBT(0U);
+                                fich.setFN(0U);
+                                fich.setFT(m_conf.getFICHFrameTotal());
+                                fich.setDev(0U);
+                                fich.setMR(m_conf.getFICHMessageRoute());
+                                fich.setVoIP(m_conf.getFICHVOIP());
+                                fich.setDT(m_conf.getFICHDataType());
+                                fich.setSQL(m_conf.getFICHSQLType());
+                                fich.setSQ(m_conf.getFICHSQLCode());
+                                fich.encode(m_ysfFrame + 35U);
 
-				unsigned char csd1[20U], csd2[20U];
-				memset(csd1, '*', YSF_CALLSIGN_LENGTH/2);
- 				memcpy(csd1 + YSF_CALLSIGN_LENGTH/2, ysf_radioid, YSF_CALLSIGN_LENGTH/2);
-				//memset(csd1, '*', YSF_CALLSIGN_LENGTH);
-				memcpy(csd1 + YSF_CALLSIGN_LENGTH, m_netSrc.c_str(), YSF_CALLSIGN_LENGTH);
-				memset(csd2, ' ', YSF_CALLSIGN_LENGTH + YSF_CALLSIGN_LENGTH);
+                                unsigned char csd1[20U], csd2[20U];
+                                memset(csd1, '*', YSF_CALLSIGN_LENGTH/2);
+                                memcpy(csd1 + YSF_CALLSIGN_LENGTH/2, m_conf.getYsfRadioID().c_str(), YSF_CALLSIGN_LENGTH/2);
+                                memcpy(csd1 + YSF_CALLSIGN_LENGTH, m_netSrc.c_str(), YSF_CALLSIGN_LENGTH);
+                                memset(csd2, ' ', YSF_CALLSIGN_LENGTH + YSF_CALLSIGN_LENGTH);
 
 				CYSFPayload payload;
 				payload.writeHeader(m_ysfFrame + 35U, csd1, csd2);
@@ -691,45 +687,52 @@ int CYSF2NXDN::run()
 				switch (fn) {
 					case 0:
 						memset(dch, '*', YSF_CALLSIGN_LENGTH/2);
- 						memcpy(dch + YSF_CALLSIGN_LENGTH/2, ysf_radioid, YSF_CALLSIGN_LENGTH/2);
+ 						memcpy(dch + YSF_CALLSIGN_LENGTH/2, m_conf.getYsfRadioID().c_str(), YSF_CALLSIGN_LENGTH/2);
  						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, dch);
-						//ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, (const unsigned char*)"**********");
 						break;
 					case 1:
-						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, (const unsigned char*)m_netSrc.c_str());
+						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, (unsigned char*)m_netSrc.c_str());
 						break;
 					case 2:
-						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, (const unsigned char*)m_netDst.c_str());
+						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, (unsigned char*)m_netDst.c_str());
 						break;
 					case 5:
- 						memset(dch, ' ', YSF_CALLSIGN_LENGTH/2);
- 						memcpy(dch + YSF_CALLSIGN_LENGTH/2, ysf_radioid, YSF_CALLSIGN_LENGTH/2);
+						memset(dch, ' ', YSF_CALLSIGN_LENGTH/2);
+ 						memcpy(dch + YSF_CALLSIGN_LENGTH/2, m_conf.getYsfRadioID().c_str(), YSF_CALLSIGN_LENGTH/2);
  						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, dch);	// Rem3/4
  						break;
-					case 6:
-						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, dt1);
+					case 6: {
+							unsigned char dt1[10U] = {0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U};
+							for (unsigned int i = 0U; i < m_conf.getYsfDT1().size() && i < 10U; i++)
+								dt1[i] = m_conf.getYsfDT1()[i];
+							ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, dt1);
+						}
 						break;
-					case 7:
-						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, dt2_temp);
+					case 7: {
+							unsigned char dt2[10U] = {0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U};
+							for (unsigned int i = 0U; i < m_conf.getYsfDT2().size() && i < 10U; i++)
+								dt2[i] = m_conf.getYsfDT2()[i];
+							ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, dt2);
+						}
 						break;
 					default:
 						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, (const unsigned char*)"          ");
 				}
-				
+
 				// Set the FICH
 				fich.setFI(YSF_FI_COMMUNICATIONS);
-				fich.setCS(2U);
-				fich.setCM(1U);
+				fich.setCS(m_conf.getFICHCallSign());
+ 				fich.setCM(m_conf.getFICHCallMode());
  				fich.setBN(0U);
  				fich.setBT(0U);
-				fich.setFN(fn);
-				fich.setFT(6U);
+ 				fich.setFN(fn);
+				fich.setFT(m_conf.getFICHFrameTotal());
 				fich.setDev(0U);
-				fich.setMR(0U);
-				fich.setVoIP(false);
-				fich.setDT(YSF_DT_VD_MODE2);
-				fich.setSQL(0U);
-				fich.setSQ(0U);
+				fich.setMR(m_conf.getFICHMessageRoute());
+ 				fich.setVoIP(m_conf.getFICHVOIP());
+ 				fich.setDT(m_conf.getFICHDataType());
+ 				fich.setSQL(m_conf.getFICHSQLType());
+ 				fich.setSQ(m_conf.getFICHSQLCode());
 				fich.encode(m_ysfFrame + 35U);
 
 				// Net frame counter
@@ -737,7 +740,7 @@ int CYSF2NXDN::run()
 
 				// Send data to MMDVMHost
 				m_ysfNetwork->write(m_ysfFrame);
-				
+
 				ysf_cnt++;
 				ysfWatch.start();
 			}
@@ -766,17 +769,17 @@ int CYSF2NXDN::run()
 
 	m_ysfNetwork->close();
 	m_nxdnNetwork->close();
-	
+
 	if (m_APRS != NULL) {
 		m_APRS->stop();
 		delete m_APRS;
 	}
-	
+
 	if (m_gps != NULL) {
 		m_gps->close();
 		delete m_gps;
 	}
-	
+
 	delete m_nxdnNetwork;
 	delete m_ysfNetwork;
 
