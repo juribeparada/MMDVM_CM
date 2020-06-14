@@ -54,9 +54,6 @@ public:
   std::vector<unsigned char> getYsfDT1();
   std::vector<unsigned char> getYsfDT2();
   std::string  getYsfRadioID();
-  unsigned char* getYsfDT1();
-  unsigned char* getYsfDT2();
-  char*         getYsfRadioID();
   bool          getDaemon() const;
 
   // The Info section
