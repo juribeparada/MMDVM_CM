@@ -20,7 +20,7 @@
 
 #include "Defines.h"
 #include "RingBuffer.h"
-#include "mbevocoder.h"
+#include "MBEVocoder.h"
 
 #if !defined(MODECONV_H)
 #define MODECONV_H

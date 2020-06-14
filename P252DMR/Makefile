@@ -6,8 +6,8 @@ LDFLAGS ?= -g
 
 OBJECTS = 	BPTC19696.o Conf.o CRC.o DelayBuffer.o DMRData.o DMREMB.o DMREmbeddedData.o \
 			DMRFullLC.o DMRLC.o DMRLookup.o DMRNetwork.o DMRSlotType.o  P25Network.o Golay2087.o \
-			Golay24128.o Hamming.o Log.o ModeConv.o Mutex.o QR1676.o Reflectors.o RS129.o \
-			SHA256.o StopWatch.o Sync.o Thread.o Timer.o UDPSocket.o Utils.o mbevocoder.o P252DMR.o
+			Golay24128.o Hamming.o Log.o MBEVocoder.o ModeConv.o Mutex.o QR1676.o Reflectors.o RS129.o \
+			SHA256.o StopWatch.o Sync.o Thread.o Timer.o UDPSocket.o Utils.o P252DMR.o
 
 all:		P252DMR
 
