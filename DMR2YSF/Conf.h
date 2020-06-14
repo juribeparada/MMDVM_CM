@@ -38,8 +38,6 @@ public:
   std::string  getLocalAddress() const;
   unsigned int getLocalPort() const;
   std::string  getFCSFile() const;
-  bool         getDaemon() const;
-  bool         getDebug() const;
   unsigned char getFICHCallSign() const;
   unsigned char getFICHCallMode() const;
   unsigned char getFICHFrameTotal() const;
@@ -48,9 +46,11 @@ public:
   unsigned char getFICHDataType() const;
   unsigned char getFICHSQLType() const;
   unsigned char getFICHSQLCode() const;
-  unsigned char* getYsfDT1();
-  unsigned char* getYsfDT2();
-  char* getYsfRadioID();
+  std::vector<unsigned char> getYsfDT1();
+  std::vector<unsigned char> getYsfDT2();
+  std::string  getYsfRadioID();
+  bool         getDaemon() const;
+  bool         getDebug() const;
 
   // The DMR Network section
   unsigned int getDMRId() const;
@@ -81,6 +81,17 @@ private:
   std::string  m_localAddress;
   unsigned int m_localPort;
   std::string  m_fcsFile;
+  unsigned char m_fichCallSign;
+  unsigned char m_fichCallMode;
+  unsigned char m_fichFrameTotal;
+  unsigned char m_fichMessageRoute;
+  unsigned char m_fichVOIP;
+  unsigned char m_fichDataType;
+  unsigned char m_fichSQLType;
+  unsigned char m_fichSQLCode;
+  std::vector<unsigned char> m_ysfDT1;
+  std::vector<unsigned char> m_ysfDT2;
+  std::string   m_ysfRadioID;
   bool         m_daemon;
   bool         m_debug;
 
@@ -101,18 +112,6 @@ private:
   unsigned int m_logFileLevel;
   std::string  m_logFilePath;
   std::string  m_logFileRoot;
-  
-  unsigned char m_fichCallSign;
-  unsigned char m_fichCallMode;
-  unsigned char m_fichFrameTotal;
-  unsigned char m_fichMessageRoute;
-  unsigned char m_fichVOIP;
-  unsigned char m_fichDataType;
-  unsigned char m_fichSQLType;
-  unsigned char m_fichSQLCode;
-  unsigned char m_ysfDT1[10];
-  unsigned char m_ysfDT2[10];
-  char m_ysfRadioID[5];
 };
 
 #endif

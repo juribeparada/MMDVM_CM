@@ -50,6 +50,17 @@ m_enableWiresX(false),
 m_remoteGateway(false),
 m_hangTime(1000U),
 m_wiresXMakeUpper(true),
+m_fichCallSign(2U),
+m_fichCallMode(0U),
+m_fichFrameTotal(6U),
+m_fichMessageRoute(0U),
+m_fichVOIP(0U),
+m_fichDataType(2U),
+m_fichSQLType(0U),
+m_fichSQLCode(0U),
+m_ysfDT1(),
+m_ysfDT2(),
+m_ysfRadioID("*****"),
 m_daemon(false),
 m_rxFrequency(0U),
 m_txFrequency(0U),
@@ -143,7 +154,6 @@ bool CConf::read()
     // Remove quotes from the value
     size_t len = ::strlen(value);
     char *t;
-    unsigned char tokencnt = 0;
     if (len > 1U && *value == '"' && value[len - 1U] == '"') {
       value[len - 1U] = '\0';
       value++;
@@ -179,39 +189,30 @@ bool CConf::read()
 		else if (::strcmp(key, "Daemon") == 0)
 			m_daemon = ::atoi(value) == 1;
 		else if (::strcmp(key, "RadioID") == 0)
-			::memcpy(m_ysfRadioID, value, 5);
-		else if (::strcmp(key, "FICHCallsign") == 0)
-			m_fichCallSign = ::atoi(value);
-		else if (::strcmp(key, "FICHCallMode") == 0)
-			m_fichCallMode = ::atoi(value);
-		else if (::strcmp(key, "FICHFrameTotal") == 0)
-			m_fichFrameTotal = ::atoi(value);
-		else if (::strcmp(key, "FICHMessageRoute") == 0)
-			m_fichMessageRoute = ::atoi(value);
-		else if (::strcmp(key, "FICHVOIP") == 0)
-			m_fichVOIP = ::atoi(value);
-		else if (::strcmp(key, "FICHDataType") == 0)
-			m_fichDataType = ::atoi(value);
-		else if (::strcmp(key, "FICHSQLType") == 0)
-			m_fichSQLType = ::atoi(value);
-		else if (::strcmp(key, "FICHSQLCode") == 0)
-			m_fichSQLCode = ::atoi(value);
+			m_ysfRadioID = value;
+ 		else if (::strcmp(key, "FICHCallsign") == 0)
+ 			m_fichCallSign = ::atoi(value);
+ 		else if (::strcmp(key, "FICHCallMode") == 0)
+ 			m_fichCallMode = ::atoi(value);
+ 		else if (::strcmp(key, "FICHFrameTotal") == 0)
+ 			m_fichFrameTotal = ::atoi(value);
+ 		else if (::strcmp(key, "FICHMessageRoute") == 0)
+ 			m_fichMessageRoute = ::atoi(value);
+ 		else if (::strcmp(key, "FICHVOIP") == 0)
+ 			m_fichVOIP = ::atoi(value);
+ 		else if (::strcmp(key, "FICHDataType") == 0)
+ 			m_fichDataType = ::atoi(value);
+ 		else if (::strcmp(key, "FICHSQLType") == 0)
+ 			m_fichSQLType = ::atoi(value);
+ 		else if (::strcmp(key, "FICHSQLCode") == 0)
+ 			m_fichSQLCode = ::atoi(value);
 		else if (::strcmp(key, "DT1") == 0){
-			tokencnt = 0;
-			while((t = strtok_r(value, ",", &value)) != NULL){
-				if(tokencnt < 10){
-					m_ysfDT1[tokencnt++] = atoi(t);
-				}
-			}
-		}
-		else if (::strcmp(key, "DT2") == 0){
-			tokencnt = 0;
-			while((t = strtok_r(value, ",", &value)) != NULL){
-				if(tokencnt < 10){
-					m_ysfDT2[tokencnt++] = atoi(t);
-				}
-			}
-		}
+ 			while ((t = strtok_r(value, ",", &value)) != NULL)
+				m_ysfDT1.push_back(::atoi(t));
+ 		} else if (::strcmp(key, "DT2") == 0){
+ 			while ((t = strtok_r(value, ",", &value)) != NULL)
+				m_ysfDT2.push_back(::atoi(t));
+ 		}
 	} else if (section == SECTION_INFO) {
 		if (::strcmp(key, "TXFrequency") == 0)
 			m_txFrequency = (unsigned int)::atoi(value);
@@ -372,57 +373,57 @@ bool CConf::getDaemon() const
 
 unsigned char CConf::getFICHCallSign() const
 {
-	return m_fichCallSign;
+ 	return m_fichCallSign;
 }
 
 unsigned char CConf::getFICHCallMode() const
 {
-	return m_fichCallMode;
+ 	return m_fichCallMode;
 }
 
 unsigned char CConf::getFICHFrameTotal() const
 {
-	return m_fichFrameTotal;
+ 	return m_fichFrameTotal;
 }
 
 unsigned char CConf::getFICHMessageRoute() const
 {
-	return m_fichMessageRoute;
+ 	return m_fichMessageRoute;
 }
 
 unsigned char CConf::getFICHVOIP() const
 {
-	return m_fichVOIP;
+ 	return m_fichVOIP;
 }
 
 unsigned char CConf::getFICHDataType() const
 {
-	return m_fichDataType;
+ 	return m_fichDataType;
 }
 
 unsigned char CConf::getFICHSQLType() const
 {
-	return m_fichSQLType;
+ 	return m_fichSQLType;
 }
 
 unsigned char CConf::getFICHSQLCode() const
 {
-	return m_fichSQLCode;
+ 	return m_fichSQLCode;
 }
 
-unsigned char* CConf::getYsfDT1()
+std::vector<unsigned char> CConf::getYsfDT1()
 {
-	return m_ysfDT1;
+ 	return m_ysfDT1;
 }
 
-unsigned char* CConf::getYsfDT2()
+std::vector<unsigned char> CConf::getYsfDT2()
 {
-	return m_ysfDT2;
+ 	return m_ysfDT2;
 }
 
-char* CConf::getYsfRadioID()
+std::string CConf::getYsfRadioID()
 {
-	return m_ysfRadioID;
+ 	return m_ysfRadioID;
 }
 
 unsigned int CConf::getRxFrequency() const
