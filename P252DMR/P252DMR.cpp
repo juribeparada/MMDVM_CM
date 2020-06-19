@@ -375,6 +375,11 @@ int CP252DMR::run()
 						m_conv.putP25Header();
 					}
 					m_p25Dst = dstId;
+					
+					if(!m_xlxConnected){
+						m_dstid = m_p25Dst;
+					}
+					
 				} else if (m_p25Frame[0U] == 0x66U && !m_p25info) {
 					srcId  = (m_p25Frame[1U] << 16) & 0xFF0000U;
 					srcId |= (m_p25Frame[2U] << 8)  & 0x00FF00U;
@@ -646,6 +651,11 @@ int CP252DMR::run()
 		if (p25Watch.elapsed() > P25_FRAME_PER) {
 			unsigned int p25FrameType = m_conv.getP25(m_p25Frame);
 			m_p25Src = m_dmrSrc;
+			
+			if(!m_xlxConnected){
+				m_p25Dst = m_dmrDst;
+			}
+			
 			if(p25FrameType == TAG_HEADER) {
 				p25_cnt = 0U;
 				p25Watch.start();
