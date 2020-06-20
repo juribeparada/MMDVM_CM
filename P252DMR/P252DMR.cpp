@@ -377,7 +377,12 @@ int CP252DMR::run()
 					m_p25Dst = dstId;
 					
 					if(!m_xlxConnected){
-						m_dstid = m_p25Dst;
+						if(m_p25Dst == 20U) {
+							m_dstid = m_conf.getDMRDstId();
+						}
+						else{
+							m_dstid = m_p25Dst;
+						}
 					}
 					
 				} else if (m_p25Frame[0U] == 0x66U && !m_p25info) {
@@ -783,15 +788,12 @@ int CP252DMR::run()
 			pollTimer.start();
 		}
 
-
 		m_dmrNetwork->clock(ms);
 
 		if (m_xlxReflectors != NULL)
 			m_xlxReflectors->clock(ms);
 
-
-		if (ms < 5U)
-			CThread::sleep(5U);
+		//if (ms < 5U) CThread::sleep(5U);
 	}
 
 	m_p25Network->close();
