@@ -203,6 +203,8 @@ bool CConf::read()
 				m_p25LocalPort = (unsigned int)::atoi(value);
 			else if (::strcmp(key, "TGListFile") == 0)
 				m_p25TGListFile = value;
+			else if (::strcmp(key, "Daemon") == 0)
+				m_daemon = ::atoi(value) == 1;
 			else if (::strcmp(key, "Debug") == 0)
 				m_p25NetworkDebug = ::atoi(value) == 1;
 		}
