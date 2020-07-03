@@ -19,6 +19,9 @@ NXDN2DMR:	$(OBJECTS)
 %.o: %.cpp
 		$(CXX) $(CFLAGS) -c -o $@ $<
 
+install:
+		install -m 755 NXDN2DMR /usr/local/bin/
+
 clean:
 		$(RM) NXDN2DMR *.o *.d *.bak *~
  
