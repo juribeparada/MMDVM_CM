@@ -18,6 +18,9 @@ DMR2YSF:	$(OBJECTS)
 %.o: %.cpp
 		$(CXX) $(CFLAGS) -c -o $@ $<
 
+install:
+		install -m 755 DMR2YSF /usr/local/bin/
+
 clean:
 		$(RM) DMR2YSF *.o *.d *.bak *~
  
