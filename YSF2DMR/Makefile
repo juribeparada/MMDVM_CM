@@ -19,6 +19,9 @@ YSF2DMR:	$(OBJECTS)
 %.o: %.cpp
 		$(CXX) $(CFLAGS) -c -o $@ $<
 
+install:
+		install -m 755 YSF2DMR /usr/local/bin/
+
 clean:
 		$(RM) YSF2DMR *.o *.d *.bak *~
  
