@@ -17,6 +17,9 @@ P252DMR:	$(OBJECTS)
 %.o: %.cpp
 		$(CXX) $(CFLAGS) -c -o $@ $<
 
+install:
+		install -m 755 P252DMR /usr/local/bin/
+
 clean:
 		$(RM) P252DMR *.o *.d *.bak *~
 

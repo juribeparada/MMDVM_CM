@@ -18,6 +18,9 @@ YSF2NXDN:	$(OBJECTS)
 %.o: %.cpp
 		$(CXX) $(CFLAGS) -c -o $@ $<
 
+install:
+		install -m 755 YSF2NXDN /usr/local/bin/
+
 clean:
 		$(RM) YSF2NXDN *.o *.d *.bak *~
  
