@@ -52,7 +52,7 @@ public:
 
 	bool wantsBeacon();
 
-	void clock(unsigned int ms);
+	bool clock(unsigned int ms);
 
 	void reset(unsigned int slotNo);
 

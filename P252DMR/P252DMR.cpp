@@ -298,6 +298,10 @@ int CP252DMR::run()
 	std::string p25_localAddress = m_conf.getP25LocalAddress();
 	unsigned int p25_localPort   = m_conf.getP25LocalPort();
 	bool p25_debug               = m_conf.getP25NetworkDebug();
+	
+	std::string fileName    = m_conf.getDMRXLXFile();
+	m_xlxReflectors = new CReflectors(fileName, 60U);
+	m_xlxReflectors->load();
 
 	m_p25Network = new CP25Network(p25_localAddress, p25_localPort, p25_dstAddress, p25_dstPort, m_callsign, p25_debug);
 	
@@ -788,7 +792,9 @@ int CP252DMR::run()
 			pollTimer.start();
 		}
 
-		m_dmrNetwork->clock(ms);
+		if(m_dmrNetwork->clock(ms)){
+			m_xlxConnected = false;
+		}
 
 		if (m_xlxReflectors != NULL)
 			m_xlxReflectors->clock(ms);
