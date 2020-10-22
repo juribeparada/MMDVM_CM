@@ -329,8 +329,9 @@ void CDMRNetwork::close()
 	m_timeoutTimer.stop();
 }
 
-void CDMRNetwork::clock(unsigned int ms)
+bool CDMRNetwork::clock(unsigned int ms)
 {
+	bool r = false;
 	m_delayBuffers[1U]->clock(ms);
 	m_delayBuffers[2U]->clock(ms);
 
@@ -341,7 +342,7 @@ void CDMRNetwork::clock(unsigned int ms)
 			if (ret) {
 				ret = writeLogin();
 				if (!ret)
-					return;
+					return true;
 
 				m_status = WAITING_LOGIN;
 				m_timeoutTimer.start();
@@ -350,7 +351,7 @@ void CDMRNetwork::clock(unsigned int ms)
 			m_retryTimer.start();
 		}
 
-		return;
+		return false;
 	}
 
 	in_addr address;
@@ -360,7 +361,7 @@ void CDMRNetwork::clock(unsigned int ms)
 		LogError("DMR, Socket has failed, retrying connection to the master");
 		close();
 		open();
-		return;
+		return true;
 	}
 
 	// if (m_debug && length > 0)
@@ -386,7 +387,7 @@ void CDMRNetwork::clock(unsigned int ms)
 				LogError("DMR, Login to the master has failed, retrying network ...");
 				close();
 				open();
-				return;
+				return true;
 			}
 		} else if (::memcmp(m_buffer, "RPTACK",  6U) == 0) {
 			switch (m_status) {
@@ -430,6 +431,7 @@ void CDMRNetwork::clock(unsigned int ms)
 			LogError("DMR, Master is closing down");
 			close();
 			open();
+			r = true;
 		} else if (::memcmp(m_buffer, "MSTPONG", 7U) == 0) {
 			m_timeoutTimer.start();
 		} else if (::memcmp(m_buffer, "RPTSBKN", 7U) == 0) {
@@ -469,7 +471,9 @@ void CDMRNetwork::clock(unsigned int ms)
 		LogError("DMR, Connection to the master has timed out, retrying connection");
 		close();
 		open();
+		r = true;
 	}
+	return r;
 }
 
 void CDMRNetwork::reset(unsigned int slotNo)
