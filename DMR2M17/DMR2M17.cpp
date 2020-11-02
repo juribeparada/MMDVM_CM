@@ -18,84 +18,24 @@
 *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "DMR2P25.h"
-
+#include "DMR2M17.h"
 #include <sys/time.h>
 #include <unistd.h>
 #include <signal.h>
 #include <fcntl.h>
 #include <pwd.h>
 
-const unsigned char IMBE_SILENCE[] = {0x04U, 0x0CU, 0xFDU, 0x7BU, 0xFBU, 0x7DU, 0xF2U, 0x7BU, 0x3DU, 0x9EU, 0x44};
-
-const unsigned char REC62[] = {
-	0x62U, 0x02U, 0x02U, 0x0CU, 0x0BU, 0x12U, 0x64U, 0x00U, 0x00U, 0x80U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U,
-	0x00U, 0x00U, 0x00U, 0x00U, 0x00U};
-
-const unsigned char REC63[] = {
-	0x63U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x02U};
-
-const unsigned char REC64[] = {
-	0x64U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x02U};
-
-const unsigned char REC65[] = {
-	0x65U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x02U};
-
-const unsigned char REC66[] = {
-	0x66U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x02U};
-
-const unsigned char REC67[] = {
-	0x67U, 0xF0U, 0x9DU, 0x6AU, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x02U};
-
-const unsigned char REC68[] = {
-	0x68U, 0x19U, 0xD4U, 0x26U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x02U};
-
-const unsigned char REC69[] = {
-	0x69U, 0xE0U, 0xEBU, 0x7BU, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x02U};
-
-const unsigned char REC6A[] = {
-	0x6AU, 0x00U, 0x00U, 0x02U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U};
-
-const unsigned char REC6B[] = {
-	0x6BU, 0x02U, 0x02U, 0x0CU, 0x0BU, 0x12U, 0x64U, 0x00U, 0x00U, 0x80U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U,
-	0x00U, 0x00U, 0x00U, 0x00U, 0x00U};
-
-const unsigned char REC6C[] = {
-	0x6CU, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x02U};
-
-const unsigned char REC6D[] = {
-	0x6DU, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x02U};
-
-const unsigned char REC6E[] = {
-	0x6EU, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x02U};
-
-const unsigned char REC6F[] = {
-	0x6FU, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x02U};
-
-const unsigned char REC70[] = {
-	0x70U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x02U};
-
-const unsigned char REC71[] = {
-	0x71U, 0xACU, 0xB8U, 0xA4U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x02U};
-
-const unsigned char REC72[] = {
-	0x72U, 0x9BU, 0xDCU, 0x75U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x02U};
-
-const unsigned char REC73[] = {
-	0x73U, 0x00U, 0x00U, 0x02U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U};
-
-const unsigned char REC80[] = {
-	0x80U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U};
-
 #define DMR_FRAME_PER       55U
-#define P25_FRAME_PER       15U
+#define M17_FRAME_PER       35U
 
-const char* DEFAULT_INI_FILE = "/etc/DMR2P25.ini";
+const char* DEFAULT_INI_FILE = "/etc/DMR2M17.ini";
 
 const char* HEADER1 = "This software is for use on amateur radio networks only,";
 const char* HEADER2 = "it is to be used for educational purposes only. Its use on";
 const char* HEADER3 = "commercial networks is strictly prohibited.";
 const char* HEADER4 = "Copyright(C) 2018 by CA6JAU, G4KLX and others";
+
+#define M17CHARACTERS " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-/."
 
 #include <functional>
 #include <algorithm>
@@ -115,6 +55,46 @@ void sig_handler(int signo)
 	}
 }
 
+void encode_callsign(uint8_t *callsign)
+{
+	const std::string m17_alphabet(M17CHARACTERS);
+	char cs[10];
+	memset(cs, 0, sizeof(cs));
+	memcpy(cs, callsign, strlen((char *)callsign));
+	uint64_t encoded = 0;
+	for(int i = std::strlen((char *)callsign)-1; i >= 0; i--) {
+		auto pos = m17_alphabet.find(cs[i]);
+		if (pos == std::string::npos) {
+			pos = 0;
+		}
+		encoded *= 40;
+		encoded += pos;
+	}
+	for (int i=0; i<6; i++) {
+		callsign[i] = (encoded >> (8*(5-i)) & 0xFFU);
+	}
+}
+
+void decode_callsign(uint8_t *callsign)
+{
+	const std::string m17_alphabet(M17CHARACTERS);
+	uint8_t code[6];
+	uint64_t coded = callsign[0];
+	for (int i=1; i<6; i++)
+		coded = (coded << 8) | callsign[i];
+	if (coded > 0xee6b27ffffffu) {
+		//std::cerr << "Callsign code is too large, 0x" << std::hex << coded << std::endl;
+		return;
+	}
+	memcpy(code, callsign, 6);
+	memset(callsign, 0, 10);
+	int i = 0;
+	while (coded) {
+		callsign[i++] = m17_alphabet[coded % 40];
+		coded /= 40;
+	}
+}
+
 int main(int argc, char** argv)
 {
 	const char* iniFile = DEFAULT_INI_FILE;
@@ -122,10 +102,10 @@ int main(int argc, char** argv)
 		for (int currentArg = 1; currentArg < argc; ++currentArg) {
 			std::string arg = argv[currentArg];
 			if ((arg == "-v") || (arg == "--version")) {
-				::fprintf(stdout, "DMR2P25 version %s\n", VERSION);
+				::fprintf(stdout, "DMR2M17 version %s\n", VERSION);
 				return 0;
 			} else if (arg.substr(0, 1) == "-") {
-				::fprintf(stderr, "Usage: DMR2P25 [-v|--version] [filename]\n");
+				::fprintf(stderr, "Usage: DMR2M17 [-v|--version] [filename]\n");
 				return 1;
 			} else {
 				iniFile = argv[currentArg];
@@ -137,7 +117,7 @@ int main(int argc, char** argv)
 	if (signal(SIGTERM, sig_handler) == SIG_ERR) 
 		::fprintf(stdout, "Can't catch SIGTERM\n");
 
-	CDMR2P25* gateway = new CDMR2P25(std::string(iniFile));
+	CDMR2M17* gateway = new CDMR2M17(std::string(iniFile));
 
 	int ret = gateway->run();
 
@@ -146,11 +126,12 @@ int main(int argc, char** argv)
 	return ret;
 }
 
-CDMR2P25::CDMR2P25(const std::string& configFile) :
+CDMR2M17::CDMR2M17(const std::string& configFile) :
 m_callsign(),
+m_m17Ref(),
 m_conf(configFile),
 m_dmrNetwork(NULL),
-m_p25Network(NULL),
+m_m17Network(NULL),
 m_dmrlookup(NULL),
 m_conv(),
 m_colorcode(1U),
@@ -160,41 +141,40 @@ m_dmrDst(1U),
 m_dmrLastDT(0U),
 m_dmrFrame(NULL),
 m_dmrFrames(0U),
-m_p25Src(1U),
-m_p25Dst(1U),
-m_p25Frame(NULL),
-m_p25Frames(0U),
-m_p25info(false),
+m_m17Src(),
+m_m17Dst(),
+m_m17Frame(NULL),
+m_m17Frames(0U),
 m_EmbeddedLC(),
 m_dmrflco(FLCO_GROUP),
 m_dmrinfo(false),
 m_config(NULL),
 m_configLen(0U)
 {
-	m_p25Frame = new unsigned char[100U];
+	m_m17Frame = new unsigned char[100U];
 	m_dmrFrame  = new unsigned char[50U];
 	m_config    = new unsigned char[400U];
 
-	::memset(m_p25Frame, 0U, 100U);
+	::memset(m_m17Frame, 0U, 100U);
 	::memset(m_dmrFrame, 0U, 50U);
 }
 
-CDMR2P25::~CDMR2P25()
+CDMR2M17::~CDMR2M17()
 {
-	delete[] m_p25Frame;
+	delete[] m_m17Frame;
 	delete[] m_dmrFrame;
 	delete[] m_config;
 }
 
-int CDMR2P25::run()
+int CDMR2M17::run()
 {
 	bool ret = m_conf.read();
 	if (!ret) {
-		::fprintf(stderr, "DMR2P25: cannot read the .ini file\n");
+		::fprintf(stderr, "DMR2NXDN: cannot read the .ini file\n");
 		return 1;
 	}
 
-	setlocale(LC_ALL, "C");
+	//setlocale(LC_ALL, "C");
 
 	unsigned int logDisplayLevel = m_conf.getLogDisplayLevel();
 
@@ -255,7 +235,7 @@ int CDMR2P25::run()
 
 	ret = ::LogInitialise(m_conf.getLogFilePath(), m_conf.getLogFileRoot(), m_conf.getLogFileLevel(), logDisplayLevel);
 	if (!ret) {
-		::fprintf(stderr, "DMR2P25: unable to open the log file\n");
+		::fprintf(stderr, "DMR2M17: unable to open the log file\n");
 		return 1;
 	}
 
@@ -271,23 +251,33 @@ int CDMR2P25::run()
 	LogInfo(HEADER4);
 	
 	m_callsign = m_conf.getCallsign();
+	m_m17Ref = m_conf.getM17DstName();
 
-	std::string p25_dstAddress   = m_conf.getP25DstAddress();
-	unsigned int p25_dstPort     = m_conf.getP25DstPort();
-	std::string p25_localAddress = m_conf.getP25LocalAddress();
-	unsigned int p25_localPort   = m_conf.getP25LocalPort();
-	bool p25_debug               = m_conf.getP25NetworkDebug();
-	::fprintf(stderr, "%s : %s\n", p25_dstAddress.c_str(), p25_localAddress.c_str());
-	 
-	m_p25Network = new CP25Network(p25_localAddress, p25_localPort, p25_dstAddress, p25_dstPort, m_callsign, p25_debug);
-
-	ret = m_p25Network->open();
+	std::string m17_dstAddress   = m_conf.getM17DstAddress();
+	unsigned int m17_dstPort     = m_conf.getM17DstPort();
+	std::string m17_localAddress = m_conf.getM17LocalAddress();
+	unsigned int m17_localPort   = m_conf.getM17LocalPort();
+	bool m17_debug               = m_conf.getM17NetworkDebug();
+	
+	m_conv.setM17GainAdjDb(m_conf.getM17GainAdjDb());
+	
+	uint16_t streamid = 0;
+	unsigned char m17_src[10];
+	unsigned char m17_dst[10];
+	
+	memcpy(m17_src, m_callsign.c_str(), 9);
+	m17_src[9] = 0x00;
+	encode_callsign(m17_src);
+	
+	m_m17Network = new CM17Network(m17_localAddress, m17_localPort, m17_dstAddress, m17_dstPort, m17_src, m17_debug);
+	
+	ret = m_m17Network->open();
 	if (!ret) {
-		::LogError("Cannot open the P25 network port");
+		::LogError("Cannot open the M17 network port");
 		::LogFinalise();
 		return 1;
 	}
-	m_p25Network->writePoll();
+	
 	ret = createMMDVM();
 	if (!ret)
 		return 1;
@@ -321,187 +311,116 @@ int CDMR2P25::run()
 	m_dmrflco = FLCO_GROUP;
 
 	CTimer networkWatchdog(100U, 0U, 1500U);
-
+	CTimer pollTimer(1000U, 8U);
 	CStopWatch stopWatch;
-	CStopWatch p25Watch;
+	CStopWatch m17Watch;
 	CStopWatch dmrWatch;
+	
+	pollTimer.start();
 	stopWatch.start();
-	p25Watch.start();
+	m17Watch.start();
 	dmrWatch.start();
 
-	unsigned char p25_cnt = 0;
+	unsigned short m17_cnt = 0;
 	unsigned char dmr_cnt = 0;
-
-	LogMessage("Starting DMR2P25-%s", VERSION);
+	
+	m_m17Network->writeLink();
+	
+	LogMessage("Starting DMR2M17-%s", VERSION);
 
 	for (; m_killed == 0;) {
 		unsigned char buffer[2000U];
-
+		memset(buffer, 0, sizeof(buffer));
+		
 		CDMRData tx_dmrdata;
 		unsigned int ms = stopWatch.elapsed();
 
-		if (p25Watch.elapsed() > P25_FRAME_PER) {
-			unsigned int p25FrameType = m_conv.getP25(m_p25Frame);
-			m_p25Src = m_dmrSrc;
-			m_p25Dst = m_dmrDst;
-
-			if(p25FrameType == TAG_HEADER) {
-				p25_cnt = 0U;
-				p25Watch.start();
+		if (m17Watch.elapsed() > M17_FRAME_PER) {
+			unsigned int m17FrameType = m_conv.getM17(m_m17Frame);
+			
+			if(m17FrameType == TAG_HEADER) {
+				m17_cnt = 0U;
+				m17Watch.start();
+				
+				streamid = static_cast<uint16_t>((::rand() & 0xFFFF));
+				memcpy(m17_dst, m_m17Ref.c_str(), m_m17Ref.size());
+				m17_dst[9] = 0x00;
+				encode_callsign(m17_dst);
+				
+				memcpy(buffer, "M17 ", 4);
+				memcpy(buffer+4, &streamid, 2);
+				memcpy(buffer+6, m17_dst, 6);
+				memcpy(buffer+12, m17_src, 6);
+				buffer[19] = 0x05;
+				memcpy(buffer+36, m_m17Frame, 16);
+				m_m17Network->writeData(buffer, 54U);
 			}
-			else if(p25FrameType == TAG_EOT) {
-				m_p25Network->writeData(REC80, 17U);
-				p25Watch.start();
+			else if(m17FrameType == TAG_EOT) {
+				m17_cnt |= 0x8000;
+				memcpy(buffer, "M17 ", 4);
+				memcpy(buffer+4, &streamid, 2);
+				memcpy(buffer+6, m17_dst, 6);
+				memcpy(buffer+12, m17_src, 6);
+				buffer[19] = 0x05;
+				buffer[34] = m17_cnt >> 8;
+				buffer[35] = m17_cnt & 0xff;
+				memcpy(buffer+36, m_m17Frame, 16);
+				m_m17Network->writeData(buffer, 54U);
+				m17Watch.start();
 			}
-			else if(p25FrameType == TAG_DATA) {
-				unsigned int p25step = p25_cnt % 18U;
+			else if(m17FrameType == TAG_DATA) {
 				//CUtils::dump(1U, "P25 Data", m_p25Frame, 11U);
-
-				if (p25_cnt > 2U) {
-					switch (p25step) {
-					case 0x00U:
-						::memcpy(buffer, REC62, 22U);
-						::memcpy(buffer + 10U, m_p25Frame, 11U);
-						m_p25Network->writeData(buffer, 22U);
-						break;
-					case 0x01U:
-						::memcpy(buffer, REC63, 14U);
-						::memcpy(buffer + 1U, m_p25Frame, 11U);
-						m_p25Network->writeData(buffer, 14U);
-						break;
-					case 0x02U:
-						::memcpy(buffer, REC64, 17U);
-						::memcpy(buffer + 5U, m_p25Frame, 11U);
-						buffer[1U] = 0x00U;
-						m_p25Network->writeData(buffer, 17U);
-						break;
-					case 0x03U:
-						::memcpy(buffer, REC65, 17U);
-						::memcpy(buffer + 5U, m_p25Frame, 11U);
-						buffer[1U] = (m_p25Dst >> 16) & 0xFFU;
-						buffer[2U] = (m_p25Dst >> 8) & 0xFFU;
-						buffer[3U] = (m_p25Dst >> 0) & 0xFFU;
-						m_p25Network->writeData(buffer, 17U);
-						break;
-					case 0x04U:
-						::memcpy(buffer, REC66, 17U);
-						::memcpy(buffer + 5U, m_p25Frame, 11U);
-						buffer[1U] = (m_p25Src >> 16) & 0xFFU;
-						buffer[2U] = (m_p25Src >> 8) & 0xFFU;
-						buffer[3U] = (m_p25Src >> 0) & 0xFFU;
-						m_p25Network->writeData(buffer, 17U);
-						break;
-					case 0x05U:
-						::memcpy(buffer, REC67, 17U);
-						::memcpy(buffer + 5U, m_p25Frame, 11U);
-						m_p25Network->writeData(buffer, 17U);
-						break;
-					case 0x06U:
-						::memcpy(buffer, REC68, 17U);
-						::memcpy(buffer + 5U, m_p25Frame, 11U);
-						m_p25Network->writeData(buffer, 17U);
-						break;
-					case 0x07U:
-						::memcpy(buffer, REC69, 17U);
-						::memcpy(buffer + 5U, m_p25Frame, 11U);
-						m_p25Network->writeData(buffer, 17U);
-						break;
-					case 0x08U:
-						::memcpy(buffer, REC6A, 16U);
-						::memcpy(buffer + 4U, m_p25Frame, 11U);
-						m_p25Network->writeData(buffer, 16U);
-						break;
-					case 0x09U:
-						::memcpy(buffer, REC6B, 22U);
-						::memcpy(buffer + 10U, m_p25Frame, 11U);
-						m_p25Network->writeData(buffer, 22U);
-						break;
-					case 0x0AU:
-						::memcpy(buffer, REC6C, 14U);
-						::memcpy(buffer + 1U, m_p25Frame, 11U);
-						m_p25Network->writeData(buffer, 14U);
-						break;
-					case 0x0BU:
-						::memcpy(buffer, REC6D, 17U);
-						::memcpy(buffer + 5U, m_p25Frame, 11U);
-						m_p25Network->writeData(buffer, 17U);
-						break;
-					case 0x0CU:
-						::memcpy(buffer, REC6E, 17U);
-						::memcpy(buffer + 5U, m_p25Frame, 11U);
-						m_p25Network->writeData(buffer, 17U);
-						break;
-					case 0x0DU:
-						::memcpy(buffer, REC6F, 17U);
-						::memcpy(buffer + 5U, m_p25Frame, 11U);
-						m_p25Network->writeData(buffer, 17U);
-						break;
-					case 0x0EU:
-						::memcpy(buffer, REC70, 17U);
-						::memcpy(buffer + 5U, m_p25Frame, 11U);
-						buffer[1U] = 0x80U;
-						m_p25Network->writeData(buffer, 17U);
-						break;
-					case 0x0FU:
-						::memcpy(buffer, REC71, 17U);
-						::memcpy(buffer + 5U, m_p25Frame, 11U);
-						m_p25Network->writeData(buffer, 17U);
-						break;
-					case 0x10U:
-						::memcpy(buffer, REC72, 17U);
-						::memcpy(buffer + 5U, m_p25Frame, 11U);
-						m_p25Network->writeData(buffer, 17U);
-						break;
-					case 0x11U:
-						::memcpy(buffer, REC73, 16U);
-						::memcpy(buffer + 4U, m_p25Frame, 11U);
-						m_p25Network->writeData(buffer, 16U);
-						break;
-					}
-				}
-
-				p25_cnt++;
-				p25Watch.start();
+				m17_cnt++;
+				memcpy(buffer, "M17 ", 4);
+				memcpy(buffer+4, &streamid, 2);
+				memcpy(buffer+6, m17_dst, 6);
+				memcpy(buffer+12, m17_src, 6);
+				buffer[19] = 0x05;
+				buffer[34] = m17_cnt >> 8;
+				buffer[35] = m17_cnt & 0xff;
+				memcpy(buffer+36, m_m17Frame, 16);
+				m_m17Network->writeData(buffer, 54U);
+				m17Watch.start();
 			}
 		}
 
-		while (m_p25Network->readData(m_p25Frame, 22U) > 0U) {
+		while (m_m17Network->readData(m_m17Frame, 54U) > 0U) {
 			//CUtils::dump(1U, "P25 Data", m_p25Frame, 22U);
-			if (m_p25Frame[0U] != 0xF0U && m_p25Frame[0U] != 0xF1U) {
-				if (m_p25Frame[0U] == 0x62U && !m_p25info) {
-					m_p25Frames = 0;
-					m_conv.putP25Header();
-				} else if (m_p25Frame[0U] == 0x65U && !m_p25info) {
-					m_p25Dst  = (m_p25Frame[1U] << 16) & 0xFF0000U;
-					m_p25Dst |= (m_p25Frame[2U] << 8)  & 0x00FF00U;
-					m_p25Dst |= (m_p25Frame[3U] << 0)  & 0x0000FFU;
-				} else if (m_p25Frame[0U] == 0x66U && !m_p25info) {
-					m_p25Src  = (m_p25Frame[1U] << 16) & 0xFF0000U;
-					m_p25Src |= (m_p25Frame[2U] << 8)  & 0x00FF00U;
-					m_p25Src |= (m_p25Frame[3U] << 0)  & 0x0000FFU;
-					LogMessage("Received P25 audio: Src: %d Dst: %d", m_p25Src, m_p25Dst);
-					m_p25info = true;
-				} else if (m_p25Frame[0U] == 0x80U) {
-					LogMessage("P25 received end of voice transmission, %.1f seconds", float(m_p25Frames) / 50.0F);
-					m_p25info = false;
-					m_conv.putP25EOT();
+			if (!memcmp(m_m17Frame, "M17 ", 4)) {
+				if (m_m17Frame[34] == 0 && m_m17Frame[35] == 0) {
+					m_m17Frames = 0;
+					m_conv.putM17Header();
+				} 
+				else if (m_m17Frame[34U] & 0x80U) {
+					LogMessage("M17 received end of voice transmission, %.1f seconds", float(m_m17Frames) / 25.0F);
+					m_conv.putM17EOT();
 				}
-				m_conv.putP25(m_p25Frame);
-				m_p25Frames++;
+				else{
+					m_conv.putM17(m_m17Frame);
+				}
+				uint8_t cs[10];
+				memcpy(cs, m_m17Frame+12, 6);
+				decode_callsign(cs);
+				std::string css((char *)cs);
+				css = css.substr(0, css.find(' '));
+				 
+				int dmrid = m_dmrlookup->findID(css);
+				if(dmrid){
+					m_dmrSrc = dmrid;
+				}
+				m_m17Frames++;
 			}
 		}
 
-		if (dmrWatch.elapsed() > DMR_FRAME_PER && m_p25Frames > 4U) {
+		if (dmrWatch.elapsed() > DMR_FRAME_PER) {
 			unsigned int dmrFrameType = m_conv.getDMR(m_dmrFrame);
-			m_dmrSrc = m_p25Src;
-			m_dstid = m_p25Dst;
 			if(dmrFrameType == TAG_HEADER) {
 				CDMRData rx_dmrdata;
 				dmr_cnt = 0U;
 
 				rx_dmrdata.setSlotNo(2U);
 				rx_dmrdata.setSrcId(m_dmrSrc);
-				rx_dmrdata.setDstId(m_dstid);
+				rx_dmrdata.setDstId(m_dmrDst);
 				rx_dmrdata.setFLCO(m_dmrflco);
 				rx_dmrdata.setN(0U);
 				rx_dmrdata.setSeqNo(0U);
@@ -519,7 +438,7 @@ int CDMR2P25::run()
 				slotType.getData(m_dmrFrame);
 
 				// Full LC
-				CDMRLC dmrLC = CDMRLC(m_dmrflco, m_dmrSrc, m_dstid);
+				CDMRLC dmrLC = CDMRLC(m_dmrflco, m_dmrSrc, m_dmrDst);
 				CDMRFullLC fullLC;
 				fullLC.encode(dmrLC, m_dmrFrame, DT_VOICE_LC_HEADER);
 				m_EmbeddedLC.setLC(dmrLC);
@@ -548,7 +467,7 @@ int CDMR2P25::run()
 
 						rx_dmrdata.setSlotNo(2U);
 						rx_dmrdata.setSrcId(m_dmrSrc);
-						rx_dmrdata.setDstId(m_dstid);
+						rx_dmrdata.setDstId(m_dmrDst);
 						rx_dmrdata.setFLCO(m_dmrflco);
 						rx_dmrdata.setN(n_dmr);
 						rx_dmrdata.setSeqNo(dmr_cnt);
@@ -578,7 +497,7 @@ int CDMR2P25::run()
 
 				rx_dmrdata.setSlotNo(2U);
 				rx_dmrdata.setSrcId(m_dmrSrc);
-				rx_dmrdata.setDstId(m_dstid);
+				rx_dmrdata.setDstId(m_dmrDst);
 				rx_dmrdata.setFLCO(m_dmrflco);
 				rx_dmrdata.setN(n_dmr);
 				rx_dmrdata.setSeqNo(dmr_cnt);
@@ -596,7 +515,7 @@ int CDMR2P25::run()
 				slotType.getData(m_dmrFrame);
 
 				// Full LC
-				CDMRLC dmrLC = CDMRLC(m_dmrflco, m_dmrSrc, m_dstid);
+				CDMRLC dmrLC = CDMRLC(m_dmrflco, m_dmrSrc, m_dmrDst);
 				CDMRFullLC fullLC;
 				fullLC.encode(dmrLC, m_dmrFrame, DT_TERMINATOR_WITH_LC);
 
@@ -613,7 +532,7 @@ int CDMR2P25::run()
 
 				rx_dmrdata.setSlotNo(2U);
 				rx_dmrdata.setSrcId(m_dmrSrc);
-				rx_dmrdata.setDstId(m_dstid);
+				rx_dmrdata.setDstId(m_dmrDst);
 				rx_dmrdata.setFLCO(m_dmrflco);
 				rx_dmrdata.setN(n_dmr);
 				rx_dmrdata.setSeqNo(dmr_cnt);
@@ -625,7 +544,7 @@ int CDMR2P25::run()
 					// Add sync
 					CSync::addDMRAudioSync(m_dmrFrame, 0U);
 					// Prepare Full LC data
-					CDMRLC dmrLC = CDMRLC(m_dmrflco, m_dmrSrc, m_dstid);
+					CDMRLC dmrLC = CDMRLC(m_dmrflco, m_dmrSrc, m_dmrDst);
 					// Configure the Embedded LC
 					m_EmbeddedLC.setLC(dmrLC);
 				}
@@ -652,6 +571,14 @@ int CDMR2P25::run()
 		while (m_dmrNetwork->read(tx_dmrdata) > 0U) {
 			m_dmrSrc = tx_dmrdata.getSrcId();
 			m_dmrDst = tx_dmrdata.getDstId();
+			
+			memset(m17_src, 0, 10);
+			std::string css = m_dmrlookup->findCS(m_dmrSrc);
+			memcpy(m17_src, css.c_str(), css.size());
+			m17_src[css.size()] = ' ';
+			m17_src[css.size()+1] = 'D';
+			encode_callsign(m17_src);
+			//fprintf(stderr, "M17 Callsign info %s : %s : %d\n", m17_src, css.c_str(), m_dmrSrc);
 			
 			FLCO netflco = tx_dmrdata.getFLCO();
 			unsigned char DataType = tx_dmrdata.getDataType();
@@ -683,7 +610,7 @@ int CDMR2P25::run()
 				if(DataType == DT_VOICE_SYNC || DataType == DT_VOICE) {
 					unsigned char dmr_frame[50];
 					tx_dmrdata.getData(dmr_frame);
-					m_conv.putDMR(dmr_frame); // Add DMR frame for NXDN conversion
+					m_conv.putDMR(dmr_frame);
 					m_dmrFrames++;
 				}
 			}
@@ -702,7 +629,7 @@ int CDMR2P25::run()
 						m_dmrinfo = true;
 					}
 
-					m_conv.putDMR(dmr_frame); // Add DMR frame for NXDN conversion
+					m_conv.putDMR(dmr_frame);
 					m_dmrFrames++;
 				}
 
@@ -721,20 +648,26 @@ int CDMR2P25::run()
 		stopWatch.start();
 
 		m_dmrNetwork->clock(ms);
+		pollTimer.clock(ms);
+		if (pollTimer.isRunning() && pollTimer.hasExpired()) {
+			m_m17Network->writePoll();
+			pollTimer.start();
+		}
+
 		
 	}
 
-	m_p25Network->close();
+	m_m17Network->close();
 	m_dmrNetwork->close();
 	delete m_dmrNetwork;
-	delete m_p25Network;
+	delete m_m17Network;
 
 	::LogFinalise();
 
 	return 0;
 }
 
-bool CDMR2P25::createMMDVM()
+bool CDMR2M17::createMMDVM()
 {
 	std::string rptAddress   = m_conf.getDMRRptAddress();
 	unsigned int rptPort     = m_conf.getDMRRptPort();
