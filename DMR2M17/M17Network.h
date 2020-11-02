@@ -33,7 +33,7 @@ public:
 	bool writeData(const unsigned char* data, unsigned int length);
 	unsigned int readData(unsigned char* data, unsigned int length);
 	bool writePoll();
-	bool writeLink();
+	bool writeLink(char m);
 	bool writeUnlink();
 	void close();
 private:

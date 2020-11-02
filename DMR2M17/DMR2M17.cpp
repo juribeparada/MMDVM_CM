@@ -252,6 +252,7 @@ int CDMR2M17::run()
 	
 	m_callsign = m_conf.getCallsign();
 	m_m17Ref = m_conf.getM17DstName();
+	char module = m_m17Ref.c_str()[m_m17Ref.find(' ')+1];
 
 	std::string m17_dstAddress   = m_conf.getM17DstAddress();
 	unsigned int m17_dstPort     = m_conf.getM17DstPort();
@@ -324,7 +325,7 @@ int CDMR2M17::run()
 	unsigned short m17_cnt = 0;
 	unsigned char dmr_cnt = 0;
 	
-	m_m17Network->writeLink();
+	m_m17Network->writeLink(module);
 	
 	LogMessage("Starting DMR2M17-%s", VERSION);
 

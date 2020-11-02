@@ -71,17 +71,17 @@ bool CM17Network::writePoll()
 	return m_socket.write(data, 10U, m_address, m_port);
 }
 
-bool CM17Network::writeLink()
+bool CM17Network::writeLink(char m)
 {
 	unsigned char data[11U];
 	
 	memcpy(data, "CONN", 4);
 	memcpy(data+4, m_callsign, 6);
-	data[10U] = 'A';
+	data[10U] = m;
 	if (m_debug)
 		CUtils::dump(1U, "M17 Network Link Sent", data, 11U);
 
-	LogInfo("writeLink add:port == %x, %x", m_address.s_addr, m_port);
+	//LogInfo("writeLink add:port == %x, %x", m_address.s_addr, m_port);
 	return m_socket.write(data, 11U, m_address, m_port);
 }
 
