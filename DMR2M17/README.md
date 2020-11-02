@@ -4,7 +4,7 @@ This is the source code of DMR2M17, a software for digital voice conversion from
 
 You can use this software with MMDVMHost with the default UDP ports:
 
-MMDVMHost(DMR Mode):62032 <-> 62037:DMR2M17:17000 <-> M17Reflector (mrefd)
+MMDVMHost(DMR Mode):62032 <-> 62037:DMR2M17:32010 <-> 17000:M17Reflector (mrefd)
 
 This software is licenced under the GPL v2 and is intended for amateur and educational use only. Use of this software for commercial purposes is strictly forbidden.
 
