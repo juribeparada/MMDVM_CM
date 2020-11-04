@@ -31,18 +31,17 @@ public:
 
   bool read();
 
-  // The P25 Network section
+   // The M17 Network section
   std::string  getCallsign() const;
   bool         getDaemon() const;
-  unsigned int getP25Id() const;
-  unsigned int getP25DstId() const;
-  std::string  getP25DstAddress() const;
-  unsigned int getP25DstPort() const;
-  std::string  getP25LocalAddress() const;
-  unsigned int getP25LocalPort() const;
-  std::string  getP25TGListFile() const;
-  bool         getP25NetworkDebug() const;
-
+  unsigned int getM17DstId() const;
+  std::string  getM17DstName() const;
+  std::string  getM17DstAddress() const;
+  unsigned int getM17DstPort() const;
+  std::string  getM17LocalAddress() const;
+  unsigned int getM17LocalPort() const;
+  std::string  getM17GainAdjDb() const;
+  bool         getM17NetworkDebug() const;
 
   // The Info section
   unsigned int getRxFrequency() const;
@@ -120,13 +119,14 @@ private:
   std::string  m_dmrIdLookupFile;
   unsigned int m_dmrIdLookupTime;
 
-  unsigned int m_p25DstId;
-  std::string  m_p25DstAddress;
-  unsigned int m_p25DstPort;
-  std::string  m_p25LocalAddress;
-  unsigned int m_p25LocalPort;
-  std::string  m_p25TGListFile;
-  bool         m_p25NetworkDebug;
+  unsigned int m_m17DstId;
+  std::string  m_m17DstName;
+  std::string  m_m17DstAddress;
+  unsigned int m_m17DstPort;
+  std::string  m_m17LocalAddress;
+  unsigned int m_m17LocalPort;
+  std::string  m_m17GainAdjDb;
+  bool         m_m17NetworkDebug;
 
 
   unsigned int m_logDisplayLevel;
