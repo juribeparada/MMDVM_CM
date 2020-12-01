@@ -21,8 +21,10 @@ iptables -A OUTPUT -p udp --dport 17000 -j ACCEPT #M17 Outgoing
 
 # Building
 
-This utility is not built with the other cross mode ulitities, and has 1 external dependency:
+This utility is not built with the other cross mode ulitities, and has 3 external dependencies:
 
 md380_vocoder https://github.com/nostar/md380_vocoder
+imbe_vocoder https://github.com/nostar/imbe_vocoder
+mbelib https://github.com/szechyjs/mbelib
 
-With this dependency installed, run 'make' from the source directory.
+With these dependencies installed, run 'make' from the source directory.
