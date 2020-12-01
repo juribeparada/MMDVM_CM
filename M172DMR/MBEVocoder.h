@@ -21,15 +21,19 @@
 #ifndef INCLUDED_AMBE_ENCODER_H
 #define INCLUDED_AMBE_ENCODER_H
 
+#include "mbeenc.h"
 #include <stdint.h>
+
 
 class MBEVocoder {
 public:
 	void decode_2450(int16_t *, uint8_t *);
 	void encode_2450(int16_t *, uint8_t *);
+	void encode_dmr(int16_t *, uint8_t *);
 	MBEVocoder(void);
 
 private:
+	MBEEncoder *m_mbeenc;
 };
 
 #endif /* INCLUDED_AMBE_ENCODER_H */

@@ -21,13 +21,15 @@
 #include <md380_vocoder.h>
 #include "MBEVocoder.h"
 
-
 const uint8_t  BIT_MASK_TABLE8[]  = { 0x80U, 0x40U, 0x20U, 0x10U, 0x08U, 0x04U, 0x02U, 0x01U };
 #define WRITE_BIT8(p,i,b)   p[(i)>>3] = (b) ? (p[(i)>>3] | BIT_MASK_TABLE8[(i)&7]) : (p[(i)>>3] & ~BIT_MASK_TABLE8[(i)&7])
 #define READ_BIT8(p,i)     (p[(i)>>3] & BIT_MASK_TABLE8[(i)&7])
 
 MBEVocoder::MBEVocoder(void)
 {
+	m_mbeenc = new MBEEncoder();
+	m_mbeenc->set_dmr_mode();
+	m_mbeenc->set_gain_adjust(2.5);
 }
 
 void MBEVocoder::decode_2450(int16_t *pcm, uint8_t *ambe49)
@@ -38,4 +40,9 @@ void MBEVocoder::decode_2450(int16_t *pcm, uint8_t *ambe49)
 void MBEVocoder::encode_2450(int16_t *pcm, uint8_t *ambe49)
 {
 	md380_encode(ambe49, pcm);
+}
+
+void MBEVocoder::encode_dmr(int16_t *pcm, uint8_t *ambe)
+{
+	m_mbeenc->encode(pcm, ambe);
 }

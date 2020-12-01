@@ -28,6 +28,9 @@ const uint8_t  BIT_MASK_TABLE8[]  = { 0x80U, 0x40U, 0x20U, 0x10U, 0x08U, 0x04U, 
 
 MBEVocoder::MBEVocoder(void)
 {
+	m_mbeenc = new MBEEncoder();
+	m_mbeenc->set_dmr_mode();
+	m_mbeenc->set_gain_adjust(2.5);
 }
 
 void MBEVocoder::decode_2450(int16_t *pcm, uint8_t *ambe49)
@@ -38,4 +41,9 @@ void MBEVocoder::decode_2450(int16_t *pcm, uint8_t *ambe49)
 void MBEVocoder::encode_2450(int16_t *pcm, uint8_t *ambe49)
 {
 	md380_encode(ambe49, pcm);
+}
+
+void MBEVocoder::encode_dmr(int16_t *pcm, uint8_t *ambe)
+{
+	m_mbeenc->encode(pcm, ambe);
 }

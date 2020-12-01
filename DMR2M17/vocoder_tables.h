@@ -1,38 +1,31 @@
 /*
- *   Copyright (C) 2010,2014,2016,2018 by Jonathan Naylor G4KLX
- *   Copyright (C) 2016 Mathias Weyland, HB9FRV
- *   Copyright (C) 2018 by Andy Uribe CA6JAU
- * 	 Copyright (C) 2020 by Doug McLain AD8DP
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 2 of the License, or
- *   (at your option) any later version.
- *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
- *
- *   You should have received a copy of the GNU General Public License
- *   along with this program; if not, write to the Free Software
- *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- */
+	Copyright (C) 2019 Doug McLain
 
-#include "ModeConv.h"
-#include "Golay24128.h"
-#include "Utils.h"
-#include "Log.h"
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-#include <cstdio>
-#include <cassert>
-#include <cstring>
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-const unsigned char BIT_MASK_TABLE[] = { 0x80U, 0x40U, 0x20U, 0x10U, 0x08U, 0x04U, 0x02U, 0x01U };
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+const unsigned char BIT_MASK_TABLE[] = {0x80U, 0x40U, 0x20U, 0x10U, 0x08U, 0x04U, 0x02U, 0x01U};
 
 #define WRITE_BIT(p,i,b) p[(i)>>3] = (b) ? (p[(i)>>3] | BIT_MASK_TABLE[(i)&7]) : (p[(i)>>3] & ~BIT_MASK_TABLE[(i)&7])
 #define READ_BIT(p,i)    (p[(i)>>3] & BIT_MASK_TABLE[(i)&7])
 
+const unsigned int DMR_A_TABLE[] = {0U,  4U,  8U, 12U, 16U, 20U, 24U, 28U, 32U, 36U, 40U, 44U,
+									48U, 52U, 56U, 60U, 64U, 68U,  1U,  5U,  9U, 13U, 17U, 21U};
+const unsigned int DMR_B_TABLE[] = {25U, 29U, 33U, 37U, 41U, 45U, 49U, 53U, 57U, 61U, 65U, 69U,
+									 2U,  6U, 10U, 14U, 18U, 22U, 26U, 30U, 34U, 38U, 42U};
+const unsigned int DMR_C_TABLE[] = {46U, 50U, 54U, 58U, 62U, 66U, 70U,  3U,  7U, 11U, 15U, 19U, 23U,
+									27U, 31U, 35U, 39U, 43U, 47U, 51U, 55U, 59U, 63U, 67U, 71U};
 const unsigned int PRNG_TABLE[] = {
 	0x42CC47U, 0x19D6FEU, 0x304729U, 0x6B2CD0U, 0x60BF47U, 0x39650EU, 0x7354F1U, 0xEACF60U, 0x819C9FU, 0xDE25CEU,
 	0xD7B745U, 0x8CC8B8U, 0x8D592BU, 0xF71257U, 0xBCA084U, 0xA5B329U, 0xEE6AFAU, 0xF7D9A7U, 0xBCC21CU, 0x4712D9U,
@@ -443,340 +436,57 @@ const unsigned int PRNG_TABLE[] = {
 	0xC9D7C8U, 0x98661FU, 0x93BDC6U, 0xC88EE5U, 0xC15438U, 0xBA45C3U, 0xF2FE56U, 0xE9290DU, 0x2230E8U, 0x3B9273U,
 	0x70C98FU, 0x0958DCU, 0x02A343U, 0x58B0A2U, 0x150A7DU, 0x0E5BC4U, 0x6FC897U, 0x74F33AU, 0x3F23E9U, 0x66A834U,
 	0xECDB0FU, 0xB542DAU, 0x9E5131U, 0xC7ABA5U, 0x8C38FEU, 0x97010BU, 0xDED290U, 0xA4CC7DU, 0xAD3D2EU, 0xF6B6B3U,
-	0xF9A540U, 0x205ED9U, 0x634EB6U, 0x5A9567U, 0x11A6D8U, 0x0B3F09U };
+	0xF9A540U, 0x205ED9U, 0x634EB6U, 0x5A9567U, 0x11A6D8U, 0x0B3F09U};
 
-const unsigned int A_TABLE[] = {  0U,  4U,  8U, 12U, 16U, 20U, 24U, 28U, 32U, 36U, 40U, 44U,
-								 48U, 52U, 56U, 60U, 64U, 68U,  1U,  5U,  9U, 13U, 17U, 21U };
-const unsigned int B_TABLE[] = { 25U, 29U, 33U, 37U, 41U, 45U, 49U, 53U, 57U, 61U, 65U, 69U,
-								  2U,  6U, 10U, 14U, 18U, 22U, 26U, 30U, 34U, 38U, 42U };
-const unsigned int C_TABLE[] = { 46U, 50U, 54U, 58U, 62U, 66U, 70U,  3U,  7U, 11U, 15U, 19U,
-								 23U, 27U, 31U, 35U, 39U, 43U, 47U, 51U, 55U, 59U, 63U, 67U, 71U };
+const unsigned int INTERLEAVE_TABLE_5_20[] = {
+	0U, 40U,  80U, 120U, 160U,
+	2U, 42U,  82U, 122U, 162U,
+	4U, 44U,  84U, 124U, 164U,
+	6U, 46U,  86U, 126U, 166U,
+	8U, 48U,  88U, 128U, 168U,
+	10U, 50U,  90U, 130U, 170U,
+	12U, 52U,  92U, 132U, 172U,
+	14U, 54U,  94U, 134U, 174U,
+	16U, 56U,  96U, 136U, 176U,
+	18U, 58U,  98U, 138U, 178U,
+	20U, 60U, 100U, 140U, 180U,
+	22U, 62U, 102U, 142U, 182U,
+	24U, 64U, 104U, 144U, 184U,
+	26U, 66U, 106U, 146U, 186U,
+	28U, 68U, 108U, 148U, 188U,
+	30U, 70U, 110U, 150U, 190U,
+	32U, 72U, 112U, 152U, 192U,
+	34U, 74U, 114U, 154U, 194U,
+	36U, 76U, 116U, 156U, 196U,
+	38U, 78U, 118U, 158U, 198U};
 
-const unsigned char AMBE_SILENCE[] = {0xB9U, 0xE8U, 0x81U, 0x52U, 0x61U, 0x73U, 0x00U, 0x2AU, 0x6BU};
+const unsigned int INTERLEAVE_TABLE_9_20[] = {
+		0U, 40U,  80U, 120U, 160U, 200U, 240U, 280U, 320U,
+		2U, 42U,  82U, 122U, 162U, 202U, 242U, 282U, 322U,
+		4U, 44U,  84U, 124U, 164U, 204U, 244U, 284U, 324U,
+		6U, 46U,  86U, 126U, 166U, 206U, 246U, 286U, 326U,
+		8U, 48U,  88U, 128U, 168U, 208U, 248U, 288U, 328U,
+	   10U, 50U,  90U, 130U, 170U, 210U, 250U, 290U, 330U,
+	   12U, 52U,  92U, 132U, 172U, 212U, 252U, 292U, 332U,
+	   14U, 54U,  94U, 134U, 174U, 214U, 254U, 294U, 334U,
+	   16U, 56U,  96U, 136U, 176U, 216U, 256U, 296U, 336U,
+	   18U, 58U,  98U, 138U, 178U, 218U, 258U, 298U, 338U,
+	   20U, 60U, 100U, 140U, 180U, 220U, 260U, 300U, 340U,
+	   22U, 62U, 102U, 142U, 182U, 222U, 262U, 302U, 342U,
+	   24U, 64U, 104U, 144U, 184U, 224U, 264U, 304U, 344U,
+	   26U, 66U, 106U, 146U, 186U, 226U, 266U, 306U, 346U,
+	   28U, 68U, 108U, 148U, 188U, 228U, 268U, 308U, 348U,
+	   30U, 70U, 110U, 150U, 190U, 230U, 270U, 310U, 350U,
+	   32U, 72U, 112U, 152U, 192U, 232U, 272U, 312U, 352U,
+	   34U, 74U, 114U, 154U, 194U, 234U, 274U, 314U, 354U,
+	   36U, 76U, 116U, 156U, 196U, 236U, 276U, 316U, 356U,
+	   38U, 78U, 118U, 158U, 198U, 238U, 278U, 318U, 358U};
 
-CModeConv::CModeConv() :
-m_m17N(0U),
-m_dmrN(0U),
-m_M17(5000U, "DMR2M17"),
-m_DMR(5000U, "M172DMR"),
-m_m17GainMultiplier(1),
-m_m17Attenuate(false)
-{
-	m_mbe = new MBEVocoder();
-	m_c2 = new CCodec2(true);
-}
+const unsigned int INTERLEAVE_TABLE_26_4[] = {
+	0U, 4U,  8U, 12U, 16U, 20U, 24U, 28U, 32U, 36U, 40U, 44U, 48U, 52U, 56U, 60U, 64U, 68U, 72U, 76U, 80U, 84U, 88U, 92U, 96U, 100U,
+	1U, 5U,  9U, 13U, 17U, 21U, 25U, 29U, 33U, 37U, 41U, 45U, 49U, 53U, 57U, 61U, 65U, 69U, 73U, 77U, 81U, 85U, 89U, 93U, 97U, 101U,
+	2U, 6U, 10U, 14U, 18U, 22U, 26U, 30U, 34U, 38U, 42U, 46U, 50U, 54U, 58U, 62U, 66U, 70U, 74U, 78U, 82U, 86U, 90U, 94U, 98U, 102U,
+	3U, 7U, 11U, 15U, 19U, 23U, 27U, 31U, 35U, 39U, 43U, 47U, 51U, 55U, 59U, 63U, 67U, 71U, 75U, 79U, 83U, 87U, 91U, 95U, 99U, 103U};
 
-CModeConv::~CModeConv()
-{
-}
-
-void CModeConv::setM17GainAdjDb(std::string dbstring)
-{
-	float db = std::stof(dbstring);
-	
-	float ratio = powf(10.0, (db/10.0));
-	if(db < 0){
-		ratio = 1/ratio;
-		m_m17Attenuate = true;
-	}
-	m_m17GainMultiplier = (uint16_t)roundf(ratio);
-}
-
-void CModeConv::putDMRHeader()
-{
-	const uint8_t quiet[] = { 0x00u, 0x01u, 0x43u, 0x09u, 0xe4u, 0x9cu, 0x08u, 0x21u };
-
-	m_M17.addData(&TAG_HEADER, 1U);
-	m_M17.addData(quiet, 8U);
-	m_m17N += 1U;
-}
-
-void CModeConv::putDMREOT()
-{
-	const uint8_t quiet[] = { 0x00u, 0x01u, 0x43u, 0x09u, 0xe4u, 0x9cu, 0x08u, 0x21u };
-
-	m_M17.addData(&TAG_EOT, 1U);
-	m_M17.addData(quiet, 8U);
-	m_m17N += 1U;
-}
-
-void CModeConv::putDMR(unsigned char* data)
-{
-	assert(data != NULL);
-	
-	int16_t audio[160U];
-	uint8_t ambe[9U];
-	uint8_t v_ambe[9U];
-	uint8_t codec2[8U];
-	
-	::memset(audio, 0, sizeof(audio));
-	::memset(ambe, 0, sizeof(ambe));
-	::memset(v_ambe, 0, sizeof(v_ambe));
-	::memset(codec2, 0, sizeof(codec2));
-	
-	decode(data, ambe, 0U);
-	m_mbe->decode_2450(audio, ambe);
-	m_c2->codec2_encode(codec2, audio);
-	m_M17.addData(&TAG_DATA, 1U);
-	m_M17.addData(codec2, 8U);
-	m_m17N += 1U;
-	
-	data += 9U;
-	for (unsigned int i = 0U; i < 4U; i++)
-		v_ambe[i] = data[i];
-	
-	v_ambe[4U] = data[4U] & 0xF0;
-	v_ambe[4U] |= data[10U] & 0x0F;
-	
-	for (unsigned int i = 0U; i < 4U; i++)
-		v_ambe[i + 5U] = data[i + 11U];
-
-	decode(v_ambe, ambe, 0U);
-	m_mbe->decode_2450(audio, ambe);
-	m_c2->codec2_encode(codec2, audio);
-	m_M17.addData(&TAG_DATA, 1U);
-	m_M17.addData(codec2, 8U);
-	m_m17N += 1U;
-	
-	data += 15U;;
-	decode(data, ambe, 0U);
-	m_mbe->decode_2450(audio, ambe);
-	m_c2->codec2_encode(codec2, audio);
-	m_M17.addData(&TAG_DATA, 1U);
-	m_M17.addData(codec2, 8U);
-	m_m17N += 1U;
-}
-
-void CModeConv::putM17Header()
-{
-	unsigned char vch[9U];
-
-	::memset(vch, 0, 9U);
-
-	m_DMR.addData(&TAG_HEADER, 1U);
-	m_DMR.addData(vch, 9U);
-	m_dmrN += 1U;
-}
-
-void CModeConv::putM17EOT()
-{
-	unsigned char vch[9U];
-
-	::memset(vch, 0, 9U);
-	
-	unsigned int fill = 3U - (m_dmrN % 3U);
-	for (unsigned int i = 0U; i < fill; i++) {
-		m_DMR.addData(&TAG_DATA, 1U);
-		m_DMR.addData(AMBE_SILENCE, 9U);
-		m_dmrN += 1U;
-	}
-
-	m_DMR.addData(&TAG_EOT, 1U);
-	m_DMR.addData(vch, 9U);
-	m_dmrN += 1U;
-}
-
-void CModeConv::putM17(unsigned char* data)
-{
-	assert(data != NULL);
-
-	int16_t audio[160U];
-	int16_t audio_adjusted[160U];
-	uint8_t ambe[72U];
-	uint8_t codec2[8U];
-	uint8_t vch[10U];
-	::memset(audio, 0, sizeof(audio));
-	::memset(ambe, 0, sizeof(ambe));
-	
-	::memcpy(codec2, &data[36], 8);
-	m_c2->codec2_decode(audio, codec2);
-	for(int i = 0; i < 160; ++i){
-		m_m17Attenuate ? audio_adjusted[i] = audio[i] / m_m17GainMultiplier : audio[i] * m_m17GainMultiplier;
-	}
-	//m_mbe->encode_2450(audio_adjusted, ambe);
-	m_mbe->encode_dmr(audio_adjusted, ambe);
-	encode(ambe, vch, 0U);
-	m_DMR.addData(&TAG_DATA, 1U);
-	m_DMR.addData(ambe, 9U);
-	m_dmrN += 1U;
-	
-	::memcpy(codec2, &data[44], 8);
-	m_c2->codec2_decode(audio, codec2);
-	for(int i = 0; i < 160; ++i){
-		m_m17Attenuate ? audio_adjusted[i] = audio[i] / m_m17GainMultiplier : audio[i] * m_m17GainMultiplier;
-	}
-	//m_mbe->encode_2450(audio_adjusted, ambe);
-	m_mbe->encode_dmr(audio_adjusted, ambe);
-	
-	encode(ambe, vch, 0U);
-	m_DMR.addData(&TAG_DATA, 1U);
-	m_DMR.addData(ambe, 9U);
-	m_dmrN += 1U;
-}
-
-unsigned int CModeConv::getDMR(unsigned char* data)
-{
-	unsigned char tmp[9U];
-	unsigned char tag[1U];
-
-	tag[0U] = TAG_NODATA;
-
-	if (m_dmrN >= 1U) {
-		m_DMR.peek(tag, 1U);
-		//LogMessage("CModeConv::getDMR %d:%d:%d", m_DMR.isEmpty(), m_dmrN, tag[0]);
-		if (tag[0U] != TAG_DATA) {
-			m_DMR.getData(tag, 1U);
-			m_DMR.getData(data, 9U);
-			m_dmrN -= 1U;
-			if(tag[0U] == TAG_EOT){
-				m_DMR.clear();
-				m_dmrN = 0;
-			}
-			return tag[0U];
-		}
-	}
-
-	if (m_dmrN >= 3U) {
-		m_DMR.getData(tag, 1U);
-		m_DMR.getData(data, 9U);
-		m_dmrN -= 1U;
-
-		m_DMR.getData(tag, 1U);
-		m_DMR.getData(tmp, 9U);
-		m_dmrN -= 1U;
-
-		::memcpy(data + 9U, tmp, 4U);
-		data[13U] = tmp[4U] & 0xF0U;
-		data[19U] = tmp[4U] & 0x0FU;
-		::memcpy(data + 20U, tmp + 5U, 4U);
-
-		m_DMR.getData(tag, 1U);
-		m_DMR.getData(data + 24U, 9U);
-		m_dmrN -= 1U;
-
-		return TAG_DATA;
-	}
-	else
-		return TAG_NODATA;
-}
-
-unsigned int CModeConv::getM17(unsigned char* data)
-{
-	unsigned char tag[2U];
-
-	tag[0U] = TAG_NODATA;
-	tag[1U] = TAG_NODATA;
-
-	if (m_m17N >= 2U) {
-		m_M17.getData(tag, 1U);
-		m_M17.getData(data, 8U);
-		m_M17.getData(tag+1, 1U);
-		m_M17.getData(data+8, 8U);
-		fprintf(stderr, "getM17() m_m17N:tag1:tag2 == %d:%d:%d\n", m_m17N, tag[0U], tag[1U]);
-		m_m17N -= 2U;
-	}
-	return (tag[1U] == TAG_EOT) ? tag[1U] : tag[0];
-}
-
-void CModeConv::decode(const unsigned char* in, unsigned char* out, unsigned int offset) const
-{
-	assert(in != NULL);
-	assert(out != NULL);
-
-	unsigned int a = 0U;
-	unsigned int MASK = 0x800000U;
-	for (unsigned int i = 0U; i < 24U; i++, MASK >>= 1) {
-		unsigned int aPos = A_TABLE[i];
-		if (READ_BIT(in, aPos))
-			a |= MASK;
-	}
-
-	unsigned int b = 0U;
-	MASK = 0x400000U;
-	for (unsigned int i = 0U; i < 23U; i++, MASK >>= 1) {
-		unsigned int bPos = B_TABLE[i];
-		if (READ_BIT(in, bPos))
-			b |= MASK;
-	}
-
-	unsigned int c = 0U;
-	MASK = 0x1000000U;
-	for (unsigned int i = 0U; i < 25U; i++, MASK >>= 1) {
-		unsigned int cPos = C_TABLE[i];
-		if (READ_BIT(in, cPos))
-			c |= MASK;
-	}
-
-	a >>= 12;
-
-	// The PRNG
-	b ^= (PRNG_TABLE[a] >> 1);
-	b >>= 11;
-
-	MASK = 0x000800U;
-	for (unsigned int i = 0U; i < 12U; i++, MASK >>= 1) {
-		unsigned int aPos = i + offset + 0U;
-		unsigned int bPos = i + offset + 12U;
-		WRITE_BIT(out, aPos, a & MASK);
-		WRITE_BIT(out, bPos, b & MASK);
-	}
-
-	MASK = 0x1000000U;
-	for (unsigned int i = 0U; i < 25U; i++, MASK >>= 1) {
-		unsigned int cPos = i + offset + 24U;
-		WRITE_BIT(out, cPos, c & MASK);
-	}
-}
-
-void CModeConv::encode(const unsigned char* in, unsigned char* out, unsigned int offset) const
-{
-	assert(in != NULL);
-	assert(out != NULL);
-
-	unsigned int aOrig = 0U;
-	unsigned int bOrig = 0U;
-	unsigned int cOrig = 0U;
-
-	unsigned int MASK = 0x000800U;
-	for (unsigned int i = 0U; i < 12U; i++, MASK >>= 1) {
-		unsigned int n1 = i + offset + 0U;
-		unsigned int n2 = i + offset + 12U;
-		if (READ_BIT(in, n1))
-			aOrig |= MASK;
-		if (READ_BIT(in, n2))
-			bOrig |= MASK;
-	}
-
-	MASK = 0x1000000U;
-	for (unsigned int i = 0U; i < 25U; i++, MASK >>= 1) {
-		unsigned int n = i + offset + 24U;
-		if (READ_BIT(in, n))
-			cOrig |= MASK;
-	}
-
-	unsigned int a = CGolay24128::encode24128(aOrig);
-
-	// The PRNG
-	unsigned int p = PRNG_TABLE[aOrig] >> 1;
-
-	unsigned int b = CGolay24128::encode23127(bOrig) >> 1;
-	b ^= p;
-
-	MASK = 0x800000U;
-	for (unsigned int i = 0U; i < 24U; i++, MASK >>= 1) {
-		unsigned int aPos = A_TABLE[i];
-		WRITE_BIT(out, aPos, a & MASK);
-	}
-
-	MASK = 0x400000U;
-	for (unsigned int i = 0U; i < 23U; i++, MASK >>= 1) {
-		unsigned int bPos = B_TABLE[i];
-		WRITE_BIT(out, bPos, b & MASK);
-	}
-
-	MASK = 0x1000000U;
-	for (unsigned int i = 0U; i < 25U; i++, MASK >>= 1) {
-		unsigned int cPos = C_TABLE[i];
-		WRITE_BIT(out, cPos, cOrig & MASK);
-	}
-}
+const unsigned char WHITENING_DATA[] = {0x93U, 0xD7U, 0x51U, 0x21U, 0x9CU, 0x2FU, 0x6CU, 0xD0U, 0xEFU, 0x0FU,
+										0xF8U, 0x3DU, 0xF1U, 0x73U, 0x20U, 0x94U, 0xEDU, 0x1EU, 0x7CU, 0xD8U};

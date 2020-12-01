@@ -582,7 +582,7 @@ void CModeConv::putM17(unsigned char* data)
 
 	int16_t audio[160U];
 	int16_t audio_adjusted[160U];
-	uint8_t ambe[9U];
+	uint8_t ambe[72U];
 	uint8_t codec2[8U];
 	uint8_t vch[10U];
 	::memset(audio, 0, sizeof(audio));
@@ -593,11 +593,12 @@ void CModeConv::putM17(unsigned char* data)
 	for(int i = 0; i < 160; ++i){
 		m_m17Attenuate ? audio_adjusted[i] = audio[i] / m_m17GainMultiplier : audio[i] * m_m17GainMultiplier;
 	}
-	m_mbe->encode_2450(audio_adjusted, ambe);
+	//m_mbe->encode_2450(audio_adjusted, ambe);
+	m_mbe->encode_dmr(audio_adjusted, ambe);
 	
 	encode(ambe, vch, 0U);
 	m_DMR.addData(&TAG_DATA, 1U);
-	m_DMR.addData(vch, 9U);
+	m_DMR.addData(ambe, 9U);
 	m_dmrN += 1U;
 	
 	::memcpy(codec2, &data[44], 8);
@@ -605,11 +606,11 @@ void CModeConv::putM17(unsigned char* data)
 	for(int i = 0; i < 160; ++i){
 		m_m17Attenuate ? audio_adjusted[i] = audio[i] / m_m17GainMultiplier : audio[i] * m_m17GainMultiplier;
 	}
-	m_mbe->encode_2450(audio_adjusted, ambe);
-	
+	//m_mbe->encode_2450(audio_adjusted, ambe);
+	m_mbe->encode_dmr(audio_adjusted, ambe);
 	encode(ambe, vch, 0U);
 	m_DMR.addData(&TAG_DATA, 1U);
-	m_DMR.addData(vch, 9U);
+	m_DMR.addData(ambe, 9U);
 	m_dmrN += 1U;
 }
 

@@ -405,6 +405,7 @@ int CM172DMR::run()
 				for (unsigned int i = 0U; i < 3U; i++) {
 					rx_dmrdata.setSeqNo(dmr_cnt);
 					m_dmrNetwork->write(rx_dmrdata);
+					
 					dmr_cnt++;
 				}
 

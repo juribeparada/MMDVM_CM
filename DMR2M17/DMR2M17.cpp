@@ -170,7 +170,7 @@ int CDMR2M17::run()
 {
 	bool ret = m_conf.read();
 	if (!ret) {
-		::fprintf(stderr, "DMR2NXDN: cannot read the .ini file\n");
+		::fprintf(stderr, "DMR2M17: cannot read the .ini file\n");
 		return 1;
 	}
 
