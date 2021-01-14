@@ -21,13 +21,13 @@ StartupDstId, StartupPC and Address parameters don't care in XLX mode.
 This software is licenced under the GPL v2 and is intended for amateur and educational use only. Use of this software for commercial purposes is strictly forbidden.
 
 # Building
-
 This utility is not built with the other cross mode ulitities, and has 3 external dependencies:
 
 md380_vocoder https://github.com/nostar/md380_vocoder
+
 imbe_vocoder https://github.com/nostar/imbe_vocoder
+
 mbelib https://github.com/szechyjs/mbelib
 
-run 'make' from the source directory.
-
+md380_vocoder uses md380 firmware for vocoding, so this software needs to be run on an ARM based platform i.e. raspberri pi.
 
