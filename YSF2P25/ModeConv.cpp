@@ -247,6 +247,10 @@ unsigned int CModeConv::getYSF(unsigned char* data)
 			m_YSF.getData(tag, 1U);
 			m_YSF.getData(data, 11U);
 			m_ysfN -= 1U;
+			if(tag[0U] == TAG_EOT) {
+				m_YSF.clear();
+				m_ysfN = 0;
+			}
 			return tag[0U];
 		}
 	}
