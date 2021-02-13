@@ -721,7 +721,6 @@ int CYSF2P25::run()
 
 				// Send data to MMDVMHost
 				m_ysfNetwork->write(m_ysfFrame);
-
 				ysf_cnt++;
 				ysfWatch.start();
 			}

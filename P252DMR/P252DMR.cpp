@@ -799,7 +799,7 @@ int CP252DMR::run()
 		if (m_xlxReflectors != NULL)
 			m_xlxReflectors->clock(ms);
 
-		//if (ms < 5U) CThread::sleep(5U);
+		if (ms < 5U) CThread::sleep(5U);
 	}
 
 	m_p25Network->close();

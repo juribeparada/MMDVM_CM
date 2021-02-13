@@ -672,7 +672,6 @@ unsigned int CModeConv::getM17(unsigned char* data)
 		m_M17.getData(data, 8U);
 		m_M17.getData(tag+1, 1U);
 		m_M17.getData(data+8, 8U);
-		fprintf(stderr, "getM17() m_m17N:tag1:tag2 == %d:%d:%d\n", m_m17N, tag[0U], tag[1U]);
 		m_m17N -= 2U;
 	}
 	return (tag[1U] == TAG_EOT) ? tag[1U] : tag[0];
