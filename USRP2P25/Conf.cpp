@@ -38,13 +38,13 @@ enum SECTION {
 CConf::CConf(const std::string& file) :
 m_file(file),
 m_callsign(),
+m_dmrid(0U),
 m_daemon(false),
 m_usrpAddress(),
 m_usrpDstPort(0U),
 m_usrpLocalPort(0U),
 m_usrpGainAdjDb(),
 m_usrpDebug(false),
-m_p25DstId(0U),
 m_p25DstAddress(),
 m_p25DstPort(0U),
 m_p25LocalAddress(),
@@ -107,8 +107,8 @@ bool CConf::read()
 	if (section == SECTION_P25_NETWORK) {
 		if (::strcmp(key, "Callsign") == 0)
 			m_callsign = value;
-		else if (::strcmp(key, "StartupDstId") == 0)
-			m_p25DstId = (unsigned int)::atoi(value);
+		else if (::strcmp(key, "DmrId") == 0)
+			m_dmrid = (unsigned int)::atoi(value);
 		else if (::strcmp(key, "LocalAddress") == 0)
 			m_p25LocalAddress = value;
 		else if (::strcmp(key, "LocalPort") == 0)
@@ -154,12 +154,17 @@ std::string CConf::getCallsign() const
   return m_callsign;
 }
 
+uint32_t CConf::getDMRId() const
+{
+	return m_dmrid;
+}
+
 std::string CConf::getP25DstAddress() const
 {
 	return m_p25DstAddress;
 }
 
-unsigned int CConf::getP25DstPort() const
+uint32_t CConf::getP25DstPort() const
 {
 	return m_p25DstPort;
 }
@@ -169,7 +174,7 @@ std::string CConf::getP25LocalAddress() const
 	return m_p25LocalAddress;
 }
 
-unsigned int CConf::getP25LocalPort() const
+uint32_t CConf::getP25LocalPort() const
 {
 	return m_p25LocalPort;
 }

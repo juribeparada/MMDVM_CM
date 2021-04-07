@@ -46,6 +46,7 @@ private:
 	CUSRPNetwork*    m_usrpNetwork;
 	CP25Network*     m_p25Network;
 	CModeConv        m_conv;
+	uint32_t         m_dmrid;
 	uint32_t         m_p25Src;
 	uint32_t         m_p25Dst;
 	uint8_t*         m_p25Frame;

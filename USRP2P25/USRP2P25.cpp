@@ -148,6 +148,7 @@ m_conf(configFile),
 m_usrpNetwork(NULL),
 m_p25Network(NULL),
 m_conv(),
+m_dmrid(1U),
 m_p25Src(1U),
 m_p25Dst(1U),
 m_p25Frame(NULL),
@@ -254,6 +255,7 @@ int CUSRP2P25::run()
 	LogInfo(HEADER4);
 	
 	m_callsign = m_conf.getCallsign();
+	m_dmrid = m_conf.getDMRId();
 	
 	std::string p25_dstAddress   = m_conf.getP25DstAddress();
 	unsigned int p25_dstPort     = m_conf.getP25DstPort();
@@ -355,9 +357,9 @@ int CUSRP2P25::run()
 					case 0x04U:
 						::memcpy(buffer, REC66, 17U);
 						::memcpy(buffer + 5U, m_p25Frame, 11U);
-						buffer[1U] = (m_p25Src >> 16) & 0xFFU;
-						buffer[2U] = (m_p25Src >> 8) & 0xFFU;
-						buffer[3U] = (m_p25Src >> 0) & 0xFFU;
+						buffer[1U] = (m_dmrid >> 16) & 0xFFU;
+						buffer[2U] = (m_dmrid >> 8) & 0xFFU;
+						buffer[3U] = (m_dmrid >> 0) & 0xFFU;
 						m_p25Network->writeData(buffer, 17U);
 						break;
 					case 0x05U:

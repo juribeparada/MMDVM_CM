@@ -34,6 +34,7 @@ public:
 
  // The P25 Network section
   std::string  getCallsign() const;
+  uint32_t     getDMRId() const;
   bool         getDaemon() const;
   uint32_t     getP25DstId() const;
   std::string  getP25DstAddress() const;
@@ -59,6 +60,7 @@ public:
 private:
   std::string  m_file;
   std::string  m_callsign;
+  uint32_t     m_dmrid;
   bool         m_daemon;
   
   std::string  m_usrpAddress;
@@ -67,7 +69,6 @@ private:
   std::string  m_usrpGainAdjDb;
   bool         m_usrpDebug;
   
-  uint32_t     m_p25DstId;
   std::string  m_p25DstAddress;
   uint32_t     m_p25DstPort;
   std::string  m_p25LocalAddress;
