@@ -40,7 +40,6 @@ public:
 	void putUSRP(int16_t* data);
 	void putUSRPHeader();
 	void putUSRPEOT();
-	
 	void putP25(unsigned char* data);
 	
 	uint32_t getP25(uint8_t* data);

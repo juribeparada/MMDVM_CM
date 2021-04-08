@@ -127,6 +127,7 @@ int main(int argc, char** argv)
 CUSRP2M17::CUSRP2M17(const std::string& configFile) :
 m_callsign(),
 m_m17Ref(),
+m_usrpcs(),
 m_conf(configFile),
 m_usrpNetwork(NULL),
 m_m17Network(NULL),
@@ -357,8 +358,10 @@ int CUSRP2M17::run()
 			if (!memcmp(m_m17Frame, "M17 ", 4)) {
 				if (m_m17Frame[34] == 0 && m_m17Frame[35] == 0) {
 					m_m17Frames = 0;
+					m_conv.putM17Header();
 				} 
 				else if (m_m17Frame[34U] & 0x80U) {
+					m_conv.putM17EOT();
 					LogMessage("M17 received end of voice transmission, %.1f seconds", float(m_m17Frames) / 25.0F);
 				}
 				else{
@@ -368,7 +371,7 @@ int CUSRP2M17::run()
 				memcpy(cs, m_m17Frame+12, 6);
 				decode_callsign(cs);
 				std::string css((char *)cs);
-				css = css.substr(0, css.find(' '));
+				m_usrpcs = css.substr(0, css.find(' '));
 				 
 				m_m17Frames++;
 			}
@@ -376,7 +379,37 @@ int CUSRP2M17::run()
 
 		if (usrpWatch.elapsed() > USRP_FRAME_PER) {
 			int16_t pcm[160];
-			if(m_conv.getUSRP(pcm)){
+			uint32_t usrpFrameType = m_conv.getUSRP(pcm);
+			
+			if(usrpFrameType == TAG_USRP_HEADER){
+				//CUtils::dump(1U, "USRP data:", m_usrpFrame, 33U);
+
+				const uint32_t cnt = htonl(usrp_cnt);
+				memset(m_usrpFrame, 0, 352);
+				memcpy(m_usrpFrame, "USRP", 4);
+				memcpy(m_usrpFrame+4, &cnt, 4);
+				m_usrpFrame[20] = 2;
+				memcpy(m_usrpFrame+46, m_usrpcs.c_str(), m_usrpcs.size());
+				
+				m_usrpNetwork->writeData(m_usrpFrame, 352);
+				usrp_cnt++;
+				usrpWatch.start();
+			}
+			
+			if(usrpFrameType == TAG_USRP_EOT){
+				//CUtils::dump(1U, "USRP data:", m_usrpFrame, 33U);
+				const uint32_t cnt = htonl(usrp_cnt);
+				memcpy(m_usrpFrame, "USRP", 4);
+				memset(m_usrpFrame+4, 0, 28);
+				memcpy(m_usrpFrame+4, &cnt, 4);
+				m_usrpFrame[15] = 0;
+				
+				m_usrpNetwork->writeData(m_usrpFrame, 32);
+				usrp_cnt++;
+				usrpWatch.start();
+			}
+			
+			if(usrpFrameType == TAG_USRP_DATA){
 				//CUtils::dump(1U, "USRP data:", m_usrpFrame, 33U);
 				const uint32_t cnt = htonl(usrp_cnt);
 				memcpy(m_usrpFrame, "USRP", 4);

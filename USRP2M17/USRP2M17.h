@@ -43,6 +43,7 @@ public:
 private:
 	std::string      m_callsign;
 	std::string		 m_m17Ref;
+	std::string      m_usrpcs;
 	CConf            m_conf;
 	CUSRPNetwork*    m_usrpNetwork;
 	CM17Network*     m_m17Network;

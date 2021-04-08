@@ -109,6 +109,24 @@ void CModeConv::putUSRP(int16_t* data)
 	m_m17N += 1U;
 }
 
+void CModeConv::putM17Header()
+{
+	const int16_t zero[160U] = {0};
+	
+	m_USRP.addData(&TAG_USRP_HEADER, 1U);
+	m_USRP.addData(zero, 160U);
+	m_usrpN += 1U;
+}
+
+void CModeConv::putM17EOT()
+{
+	const int16_t zero[160U] = {0};
+	
+	m_USRP.addData(&TAG_USRP_EOT, 1U);
+	m_USRP.addData(zero, 160U);
+	m_usrpN += 1U;
+}
+
 void CModeConv::putM17(uint8_t* data)
 {
 	int16_t audio[160U];
@@ -124,6 +142,7 @@ void CModeConv::putM17(uint8_t* data)
 		audio_adjusted[i] = m_m17Attenuate ? audio[i] / m_m17GainMultiplier : audio[i] * m_m17GainMultiplier;
 	}
 	
+	m_USRP.addData(&TAG_USRP_DATA, 1U);
 	m_USRP.addData(audio_adjusted, 160U);
 	m_usrpN += 1U;
 	
@@ -132,20 +151,25 @@ void CModeConv::putM17(uint8_t* data)
 	for(int i = 0; i < 160; ++i){
 		audio_adjusted[i] = m_m17Attenuate ? audio[i] / m_m17GainMultiplier : audio[i] * m_m17GainMultiplier;
 	}
-	
+	m_USRP.addData(&TAG_USRP_DATA, 1U);
 	m_USRP.addData(audio_adjusted, 160U);
 	m_usrpN += 1U;
 }
 
-bool CModeConv::getUSRP(int16_t* data)
+uint32_t CModeConv::getUSRP(int16_t* data)
 {
+	int16_t tag[1U];
+	
+	tag[0] = TAG_USRP_NODATA;
+
 	if(m_usrpN){
+		m_USRP.getData(tag, 1U);
+		m_USRP.getData(data, 160U);
 		--m_usrpN;
-		return m_USRP.getData(data, 160U);
+		//return tag[0];
 	}
-	else{
-		return false;
-	}
+	
+	return tag[0];
 }
 
 uint32_t CModeConv::getM17(uint8_t* data)

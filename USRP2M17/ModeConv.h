@@ -21,11 +21,17 @@
 #include "RingBuffer.h"
 #include "codec2/codec2.h"
 
-const unsigned char TAG_HEADER = 0x00U;
-const unsigned char TAG_DATA   = 0x01U;
-const unsigned char TAG_LOST   = 0x02U;
-const unsigned char TAG_EOT    = 0x03U;
-const unsigned char TAG_NODATA = 0x04U;
+const uint8_t TAG_HEADER = 0x00U;
+const uint8_t TAG_DATA   = 0x01U;
+const uint8_t TAG_LOST   = 0x02U;
+const uint8_t TAG_EOT    = 0x03U;
+const uint8_t TAG_NODATA = 0x04U;
+
+const int16_t TAG_USRP_HEADER = 0x0000U;
+const int16_t TAG_USRP_DATA   = 0x0001U;
+const int16_t TAG_USRP_LOST   = 0x0002U;
+const int16_t TAG_USRP_EOT    = 0x0003U;
+const int16_t TAG_USRP_NODATA = 0x0004U;
 
 #if !defined(MODECONV_H)
 #define MODECONV_H
@@ -41,8 +47,10 @@ public:
 	void putUSRPHeader();
 	void putUSRPEOT();
 	void putM17(uint8_t* data);
+	void putM17Header();
+	void putM17EOT();
 	uint32_t getM17(uint8_t* data);
-	bool getUSRP(int16_t* data);
+	uint32_t getUSRP(int16_t* data);
 private:
 	uint32_t m_m17N;
 	uint32_t m_usrpN;
