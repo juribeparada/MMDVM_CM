@@ -307,6 +307,19 @@ int CUSRP2M17::run()
 		if (m17Watch.elapsed() > M17_FRAME_PER) {
 			uint32_t m17FrameType = m_conv.getM17(m_m17Frame);
 			
+			if( (m_usrpcs.size()) > 3 && (m_usrpcs.size() < 8) ){
+				memset(m17_src, ' ', 9);
+				memcpy(m17_src, m_usrpcs.c_str(), m_usrpcs.size());
+				m17_src[8] = 'D';
+				m17_src[9] = 0x00;
+				encode_callsign(m17_src);
+			}
+			else{
+				memcpy(m17_src, m_callsign.c_str(), 9);
+				m17_src[9] = 0x00;
+				encode_callsign(m17_src);
+			}
+			
 			if(m17FrameType == TAG_HEADER) {
 				m17_cnt = 0U;
 				m17Watch.start();
@@ -432,10 +445,15 @@ int CUSRP2M17::run()
 			if((len == 32) && !memcmp(m_usrpFrame, "USRP", 4)) {
 				LogMessage("USRP received end of voice transmission, %.1f seconds", float(m_usrpFrames) / 50.0F);
 				m_conv.putUSRPEOT();
+				m_usrpcs.clear();
 				m_usrpFrames = 0U;
 			}
 
 			if( (!memcmp(m_usrpFrame, "USRP", 4)) && len == 352) {
+				if( (m_usrpFrame[20] == 0x02) && (m_usrpFrame[32] == 0x08) ){
+					m_usrpcs = (char *)(m_usrpFrame + 46);
+				}
+				
 				if(!m_usrpFrames){	
 					m_conv.putUSRPHeader();
 					LogMessage("USRP first frame received");

@@ -27,6 +27,12 @@ const unsigned char TAG_LOST   = 0x02U;
 const unsigned char TAG_EOT    = 0x03U;
 const unsigned char TAG_NODATA = 0x04U;
 
+const int16_t TAG_USRP_HEADER = 0x0000U;
+const int16_t TAG_USRP_DATA   = 0x0001U;
+const int16_t TAG_USRP_LOST   = 0x0002U;
+const int16_t TAG_USRP_EOT    = 0x0003U;
+const int16_t TAG_USRP_NODATA = 0x0004U;
+
 #if !defined(MODECONV_H)
 #define MODECONV_H
 
@@ -40,10 +46,12 @@ public:
 	void putUSRP(int16_t* data);
 	void putUSRPHeader();
 	void putUSRPEOT();
+	void putP25Header();
+	void putP25EOT();
 	void putP25(unsigned char* data);
 	
 	uint32_t getP25(uint8_t* data);
-	bool getUSRP(int16_t* data);
+	uint32_t getUSRP(int16_t* data);
 private:
 	uint32_t m_p25N;
 	uint32_t m_usrpN;

@@ -441,7 +441,7 @@ int CUSRP2P25::run()
 			if (m_p25Frame[0U] != 0xF0U && m_p25Frame[0U] != 0xF1U) {
 				if (m_p25Frame[0U] == 0x62U && !m_p25info) {
 					m_p25Frames = 0;
-					//m_conv.putP25Header();
+					m_conv.putP25Header();
 				} else if (m_p25Frame[0U] == 0x65U && !m_p25info) {
 					m_p25Dst  = (m_p25Frame[1U] << 16) & 0xFF0000U;
 					m_p25Dst |= (m_p25Frame[2U] << 8)  & 0x00FF00U;
@@ -455,16 +455,47 @@ int CUSRP2P25::run()
 				} else if (m_p25Frame[0U] == 0x80U) {
 					LogMessage("P25 received end of voice transmission, %.1f seconds", float(m_p25Frames) / 50.0F);
 					m_p25info = false;
-					//m_conv.putP25EOT();
+					m_conv.putP25EOT();
 				}
 				m_conv.putP25(m_p25Frame);
 				m_p25Frames++;
 			}
 		}
 		
-		if (usrpWatch.elapsed() > USRP_FRAME_PER) {
+		if ( (usrpWatch.elapsed() > USRP_FRAME_PER) && (m_p25Frames > 4U) ) {
 			int16_t pcm[160];
-			if(m_conv.getUSRP(pcm)){
+			uint32_t usrpFrameType = m_conv.getUSRP(pcm);
+			
+			if(usrpFrameType == TAG_USRP_HEADER){
+				//CUtils::dump(1U, "USRP data:", m_usrpFrame, 33U);
+
+				const uint32_t cnt = htonl(usrp_cnt);
+				//const uint32_t cnt = 
+				memset(m_usrpFrame, 0, 352);
+				memcpy(m_usrpFrame, "USRP", 4);
+				memcpy(m_usrpFrame+4, &cnt, 4);
+				m_usrpFrame[20] = 2;
+				//memcpy(m_usrpFrame+46, m_usrpcs.c_str(), m_usrpcs.size());
+				
+				m_usrpNetwork->writeData(m_usrpFrame, 352);
+				usrp_cnt++;
+				usrpWatch.start();
+			}
+			
+			if(usrpFrameType == TAG_USRP_EOT){
+				//CUtils::dump(1U, "USRP data:", m_usrpFrame, 33U);
+				const uint32_t cnt = htonl(usrp_cnt);
+				memcpy(m_usrpFrame, "USRP", 4);
+				memset(m_usrpFrame+4, 0, 28);
+				memcpy(m_usrpFrame+4, &cnt, 4);
+				m_usrpFrame[15] = 0;
+				
+				m_usrpNetwork->writeData(m_usrpFrame, 32);
+				usrp_cnt++;
+				usrpWatch.start();
+			}
+			
+			if(usrpFrameType == TAG_USRP_DATA){
 				//CUtils::dump(1U, "USRP data:", m_usrpFrame, 33U);
 				const uint32_t cnt = htonl(usrp_cnt);
 				memcpy(m_usrpFrame, "USRP", 4);

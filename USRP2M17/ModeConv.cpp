@@ -166,7 +166,6 @@ uint32_t CModeConv::getUSRP(int16_t* data)
 		m_USRP.getData(tag, 1U);
 		m_USRP.getData(data, 160U);
 		--m_usrpN;
-		//return tag[0];
 	}
 	
 	return tag[0];

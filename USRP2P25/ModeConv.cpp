@@ -100,6 +100,24 @@ void CModeConv::putUSRP(int16_t* data)
 	m_p25N += 1U;
 }
 
+void CModeConv::putP25Header()
+{
+	const int16_t zero[160U] = {0};
+	
+	m_USRP.addData(&TAG_USRP_HEADER, 1U);
+	m_USRP.addData(zero, 160U);
+	m_usrpN += 1U;
+}
+
+void CModeConv::putP25EOT()
+{
+	const int16_t zero[160U] = {0};
+	
+	m_USRP.addData(&TAG_USRP_EOT, 1U);
+	m_USRP.addData(zero, 160U);
+	m_usrpN += 1U;
+}
+
 void CModeConv::putP25(uint8_t* data)
 {
 	int16_t audio[160U];
@@ -171,20 +189,25 @@ void CModeConv::putP25(uint8_t* data)
 		audio_adjusted[i] = m_p25Attenuate ? audio[i] / m_p25GainMultiplier : audio[i] * m_p25GainMultiplier;
 	}
 	
+	m_USRP.addData(&TAG_USRP_DATA, 1U);
 	m_USRP.addData(audio_adjusted, 160U);
 	m_usrpN += 1U;
 	
 }
 
-bool CModeConv::getUSRP(int16_t* data)
+uint32_t CModeConv::getUSRP(int16_t* data)
 {
+	int16_t tag[1U];
+	
+	tag[0] = TAG_USRP_NODATA;
+
 	if(m_usrpN){
+		m_USRP.getData(tag, 1U);
+		m_USRP.getData(data, 160U);
 		--m_usrpN;
-		return m_USRP.getData(data, 160U);
 	}
-	else{
-		return false;
-	}
+	
+	return tag[0];
 }
 
 uint32_t CModeConv::getP25(uint8_t* data)
