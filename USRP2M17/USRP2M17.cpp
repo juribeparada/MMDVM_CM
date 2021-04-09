@@ -401,7 +401,10 @@ int CUSRP2M17::run()
 				memset(m_usrpFrame, 0, 352);
 				memcpy(m_usrpFrame, "USRP", 4);
 				memcpy(m_usrpFrame+4, &cnt, 4);
-				m_usrpFrame[20] = 2;
+				m_usrpFrame[20] = 0x02;
+				m_usrpFrame[32] = 0x08;
+				m_usrpFrame[33] = 13 + m_usrpcs.size();
+				
 				memcpy(m_usrpFrame+46, m_usrpcs.c_str(), m_usrpcs.size());
 				
 				m_usrpNetwork->writeData(m_usrpFrame, 352);
