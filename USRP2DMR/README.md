@@ -1,10 +1,6 @@
 # Description
 
-This is the source code of M172DMR, a software for digital voice conversion from M17 to DMR digital mode, based on Jonathan G4KLX's [MMDVM](https://github.com/g4klx) software.  Unlike the other cross mode utilities upon which this is based, this utility performs software transcoding between ICodec2(M17) and AMBE+2 2450x1150(DMR).
-
-This can be used to connect an XLX or DMR Master server to an M17 Reflector
-
-DMR Server <-> M172DMR <-> M17Reflector
+This is the source code of USRP2DMR, which converts USRP PCM audio and DMR digital mode, based on Jonathan G4KLX's [MMDVM](https://github.com/g4klx) software. Typical uses are connecting DMR talkgroups and XLX reflectors to AllStar nodes and can be used with MMDVM modems in FM mode as stand alone radios.
 
 If you want to connect directly to a XLX reflector (with DMR support), you only need to uncomment ([DMR Network] section):
 
