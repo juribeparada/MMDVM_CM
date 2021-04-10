@@ -401,8 +401,9 @@ int CUSRP2M17::run()
 				memset(m_usrpFrame, 0, 352);
 				memcpy(m_usrpFrame, "USRP", 4);
 				memcpy(m_usrpFrame+4, &cnt, 4);
-				m_usrpFrame[20] = 0x02;
-				m_usrpFrame[32] = 0x08;
+				m_usrpFrame[15] = USRP_KEYUP_FALSE;
+				m_usrpFrame[20] = USRP_TYPE_TEXT;
+				m_usrpFrame[32] = TLV_TAG_SET_INFO;
 				m_usrpFrame[33] = 13 + m_usrpcs.size();
 				
 				memcpy(m_usrpFrame+46, m_usrpcs.c_str(), m_usrpcs.size());
@@ -418,7 +419,7 @@ int CUSRP2M17::run()
 				memcpy(m_usrpFrame, "USRP", 4);
 				memset(m_usrpFrame+4, 0, 28);
 				memcpy(m_usrpFrame+4, &cnt, 4);
-				m_usrpFrame[15] = 0;
+				m_usrpFrame[15] = USRP_KEYUP_FALSE;
 				
 				m_usrpNetwork->writeData(m_usrpFrame, 32);
 				usrp_cnt++;
@@ -431,7 +432,7 @@ int CUSRP2M17::run()
 				memcpy(m_usrpFrame, "USRP", 4);
 				memset(m_usrpFrame+4, 0, 28);
 				memcpy(m_usrpFrame+4, &cnt, 4);
-				m_usrpFrame[15] = 1;
+				m_usrpFrame[15] = USRP_KEYUP_TRUE;
 				
 				for(int i = 0; i < 320; i+=2){
 					m_usrpFrame[32+i] = pcm[(i/2)] & 0xff;
@@ -445,7 +446,7 @@ int CUSRP2M17::run()
 		}
 		uint32_t len = 0;
 		while ( (len = m_usrpNetwork->readData(m_usrpFrame, 400)) ) {
-			if((len == 32) && !memcmp(m_usrpFrame, "USRP", 4)) {
+			if(!memcmp(m_usrpFrame, "USRP", 4) && (len == 32)) {
 				LogMessage("USRP received end of voice transmission, %.1f seconds", float(m_usrpFrames) / 50.0F);
 				m_conv.putUSRPEOT();
 				m_usrpcs.clear();
@@ -453,20 +454,27 @@ int CUSRP2M17::run()
 			}
 
 			if( (!memcmp(m_usrpFrame, "USRP", 4)) && len == 352) {
-				if( (m_usrpFrame[20] == 0x02) && (m_usrpFrame[32] == 0x08) ){
+				if( (m_usrpFrame[20] == USRP_TYPE_TEXT) && (m_usrpFrame[32] == TLV_TAG_SET_INFO) ){
 					m_usrpcs = (char *)(m_usrpFrame + 46);
+					
+					if(!m_usrpFrames){	
+						m_conv.putUSRPHeader();
+						LogMessage("USRP text info received as first frame");
+					}
+					m_usrpFrames++;
 				}
-				
-				if(!m_usrpFrames){	
-					m_conv.putUSRPHeader();
-					LogMessage("USRP first frame received");
+				else if(m_usrpFrame[20] == USRP_TYPE_VOICE) && (m_usrpFrame[15] == USRP_KEYUP_TRUE){
+					if(!m_usrpFrames){	
+						m_conv.putUSRPHeader();
+						LogMessage("USRP voice received as first frame");
+					}
+					int16_t pcm[160];
+					for(int i = 0; i < 160; ++i){
+						pcm[i] = (m_usrpFrame[32+(i*2)+1] << 8) | m_usrpFrame[32+(i*2)];
+					}
+					m_conv.putUSRP(pcm);
+					m_usrpFrames++;
 				}
-				int16_t pcm[160];
-				for(int i = 0; i < 160; ++i){
-					pcm[i] = (m_usrpFrame[32+(i*2)+1] << 8) | m_usrpFrame[32+(i*2)];
-				}
-				m_conv.putUSRP(pcm);
-				m_usrpFrames++;
 			}
 		}
 
