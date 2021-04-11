@@ -125,5 +125,5 @@ void CM17Network::close()
 {
 	m_socket.close();
 
-	LogInfo("Closing P25 network connection");
+	LogInfo("Closing M17 network connection");
 }
