@@ -464,7 +464,8 @@ int CUSRP2M17::run()
 					m_usrpFrames++;
 				}
 				else if( (m_usrpFrame[20] == USRP_TYPE_VOICE) && (m_usrpFrame[15] == USRP_KEYUP_TRUE) ){
-					if(!m_usrpFrames){	
+					if(!m_usrpFrames){
+						m_usrpcs.clear();
 						m_conv.putUSRPHeader();
 						LogMessage("USRP voice received as first frame");
 					}
