@@ -43,6 +43,7 @@ public:
   std::string  getP25TGListFile() const;
   bool         getP25NetworkDebug() const;
 
+
   // The Info section
   unsigned int getRxFrequency() const;
   unsigned int getTxFrequency() const;
@@ -126,6 +127,7 @@ private:
   unsigned int m_p25LocalPort;
   std::string  m_p25TGListFile;
   bool         m_p25NetworkDebug;
+
 
   unsigned int m_logDisplayLevel;
   unsigned int m_logFileLevel;

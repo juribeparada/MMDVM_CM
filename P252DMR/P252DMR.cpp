@@ -106,7 +106,7 @@ const char* DEFAULT_INI_FILE = "/etc/P252DMR.ini";
 const char* HEADER1 = "This software is for use on amateur radio networks only,";
 const char* HEADER2 = "it is to be used for educational purposes only. Its use on";
 const char* HEADER3 = "commercial networks is strictly prohibited.";
-const char* HEADER4 = "Copyright(C) 2018 by CA6JAU, G4KLX and others";
+const char* HEADER4 = "Copyright(C) 2018 by AD8DP, CA6JAU, G4KLX and others";
 
 #include <functional>
 #include <algorithm>
@@ -799,7 +799,7 @@ int CP252DMR::run()
 		if (m_xlxReflectors != NULL)
 			m_xlxReflectors->clock(ms);
 
-		//if (ms < 5U) CThread::sleep(5U);
+		if (ms < 2U) CThread::sleep(2U);
 	}
 
 	m_p25Network->close();

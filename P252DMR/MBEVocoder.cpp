@@ -28,6 +28,7 @@ const uint8_t  BIT_MASK_TABLE8[]  = { 0x80U, 0x40U, 0x20U, 0x10U, 0x08U, 0x04U, 
 
 MBEVocoder::MBEVocoder(void)
 {
+	md380_init();
 }
 
 void MBEVocoder::decode_4400(int16_t *pcm, uint8_t *imbe)

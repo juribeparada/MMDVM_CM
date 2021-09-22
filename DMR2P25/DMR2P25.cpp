@@ -190,7 +190,7 @@ int CDMR2P25::run()
 {
 	bool ret = m_conf.read();
 	if (!ret) {
-		::fprintf(stderr, "DMR2NXDN: cannot read the .ini file\n");
+		::fprintf(stderr, "DMR2P25: cannot read the .ini file\n");
 		return 1;
 	}
 
@@ -287,7 +287,7 @@ int CDMR2P25::run()
 		::LogFinalise();
 		return 1;
 	}
-
+	m_p25Network->writePoll();
 	ret = createMMDVM();
 	if (!ret)
 		return 1;
