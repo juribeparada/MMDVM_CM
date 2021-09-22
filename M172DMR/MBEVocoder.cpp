@@ -30,6 +30,7 @@ MBEVocoder::MBEVocoder(void)
 	m_mbeenc = new MBEEncoder();
 	m_mbeenc->set_dmr_mode();
 	m_mbeenc->set_gain_adjust(2.5);
+	md380_init();
 }
 
 void MBEVocoder::decode_2450(int16_t *pcm, uint8_t *ambe49)
