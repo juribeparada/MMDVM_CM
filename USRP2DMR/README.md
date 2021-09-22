@@ -21,8 +21,6 @@ This utility is not built with the other cross mode ulitities, and has 3 externa
 
 md380_vocoder https://github.com/nostar/md380_vocoder
 
-imbe_vocoder https://github.com/nostar/imbe_vocoder
-
 mbelib https://github.com/szechyjs/mbelib
 
 md380_vocoder uses md380 firmware for vocoding, so this software needs to be run on an ARM based platform i.e. raspberri pi.
