@@ -27,6 +27,7 @@
 
 #define DMR_FRAME_PER       55U
 #define M17_FRAME_PER       35U
+#define M17_PING_TIMEOUT    35000U
 
 const char* DEFAULT_INI_FILE = "/etc/DMR2M17.ini";
 
@@ -315,11 +316,13 @@ int CDMR2M17::run()
 	CTimer pollTimer(1000U, 8U);
 	CStopWatch stopWatch;
 	CStopWatch m17Watch;
+	CStopWatch m17PingWatch;
 	CStopWatch dmrWatch;
 	
 	pollTimer.start();
 	stopWatch.start();
 	m17Watch.start();
+	m17PingWatch.start();
 	dmrWatch.start();
 
 	unsigned short m17_cnt = 0;
@@ -335,6 +338,13 @@ int CDMR2M17::run()
 		
 		CDMRData tx_dmrdata;
 		unsigned int ms = stopWatch.elapsed();
+		
+		if(m17PingWatch.elapsed() > M17_PING_TIMEOUT){
+			LogMessage("M17 reflector stopped responding, sending CONN...");
+			pollTimer.stop();
+			m17PingWatch.start();
+			m_m17Network->writeLink(module);
+		}
 
 		if (m17Watch.elapsed() > M17_FRAME_PER) {
 			unsigned int m17FrameType = m_conv.getM17(m_m17Frame);
@@ -386,7 +396,21 @@ int CDMR2M17::run()
 		}
 
 		while (m_m17Network->readData(m_m17Frame, 54U) > 0U) {
-			//CUtils::dump(1U, "M17 Data", m_p25Frame, 22U);
+			if (!memcmp(m_m17Frame, "PING", 4)) {
+				m17PingWatch.start();
+			}
+			if (!memcmp(m_m17Frame, "ACKN", 4)) {
+				LogMessage("Received ACKN from reflector");
+				if(!pollTimer.isRunning()){
+					pollTimer.start();
+				}
+				m17PingWatch.start();
+			}
+			if (!memcmp(m_m17Frame, "NACK", 4)) {
+				LogMessage("Received NACK from reflector");
+				pollTimer.stop();
+				m17PingWatch.start();
+			}
 			if (!memcmp(m_m17Frame, "M17 ", 4)) {
 				if (m_m17Frame[34] == 0 && m_m17Frame[35] == 0) {
 					m_m17Frames = 0;
