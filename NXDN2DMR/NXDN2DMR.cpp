@@ -323,6 +323,10 @@ int CNXDN2DMR::run()
 			LogMessage("XLX, Linking to reflector XLX%03u, module %s", m_xlxrefl, m_xlxmodule.c_str());
 			m_xlxConnected = true;
 		}
+		else if (!m_dmrNetwork->isConnected() && !m_xlxmodule.empty() && m_xlxConnected) {
+			LogMessage("XLX, Disconnected from reflector XLX%03u, module %s", m_xlxrefl, m_xlxmodule.c_str());
+			m_xlxConnected = false;
+		}
 
 		unsigned int len = 0;
 		while ((len = m_nxdnNetwork->read(buffer)) > 0U) {
