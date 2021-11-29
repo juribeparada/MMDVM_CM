@@ -107,10 +107,10 @@ int main(int argc, char** argv)
 		for (int currentArg = 1; currentArg < argc; ++currentArg) {
 			std::string arg = argv[currentArg];
 			if ((arg == "-v") || (arg == "--version")) {
-				::fprintf(stdout, "P252DMR version %s\n", VERSION);
+				::fprintf(stdout, "M172DMR version %s\n", VERSION);
 				return 0;
 			} else if (arg.substr(0, 1) == "-") {
-				::fprintf(stderr, "Usage: P252DMR [-v|--version] [filename]\n");
+				::fprintf(stderr, "Usage: M172DMR [-v|--version] [filename]\n");
 				return 1;
 			} else {
 				iniFile = argv[currentArg];
