@@ -25,6 +25,7 @@
 
 #define USRP_FRAME_PER      15U
 #define M17_FRAME_PER       35U
+#define	M17_PING_TIMEOUT	35000U
 
 const char* DEFAULT_INI_FILE = "/etc/USRP2M17.ini";
 
@@ -284,11 +285,13 @@ int CUSRP2M17::run()
 	CTimer pollTimer(1000U, 8U);
 	CStopWatch stopWatch;
 	CStopWatch m17Watch;
+	CStopWatch m17PingWatch;
 	CStopWatch usrpWatch;
 	
 	pollTimer.start();
 	stopWatch.start();
 	m17Watch.start();
+	m17PingWatch.start();
 	usrpWatch.start();
 
 	uint16_t m17_cnt = 0;
@@ -303,6 +306,13 @@ int CUSRP2M17::run()
 		memset(buffer, 0, sizeof(buffer));
 		
 		uint32_t ms = stopWatch.elapsed();
+		
+		if(m17PingWatch.elapsed() > M17_PING_TIMEOUT){
+			LogMessage("M17 reflector stopped responding, sending CONN...");
+			pollTimer.stop();
+			m17PingWatch.start();
+			m_m17Network->writeLink(module);
+		}
 
 		if (m17Watch.elapsed() > M17_FRAME_PER) {
 			uint32_t m17FrameType = m_conv.getM17(m_m17Frame);
@@ -351,7 +361,6 @@ int CUSRP2M17::run()
 				m17Watch.start();
 			}
 			else if(m17FrameType == TAG_DATA) {
-				//CUtils::dump(1U, "M17 Data", m_p25Frame, 11U);
 				m17_cnt++;
 				memcpy(buffer, "M17 ", 4);
 				memcpy(buffer+4, &streamid, 2);
@@ -365,9 +374,24 @@ int CUSRP2M17::run()
 				m17Watch.start();
 			}
 		}
-
+		uint32_t len = 0;
 		while (m_m17Network->readData(m_m17Frame, 54U) > 0U) {
-			//CUtils::dump(1U, "M17 Data", m_p25Frame, 22U);
+			if (!memcmp(m_m17Frame, "PING", 4)) {
+				m17PingWatch.start();
+			}
+			if (!memcmp(m_m17Frame, "ACKN", 4)) {
+				LogMessage("Received ACKN from reflector");
+				if(!pollTimer.isRunning()){
+					pollTimer.start();
+				}
+				m17PingWatch.start();
+			}
+			if (!memcmp(m_m17Frame, "NACK", 4)) {
+				LogMessage("Received NACK from reflector");
+				pollTimer.stop();
+				m17PingWatch.start();
+			}
+			
 			if (!memcmp(m_m17Frame, "M17 ", 4)) {
 				if (m_m17Frame[34] == 0 && m_m17Frame[35] == 0) {
 					m_m17Frames = 0;
@@ -444,7 +468,7 @@ int CUSRP2M17::run()
 				usrpWatch.start();
 			}
 		}
-		uint32_t len = 0;
+		len = 0;
 		while ( (len = m_usrpNetwork->readData(m_usrpFrame, 400)) ) {
 			if(!memcmp(m_usrpFrame, "USRP", 4) && (len == 32)) {
 				LogMessage("USRP received end of voice transmission, %.1f seconds", float(m_usrpFrames) / 50.0F);
