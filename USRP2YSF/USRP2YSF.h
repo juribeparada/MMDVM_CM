@@ -1,5 +1,5 @@
-/* 
-*   Copyright (C) 2016,2017 by Jonathan Naylor G4KLX
+/*
+*   Copyright (C) 2016 by Jonathan Naylor G4KLX
 *   Copyright (C) 2018 by Andy Uribe CA6JAU
 * 	Copyright (C) 2020 by Doug McLain AD8DP
 *
@@ -18,17 +18,43 @@
 *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef INCLUDED_AMBE_ENCODER_H
-#define INCLUDED_AMBE_ENCODER_H
+#if !defined(USRP2YSF_H)
+#define USRP2YSF_H
 
-#include <stdint.h>
+#include "ModeConv.h"
+#include "USRPNetwork.h"
+#include "YSFPayload.h"
+#include "YSFNetwork.h"
+#include "YSFFICH.h"
+#include "UDPSocket.h"
+#include "StopWatch.h"
+#include "Version.h"
+#include "Timer.h"
+#include "Utils.h"
+#include "Conf.h"
+#include "Log.h"
+#include "CRC.h"
 
+#include <string>
 
-class MBEVocoder {
+class CUSRP2YSF
+{
 public:
-	void decode_2450(int16_t *, uint8_t *);
-	void encode_2450(int16_t *, uint8_t *);
-	MBEVocoder(void);
+	CUSRP2YSF(const std::string& configFile);
+	~CUSRP2YSF();
+
+	int run();
+
+private:
+	std::string      m_callsign;
+	std::string      m_usrpcs;
+	CConf            m_conf;
+	CYSFNetwork*     m_ysfNetwork;
+	CUSRPNetwork*    m_usrpNetwork;
+	CModeConv        m_conv;
+	uint8_t*         m_usrpFrame;
+	uint32_t         m_usrpFrames;
+	unsigned char*   m_ysfFrame;
 };
 
-#endif /* INCLUDED_AMBE_ENCODER_H */
+#endif
