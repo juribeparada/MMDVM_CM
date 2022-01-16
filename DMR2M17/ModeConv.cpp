@@ -580,38 +580,59 @@ void CModeConv::putM17(unsigned char* data)
 {
 	assert(data != NULL);
 
-	int16_t audio[160U];
-	int16_t audio_adjusted[160U];
+	int16_t audio[320U];
+	int16_t audio_adjusted[320U];
 	uint8_t ambe[72U];
 	uint8_t codec2[8U];
 	uint8_t vch[10U];
+	size_t s = 160;
+	
 	::memset(audio, 0, sizeof(audio));
 	::memset(ambe, 0, sizeof(ambe));
 	
 	::memcpy(codec2, &data[36], 8);
+	
+	if((data[19] & 0x06U) == 0x04U){	//"3200 Voice";
+		m_c2->codec2_set_mode(true);
+		s = 160;
+	}
+	else{								//"1600 V/D";
+		m_c2->codec2_set_mode(false);
+		s = 320;
+	}
+	
 	m_c2->codec2_decode(audio, codec2);
-	for(int i = 0; i < 160; ++i){
+	
+	for(size_t i = 0; i < s; ++i){
 		m_m17Attenuate ? audio_adjusted[i] = audio[i] / m_m17GainMultiplier : audio[i] * m_m17GainMultiplier;
 	}
 	//m_mbe->encode_2450(audio_adjusted, ambe);
 	m_mbe->encode_dmr(audio_adjusted, ambe);
-	
 	encode(ambe, vch, 0U);
 	m_DMR.addData(&TAG_DATA, 1U);
 	m_DMR.addData(ambe, 9U);
 	m_dmrN += 1U;
 	
-	::memcpy(codec2, &data[44], 8);
-	m_c2->codec2_decode(audio, codec2);
-	for(int i = 0; i < 160; ++i){
-		m_m17Attenuate ? audio_adjusted[i] = audio[i] / m_m17GainMultiplier : audio[i] * m_m17GainMultiplier;
+	int16_t *p = audio_adjusted;
+	
+	if(s == 160){
+		::memcpy(codec2, &data[44], 8);
+		m_c2->codec2_decode(audio, codec2);
+		for(int i = 0; i < 160; ++i){
+			m_m17Attenuate ? audio_adjusted[i] = audio[i] / m_m17GainMultiplier : audio[i] * m_m17GainMultiplier;
+		}
+	}
+	else{
+		p = &audio_adjusted[160U];
 	}
 	//m_mbe->encode_2450(audio_adjusted, ambe);
-	m_mbe->encode_dmr(audio_adjusted, ambe);
+	m_mbe->encode_dmr(p, ambe);
+	
 	encode(ambe, vch, 0U);
 	m_DMR.addData(&TAG_DATA, 1U);
 	m_DMR.addData(ambe, 9U);
 	m_dmrN += 1U;
+	m_c2->codec2_set_mode(true);
 }
 
 unsigned int CModeConv::getDMR(unsigned char* data)
