@@ -362,6 +362,10 @@ int CUSRP2M17::run()
 			}
 			else if(m17FrameType == TAG_DATA) {
 				m17_cnt++;
+				// Roll counter before it sets the EOT bit
+				if (m17_cnt > 0x7ff) {
+					m17_cnt = 1;
+				}
 				memcpy(buffer, "M17 ", 4);
 				memcpy(buffer+4, &streamid, 2);
 				memcpy(buffer+6, m17_dst, 6);
