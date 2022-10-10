@@ -487,7 +487,7 @@ int CUSRP2M17::run()
 					
 					if(!m_usrpFrames){	
 						m_conv.putUSRPHeader();
-						LogMessage("USRP text info received first frame, callsign=%s", m_usrpcs);
+						LogMessage("USRP text info received first frame, callsign=%s", m_usrpcs.c_str());
 					}
 					m_usrpFrames++;
 				}
