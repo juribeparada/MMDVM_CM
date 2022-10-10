@@ -260,7 +260,7 @@ int CUSRP2YSF::run()
 					m_usrpcs = (char *)(m_usrpFrame + 46);
 					if(!m_usrpFrames){	
 						m_conv.putUSRPHeader();
-						LogMessage("USRP text info received as first frame");
+						LogMessage("USRP text info received as first frame callsign=%s", m_usrpcs);
 					}
 					m_usrpFrames++;
 				}
