@@ -318,7 +318,6 @@ int CUSRP2M17::run()
 			uint32_t m17FrameType = m_conv.getM17(m_m17Frame);
 			
 			if( (m_usrpcs.size()) > 3 && (m_usrpcs.size() < 8) ){
-				LogMessage("debug: encoding usrpcs: %s", m_usrpcs.c_str());
 				memset(m17_src, ' ', 9);
 				memcpy(m17_src, m_usrpcs.c_str(), m_usrpcs.size());
 				m17_src[8] = 'D';
@@ -326,7 +325,6 @@ int CUSRP2M17::run()
 				encode_callsign(m17_src);
 			}
 			else{
-				LogMessage("debug: encoding m_callsign: %s", m_callsign.c_str());
 				memcpy(m17_src, m_callsign.c_str(), 9);
 				m17_src[9] = 0x00;
 				encode_callsign(m17_src);
@@ -489,7 +487,7 @@ int CUSRP2M17::run()
 					
 					if(!m_usrpFrames){	
 						m_conv.putUSRPHeader();
-						LogMessage("USRP text info received first frame, callsign=%s", m_usrpcs.c_str());
+						LogMessage("USRP text info received first frame, callsign=%s (%d bytes)", m_usrpcs.c_str(), m_usrpcs.size());
 					}
 					m_usrpFrames++;
 				}
