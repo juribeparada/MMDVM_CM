@@ -434,7 +434,7 @@ int CUSRP2YSF::run()
 				memset(csd1, '*', YSF_CALLSIGN_LENGTH);
  				memset(csd1, '*', YSF_CALLSIGN_LENGTH/2);
  				memcpy(csd1 + YSF_CALLSIGN_LENGTH/2, m_conf.getYsfRadioID().c_str(), YSF_CALLSIGN_LENGTH/2);
-				memcpy(csd1 + YSF_CALLSIGN_LENGTH, m_callsign.c_str(), YSF_CALLSIGN_LENGTH);
+				memcpy(csd1 + YSF_CALLSIGN_LENGTH, m_usrpcs.c_str(), YSF_CALLSIGN_LENGTH);
 				memset(csd2, ' ', YSF_CALLSIGN_LENGTH + YSF_CALLSIGN_LENGTH);
 
 				CYSFPayload payload;
