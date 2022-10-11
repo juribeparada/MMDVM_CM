@@ -69,6 +69,14 @@ std::string trim_callsign(const std::string s) {
     return s.substr(0, start);
 }
 
+//pad is necessary for the reverse back to ysf, the callsign needs to be 10 characters
+//spaces need to be placed if all 10 characters not used.
+void pad_callsign(std::string &str, const size_t num, const char paddingChar = ' ')
+{
+    if(num > str.size())
+        str.insert(str.size(), num - str.size(), paddingChar);
+}
+
 int main(int argc, char** argv)
 {
 	const char* iniFile = DEFAULT_INI_FILE;
@@ -272,10 +280,13 @@ int CUSRP2YSF::run()
 			if( (!memcmp(m_usrpFrame, "USRP", 4)) && len == 352) {
 				if( (m_usrpFrame[20] == USRP_TYPE_TEXT) && (m_usrpFrame[32] == TLV_TAG_SET_INFO) ){
 					m_usrpcs = (char *)(m_usrpFrame + 46);
+					// pad to 10 for ysf
+					pad_callsign(m_usrpcs, 10);
+
 					if (!m_usrpFrames)
 					{
 						m_conv.putUSRPHeader();
-						LogMessage("USRP text info received as first frame callsign=%s", m_usrpcs.c_str());
+						LogMessage("USRP text info received as first frame callsign=\"%s\" (%lu bytes)", m_usrpcs.c_str(), m_usrpcs.length());
 					}
 					m_usrpFrames++;
 				}
