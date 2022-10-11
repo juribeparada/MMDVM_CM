@@ -2,6 +2,7 @@
 *   Copyright (C) 2016,2017 by Jonathan Naylor G4KLX
 *   Copyright (C) 2018 by Andy Uribe CA6JAU
 * 	Copyright (C) 2020 by Doug McLain AD8DP
+*   Copyright (C) 2022 by Dave Behnke AC8ZD
 *
 *   This program is free software; you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
@@ -33,7 +34,7 @@ const char* DEFAULT_INI_FILE = "/etc/USRP2YSF.ini";
 const char* HEADER1 = "This software is for use on amateur radio networks only,";
 const char* HEADER2 = "it is to be used for educational purposes only. Its use on";
 const char* HEADER3 = "commercial networks is strictly prohibited.";
-const char* HEADER4 = "Copyright(C) 2018 by AD8DP, CA6JAU, G4KLX and others";
+const char* HEADER4 = "Copyright(C) 2022 by AD8DP, CA6JAU, G4KLX, AC8ZD and others";
 
 #define M17CHARACTERS " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-/."
 
@@ -55,6 +56,10 @@ void sig_handler(int signo)
 	}
 }
 
+//trim is necessary over usrp, especially USRP2M17, since people put wonky
+//calls in their radio like AC8ZD/DAVE. By default, callsigns coming in from YSF
+//are 10 characters and padded with spaces if callsign isn't that long.
+//to make it extra M17 friendly, we ensure the callsign is no longer than 8 characters.
 std::string trim_callsign(const std::string s) {
     const std::string ACCEPTABLECHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     size_t start = s.find_first_not_of(ACCEPTABLECHARS);
