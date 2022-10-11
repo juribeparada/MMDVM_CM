@@ -55,6 +55,15 @@ void sig_handler(int signo)
 	}
 }
 
+std::string trim_callsign(const std::string s) {
+    const std::string ACCEPTABLECHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    size_t start = s.find_first_not_of(ACCEPTABLECHARS);
+    if (start > 8) {
+        start = 8;
+    }
+    return s.substr(0, start);
+}
+
 int main(int argc, char** argv)
 {
 	const char* iniFile = DEFAULT_INI_FILE;
@@ -257,10 +266,12 @@ int CUSRP2YSF::run()
 
 			if( (!memcmp(m_usrpFrame, "USRP", 4)) && len == 352) {
 				if( (m_usrpFrame[20] == USRP_TYPE_TEXT) && (m_usrpFrame[32] == TLV_TAG_SET_INFO) ){
-					m_usrpcs = (char *)(m_usrpFrame + 46);
-					if(!m_usrpFrames){	
+					std::string raw_usrpcs = (char *)(m_usrpFrame + 46);
+					m_usrpcs = trim_callsign(raw_usrpcs);
+					if (!m_usrpFrames)
+					{
 						m_conv.putUSRPHeader();
-						LogMessage("USRP text info received as first frame callsign=%s", m_usrpcs.c_str());
+						LogMessage("USRP text info received as first frame raw_callsign=%s, trim_callsign=%s", raw_usrpcs.c_str(), m_usrpcs.c_str());
 					}
 					m_usrpFrames++;
 				}
