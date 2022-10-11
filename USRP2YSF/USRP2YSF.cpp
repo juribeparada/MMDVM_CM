@@ -266,12 +266,11 @@ int CUSRP2YSF::run()
 
 			if( (!memcmp(m_usrpFrame, "USRP", 4)) && len == 352) {
 				if( (m_usrpFrame[20] == USRP_TYPE_TEXT) && (m_usrpFrame[32] == TLV_TAG_SET_INFO) ){
-					std::string raw_usrpcs = (char *)(m_usrpFrame + 46);
-					m_usrpcs = trim_callsign(raw_usrpcs);
+					m_usrpcs = (char *)(m_usrpFrame + 46);
 					if (!m_usrpFrames)
 					{
 						m_conv.putUSRPHeader();
-						LogMessage("USRP text info received as first frame raw_callsign=%s, trim_callsign=%s", raw_usrpcs.c_str(), m_usrpcs.c_str());
+						LogMessage("USRP text info received as first frame callsign=%s", m_usrpcs.c_str());
 					}
 					m_usrpFrames++;
 				}
@@ -309,9 +308,10 @@ int CUSRP2YSF::run()
 
 						if (fi == YSF_FI_HEADER) {
 							if (ysfPayload.processHeaderData(buffer + 35U)) {
-								std::string ysfSrc = ysfPayload.getSource();
+								std::string ysfSrcRaw = ysfPayload.getSource();
+								std::string ysfSrc = trim_callsign(ysfSrcRaw);
 								std::string ysfDst = ysfPayload.getDest();
-								LogMessage("Received YSF Header: Src: %s Dst: %s", ysfSrc.c_str(), ysfDst.c_str());
+								LogMessage("Received YSF Header: RawSrc: \"%s\" Src: \"%s\" Dst: \"%s\"", ysfSrcRaw.c_str(), ysfSrc.c_str(), ysfDst.c_str());
 								m_conv.putYSFHeader();
 								m_usrpcs = ysfSrc;
 							}
