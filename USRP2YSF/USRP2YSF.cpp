@@ -406,7 +406,7 @@ int CUSRP2YSF::run()
 				ysf_cnt = 0U;
 
 				::memcpy(m_ysfFrame + 0U, "YSFD", 4U);
-				::memcpy(m_ysfFrame + 4U, m_callsign.c_str(), YSF_CALLSIGN_LENGTH);
+				::memcpy(m_ysfFrame + 4U, m_usrpcs.c_str(), YSF_CALLSIGN_LENGTH);
 				::memcpy(m_ysfFrame + 14U, m_usrpcs.c_str(), YSF_CALLSIGN_LENGTH);
 				::memcpy(m_ysfFrame + 24U, "ALL       ", YSF_CALLSIGN_LENGTH);
 				m_ysfFrame[34U] = 0U; // Net frame counter
@@ -448,7 +448,7 @@ int CUSRP2YSF::run()
 			else if (ysfFrameType == TAG_EOT) {
 
 				::memcpy(m_ysfFrame + 0U, "YSFD", 4U);
-				::memcpy(m_ysfFrame + 4U, m_callsign.c_str(), YSF_CALLSIGN_LENGTH);
+				::memcpy(m_ysfFrame + 4U, m_usrpcs.c_str(), YSF_CALLSIGN_LENGTH);
 				::memcpy(m_ysfFrame + 14U, m_usrpcs.c_str(), YSF_CALLSIGN_LENGTH);
 				::memcpy(m_ysfFrame + 24U, "ALL       ", YSF_CALLSIGN_LENGTH);
 				m_ysfFrame[34U] = ysf_cnt; // Net frame counter
@@ -492,7 +492,7 @@ int CUSRP2YSF::run()
 				unsigned int fn = (ysf_cnt - 1U) % (m_conf.getFICHFrameTotal() + 1);
 
 				::memcpy(m_ysfFrame + 0U, "YSFD", 4U);
-				::memcpy(m_ysfFrame + 4U, m_callsign.c_str(), YSF_CALLSIGN_LENGTH);
+				::memcpy(m_ysfFrame + 4U, m_usrpcs.c_str(), YSF_CALLSIGN_LENGTH);
 				::memcpy(m_ysfFrame + 14U, m_usrpcs.c_str(), YSF_CALLSIGN_LENGTH);
 				::memcpy(m_ysfFrame + 24U, "ALL       ", YSF_CALLSIGN_LENGTH);
 
