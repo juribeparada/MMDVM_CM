@@ -505,10 +505,10 @@ int CUSRP2YSF::run()
  						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, dch);
 						break;
 					case 1:
-						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, (unsigned char*)m_callsign.c_str());
+						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, (unsigned char*)m_usrpcs.c_str());
 						break;
 					case 2:
-						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, (unsigned char*)m_callsign.c_str());
+						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, (unsigned char*)m_usrpcs.c_str());
 						break;
 					case 5:
 						memset(dch, ' ', YSF_CALLSIGN_LENGTH/2);
