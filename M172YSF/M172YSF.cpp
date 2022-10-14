@@ -395,7 +395,7 @@ int CM172YSF::run()
 								std::string ysfSrcRaw = ysfPayload.getSource();
 								std::string ysfSrc = trim_callsign(ysfSrcRaw);
 								std::string ysfDst = ysfPayload.getDest();
-								LogMessage("Received YSF Header: Src: %s Dst: %s", ysfSrc.c_str(), ysfDst.c_str());
+								LogMessage("Received YSF Header: Raw Src: \"%s\" Src: \"%s\" Dst: \"%s\"", ysfSrcRaw.c_str(), ysfSrc.c_str(), ysfDst.c_str());
 								m_conv.putYSFHeader();
 								m_ysfcs = ysfSrc;
 							}
