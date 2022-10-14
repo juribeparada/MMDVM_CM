@@ -47,7 +47,9 @@ public:
 
 private:
 	std::string      m_callsign;
-	std::string		 m_m17Ref;
+	std::string      m_ysfcs;
+	std::string 	 m_m17cs;
+	std::string 	 m_m17Ref;
 	CConf            m_conf;
 	CYSFNetwork*     m_ysfNetwork;
 	CM17Network*	 m_m17Network;

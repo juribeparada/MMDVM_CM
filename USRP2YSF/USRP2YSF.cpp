@@ -2,6 +2,7 @@
 *   Copyright (C) 2016,2017 by Jonathan Naylor G4KLX
 *   Copyright (C) 2018 by Andy Uribe CA6JAU
 * 	Copyright (C) 2020 by Doug McLain AD8DP
+*   Copyright (C) 2022 by Dave Behnke AC8ZD
 *
 *   This program is free software; you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
@@ -33,7 +34,7 @@ const char* DEFAULT_INI_FILE = "/etc/USRP2YSF.ini";
 const char* HEADER1 = "This software is for use on amateur radio networks only,";
 const char* HEADER2 = "it is to be used for educational purposes only. Its use on";
 const char* HEADER3 = "commercial networks is strictly prohibited.";
-const char* HEADER4 = "Copyright(C) 2018 by AD8DP, CA6JAU, G4KLX and others";
+const char* HEADER4 = "Copyright(C) 2022 by AD8DP, CA6JAU, G4KLX, AC8ZD and others";
 
 #define M17CHARACTERS " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-/."
 
@@ -53,6 +54,27 @@ void sig_handler(int signo)
 		end = 1;
 		::fprintf(stdout, "Received SIGTERM\n");
 	}
+}
+
+//trim is necessary over usrp, especially USRP2M17, since people put wonky
+//calls in their radio like AC8ZD/DAVE. By default, callsigns coming in from YSF
+//are 10 characters and padded with spaces if callsign isn't that long.
+//to make it extra M17 friendly, we ensure the callsign is no longer than 8 characters.
+std::string trim_callsign(const std::string s) {
+    const std::string ACCEPTABLECHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    size_t start = s.find_first_not_of(ACCEPTABLECHARS);
+    if (start > 8) {
+        start = 8;
+    }
+    return s.substr(0, start);
+}
+
+//pad is necessary for the reverse back to ysf, the callsign needs to be 10 characters
+//spaces need to be placed if all 10 characters not used.
+void pad_callsign(std::string &str, const size_t num, const char paddingChar = ' ')
+{
+    if(num > str.size())
+        str.insert(str.size(), num - str.size(), paddingChar);
 }
 
 int main(int argc, char** argv)
@@ -258,15 +280,19 @@ int CUSRP2YSF::run()
 			if( (!memcmp(m_usrpFrame, "USRP", 4)) && len == 352) {
 				if( (m_usrpFrame[20] == USRP_TYPE_TEXT) && (m_usrpFrame[32] == TLV_TAG_SET_INFO) ){
 					m_usrpcs = (char *)(m_usrpFrame + 46);
-					if(!m_usrpFrames){	
+					// pad to 10 for ysf
+					pad_callsign(m_usrpcs, 10);
+
+					if (!m_usrpFrames)
+					{
 						m_conv.putUSRPHeader();
-						LogMessage("USRP text info received as first frame");
+						LogMessage("USRP text info received as first frame callsign=\"%s\" (%lu bytes)", m_usrpcs.c_str(), m_usrpcs.length());
 					}
 					m_usrpFrames++;
 				}
 				else if( (m_usrpFrame[20] == USRP_TYPE_VOICE) && (m_usrpFrame[15] == USRP_KEYUP_TRUE) ){
 					if(!m_usrpFrames){
-						m_usrpcs.clear();
+						//m_usrpcs.clear();
 						m_conv.putUSRPHeader();
 						LogMessage("USRP voice received as first frame");
 					}
@@ -298,9 +324,10 @@ int CUSRP2YSF::run()
 
 						if (fi == YSF_FI_HEADER) {
 							if (ysfPayload.processHeaderData(buffer + 35U)) {
-								std::string ysfSrc = ysfPayload.getSource();
+								std::string ysfSrcRaw = ysfPayload.getSource();
+								std::string ysfSrc = trim_callsign(ysfSrcRaw);
 								std::string ysfDst = ysfPayload.getDest();
-								LogMessage("Received YSF Header: Src: %s Dst: %s", ysfSrc.c_str(), ysfDst.c_str());
+								LogMessage("Received YSF Header: RawSrc: \"%s\" Src: \"%s\" Dst: \"%s\"", ysfSrcRaw.c_str(), ysfSrc.c_str(), ysfDst.c_str());
 								m_conv.putYSFHeader();
 								m_usrpcs = ysfSrc;
 							}
@@ -379,8 +406,8 @@ int CUSRP2YSF::run()
 				ysf_cnt = 0U;
 
 				::memcpy(m_ysfFrame + 0U, "YSFD", 4U);
-				::memcpy(m_ysfFrame + 4U, m_callsign.c_str(), YSF_CALLSIGN_LENGTH);
-				::memcpy(m_ysfFrame + 14U, m_callsign.c_str(), YSF_CALLSIGN_LENGTH);
+				::memcpy(m_ysfFrame + 4U, m_ysfNetwork->getCallsign().c_str(), YSF_CALLSIGN_LENGTH);
+				::memcpy(m_ysfFrame + 14U, m_usrpcs.c_str(), YSF_CALLSIGN_LENGTH);
 				::memcpy(m_ysfFrame + 24U, "ALL       ", YSF_CALLSIGN_LENGTH);
 				m_ysfFrame[34U] = 0U; // Net frame counter
 
@@ -407,7 +434,7 @@ int CUSRP2YSF::run()
 				memset(csd1, '*', YSF_CALLSIGN_LENGTH);
  				memset(csd1, '*', YSF_CALLSIGN_LENGTH/2);
  				memcpy(csd1 + YSF_CALLSIGN_LENGTH/2, m_conf.getYsfRadioID().c_str(), YSF_CALLSIGN_LENGTH/2);
-				memcpy(csd1 + YSF_CALLSIGN_LENGTH, m_callsign.c_str(), YSF_CALLSIGN_LENGTH);
+				memcpy(csd1 + YSF_CALLSIGN_LENGTH, m_usrpcs.c_str(), YSF_CALLSIGN_LENGTH);
 				memset(csd2, ' ', YSF_CALLSIGN_LENGTH + YSF_CALLSIGN_LENGTH);
 
 				CYSFPayload payload;
@@ -421,8 +448,8 @@ int CUSRP2YSF::run()
 			else if (ysfFrameType == TAG_EOT) {
 
 				::memcpy(m_ysfFrame + 0U, "YSFD", 4U);
-				::memcpy(m_ysfFrame + 4U, m_callsign.c_str(), YSF_CALLSIGN_LENGTH);
-				::memcpy(m_ysfFrame + 14U, m_callsign.c_str(), YSF_CALLSIGN_LENGTH);
+				::memcpy(m_ysfFrame + 4U, m_ysfNetwork->getCallsign().c_str(), YSF_CALLSIGN_LENGTH);
+				::memcpy(m_ysfFrame + 14U, m_usrpcs.c_str(), YSF_CALLSIGN_LENGTH);
 				::memcpy(m_ysfFrame + 24U, "ALL       ", YSF_CALLSIGN_LENGTH);
 				m_ysfFrame[34U] = ysf_cnt; // Net frame counter
 
@@ -448,7 +475,7 @@ int CUSRP2YSF::run()
 				unsigned char csd1[20U], csd2[20U];
 				memset(csd1, '*', YSF_CALLSIGN_LENGTH/2);
  				memcpy(csd1 + YSF_CALLSIGN_LENGTH/2, m_conf.getYsfRadioID().c_str(), YSF_CALLSIGN_LENGTH/2);
-				memcpy(csd1 + YSF_CALLSIGN_LENGTH, m_callsign.c_str(), YSF_CALLSIGN_LENGTH);
+				memcpy(csd1 + YSF_CALLSIGN_LENGTH, m_usrpcs.c_str(), YSF_CALLSIGN_LENGTH);
 				memset(csd2, ' ', YSF_CALLSIGN_LENGTH + YSF_CALLSIGN_LENGTH);
 
 				CYSFPayload payload;
@@ -465,8 +492,8 @@ int CUSRP2YSF::run()
 				unsigned int fn = (ysf_cnt - 1U) % (m_conf.getFICHFrameTotal() + 1);
 
 				::memcpy(m_ysfFrame + 0U, "YSFD", 4U);
-				::memcpy(m_ysfFrame + 4U, m_callsign.c_str(), YSF_CALLSIGN_LENGTH);
-				::memcpy(m_ysfFrame + 14U, m_callsign.c_str(), YSF_CALLSIGN_LENGTH);
+				::memcpy(m_ysfFrame + 4U, m_ysfNetwork->getCallsign().c_str(), YSF_CALLSIGN_LENGTH);
+				::memcpy(m_ysfFrame + 14U, m_usrpcs.c_str(), YSF_CALLSIGN_LENGTH);
 				::memcpy(m_ysfFrame + 24U, "ALL       ", YSF_CALLSIGN_LENGTH);
 
 				::memcpy(m_ysfFrame + 35U, YSF_SYNC_BYTES, YSF_SYNC_LENGTH_BYTES);
@@ -478,10 +505,10 @@ int CUSRP2YSF::run()
  						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, dch);
 						break;
 					case 1:
-						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, (unsigned char*)m_callsign.c_str());
+						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, (unsigned char*)m_usrpcs.c_str());
 						break;
 					case 2:
-						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, (unsigned char*)m_callsign.c_str());
+						ysfPayload.writeVDMode2Data(m_ysfFrame + 35U, (unsigned char*)m_usrpcs.c_str());
 						break;
 					case 5:
 						memset(dch, ' ', YSF_CALLSIGN_LENGTH/2);
